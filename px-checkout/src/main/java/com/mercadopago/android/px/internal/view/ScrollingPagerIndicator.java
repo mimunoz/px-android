@@ -14,7 +14,7 @@ import android.util.SparseArray;
 import android.view.View;
 import com.mercadopago.android.px.R;
 
-public class ScrollingPagerIndicator extends View {
+public final class ScrollingPagerIndicator extends View {
 
     private int infiniteDotCount;
 
@@ -22,7 +22,7 @@ public class ScrollingPagerIndicator extends View {
     private final int dotSelectedSize;
     private final int spaceBetweenDotCenters;
     private int visibleDotCount;
-    private int visibleDotThreshold;
+    private final int visibleDotThreshold;
 
     private float visibleFramePosition;
     private float visibleFrameWidth;
@@ -36,27 +36,27 @@ public class ScrollingPagerIndicator extends View {
     private final ArgbEvaluator colorEvaluator = new ArgbEvaluator();
 
     @ColorInt
-    private int dotColor;
+    private final int dotColor;
 
     @ColorInt
-    private int selectedDotColor;
+    private final int selectedDotColor;
 
-    private boolean looped;
+    private final boolean looped;
 
     private Runnable attachRunnable;
     private PagerAttacher<?> currentAttacher;
 
     private boolean dotCountInitialized;
 
-    public ScrollingPagerIndicator(Context context) {
+    public ScrollingPagerIndicator(final Context context) {
         this(context, null);
     }
 
-    public ScrollingPagerIndicator(Context context, @Nullable AttributeSet attrs) {
+    public ScrollingPagerIndicator(final Context context, @Nullable final AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ScrollingPagerIndicator(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ScrollingPagerIndicator(final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         final TypedArray attributes = context.obtainStyledAttributes(
@@ -70,7 +70,7 @@ public class ScrollingPagerIndicator extends View {
             attributes.getDimensionPixelSize(R.styleable.PXScrollingPagerIndicator_px_spi_dotSpacing, 0) +
                 dotNormalSize;
         looped = attributes.getBoolean(R.styleable.PXScrollingPagerIndicator_px_spi_looped, false);
-        int visibleDotCount = attributes.getInt(R.styleable.PXScrollingPagerIndicator_px_spi_visibleDotCount, 0);
+        final int visibleDotCount = attributes.getInt(R.styleable.PXScrollingPagerIndicator_px_spi_visibleDotCount, 0);
         setVisibleDotCount(visibleDotCount);
         visibleDotThreshold = attributes.getInt(R.styleable.PXScrollingPagerIndicator_px_spi_visibleDotThreshold, 2);
         attributes.recycle();
@@ -85,66 +85,6 @@ public class ScrollingPagerIndicator extends View {
     }
 
     /**
-     * You should make indicator looped in your PagerAttacher implementation if your custom pager is looped too
-     * If pager has less items than visible_dot_count, indicator will work as usual;
-     * otherwise it will always be in infinite state.
-     *
-     * @param looped true if pager is looped
-     */
-    public void setLooped(boolean looped) {
-        this.looped = looped;
-        reattach();
-        invalidate();
-    }
-
-    /**
-     * @return not selected dot color
-     */
-    @ColorInt
-    public int getDotColor() {
-        return dotColor;
-    }
-
-    /**
-     * Sets dot color
-     *
-     * @param color dot color
-     */
-    public void setDotColor(@ColorInt int color) {
-        this.dotColor = color;
-        invalidate();
-    }
-
-    /**
-     * @return the selected dot color
-     */
-    @ColorInt
-    public int getSelectedDotColor() {
-        return selectedDotColor;
-    }
-
-    /**
-     * Sets selected dot color
-     *
-     * @param color selected dot color
-     */
-    public void setSelectedDotColor(@ColorInt int color) {
-        this.selectedDotColor = color;
-        invalidate();
-    }
-
-    /**
-     * Maximum number of dots which will be visible at the same time.
-     * If pager has more pages than visible_dot_count, indicator will scroll to show extra dots.
-     * Must be odd number.
-     *
-     * @return visible dot count
-     */
-    public int getVisibleDotCount() {
-        return visibleDotCount;
-    }
-
-    /**
      * Sets visible dot count. Maximum number of dots which will be visible at the same time.
      * If pager has more pages than visible_dot_count, indicator will scroll to show extra dots.
      * Must be odd number.
@@ -152,38 +92,13 @@ public class ScrollingPagerIndicator extends View {
      * @param visibleDotCount visible dot count
      * @throws IllegalStateException when pager is already attached
      */
-    public void setVisibleDotCount(int visibleDotCount) {
+    public void setVisibleDotCount(final int visibleDotCount) {
         if (visibleDotCount % 2 == 0) {
             throw new IllegalArgumentException("visibleDotCount must be odd");
         }
         this.visibleDotCount = visibleDotCount;
-        this.infiniteDotCount = visibleDotCount + 2;
+        infiniteDotCount = visibleDotCount + 2;
 
-        if (attachRunnable != null) {
-            reattach();
-        } else {
-            requestLayout();
-        }
-    }
-
-    /**
-     * The minimum number of dots which should be visible.
-     * If pager has less pages than visibleDotThreshold, no dots will be shown.
-     *
-     * @return visible dot threshold.
-     */
-    public int getVisibleDotThreshold() {
-        return visibleDotThreshold;
-    }
-
-    /**
-     * Sets the minimum number of dots which should be visible.
-     * If pager has less pages than visibleDotThreshold, no dots will be shown.
-     *
-     * @param visibleDotThreshold visible dot threshold.
-     */
-    public void setVisibleDotThreshold(int visibleDotThreshold) {
-        this.visibleDotThreshold = visibleDotThreshold;
         if (attachRunnable != null) {
             reattach();
         } else {
@@ -196,7 +111,7 @@ public class ScrollingPagerIndicator extends View {
      *
      * @param pager pager to attach
      */
-    public void attachToPager(@NonNull ViewPager pager) {
+    public void attachToPager(@NonNull final ViewPager pager) {
         attachToPager(pager, new ViewPagerAttacher());
     }
 
@@ -211,12 +126,9 @@ public class ScrollingPagerIndicator extends View {
         attacher.attachToPager(this, pager);
         currentAttacher = attacher;
 
-        attachRunnable = new Runnable() {
-            @Override
-            public void run() {
-                itemCount = -1;
-                attachToPager(pager, attacher);
-            }
+        attachRunnable = () -> {
+            itemCount = -1;
+            attachToPager(pager, attacher);
         };
     }
 
@@ -251,7 +163,7 @@ public class ScrollingPagerIndicator extends View {
      * Page position+1 will be visible if offset is nonzero
      * @param offset Value from [0, 1) indicating the offset from the page at position
      */
-    public void onPageScrolled(int page, float offset) {
+    public void onPageScrolled(final int page, final float offset) {
         if (offset < 0 || offset > 1) {
             throw new IllegalArgumentException("Offset must be [0, 1]");
         } else if (page < 0 || page != 0 && page >= itemCount) {
@@ -280,7 +192,7 @@ public class ScrollingPagerIndicator extends View {
      *
      * @param count new dot count
      */
-    public void setDotCount(int count) {
+    public void setDotCount(final int count) {
         initDots(count);
     }
 
@@ -289,7 +201,7 @@ public class ScrollingPagerIndicator extends View {
      *
      * @param position new current position
      */
-    public void setCurrentPosition(int position) {
+    public void setCurrentPosition(final int position) {
         if (position != 0 && (position < 0 || position >= itemCount)) {
             throw new IndexOutOfBoundsException("Position must be [0, adapter.getItemCount()]");
         }
@@ -302,18 +214,18 @@ public class ScrollingPagerIndicator extends View {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-        final int measuredWidth = mesureWidth();
+        final int measuredWidth = measureWidth();
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         // Height
-        final int measuredHeight = mesureHeight(heightMode, heightSize, dotSelectedSize);
+        final int measuredHeight = measureHeight(heightMode, heightSize, dotSelectedSize);
 
         setMeasuredDimension(measuredWidth, measuredHeight);
     }
 
-    private int mesureHeight(final int heightMode, final int heightSize, final int desiredHeight) {
-        int measuredHeight;
+    private int measureHeight(final int heightMode, final int heightSize, final int desiredHeight) {
+        final int measuredHeight;
 
         switch (heightMode) {
         case MeasureSpec.EXACTLY:
@@ -330,9 +242,9 @@ public class ScrollingPagerIndicator extends View {
         return measuredHeight;
     }
 
-    private int mesureWidth() {
+    private int measureWidth() {
         // Width
-        int measuredWidth;
+        final int measuredWidth;
         // We ignore widthMeasureSpec because width is based on visibleDotCount
         if (isInEditMode()) {
             // Maximum width with all dots visible
@@ -353,8 +265,8 @@ public class ScrollingPagerIndicator extends View {
         }
 
         // Some empirical coefficients
-        final float scaleDistance = (spaceBetweenDotCenters + (dotSelectedSize - dotNormalSize) / 2) * 0.7f;
-        final float smallScaleDistance = dotSelectedSize / 2;
+        final float scaleDistance = (spaceBetweenDotCenters + (dotSelectedSize - dotNormalSize) / 2f) * 0.7f;
+        final float smallScaleDistance = dotSelectedSize / 2f;
         final float centerScaleDistance = 6f / 7f * spaceBetweenDotCenters;
 
         final int firstVisibleDotPos = (int) (visibleFramePosition - firstDotOffset) / spaceBetweenDotCenters;
@@ -369,14 +281,14 @@ public class ScrollingPagerIndicator extends View {
         }
 
         for (int i = firstVisibleDotPos; i <= lastVisibleDotPos; i++) {
-            float dot = getDotOffsetAt(i);
+            final float dot = getDotOffsetAt(i);
             if (dot >= visibleFramePosition && dot < visibleFramePosition + visibleFrameWidth) {
                 float diameter;
-                float scale;
+                final float scale;
 
                 // Calculate scale according to current page position
                 if (looped && itemCount > visibleDotCount) {
-                    float frameCenter = visibleFramePosition + visibleFrameWidth / 2;
+                    final float frameCenter = visibleFramePosition + visibleFrameWidth / 2;
                     if (dot >= frameCenter - centerScaleDistance
                         && dot <= frameCenter) {
                         scale = (dot - frameCenter + centerScaleDistance) / centerScaleDistance;
@@ -393,7 +305,7 @@ public class ScrollingPagerIndicator extends View {
 
                 // Additional scale for dots at corners
                 if (itemCount > visibleDotCount) {
-                    float currentScaleDistance;
+                    final float currentScaleDistance;
                     if (!looped && (i == 0 || i == dotCount - 1)) {
                         currentScaleDistance = smallScaleDistance;
                     } else {
@@ -401,12 +313,12 @@ public class ScrollingPagerIndicator extends View {
                     }
 
                     if (dot - visibleFramePosition < currentScaleDistance) {
-                        float calculatedDiameter = diameter * (dot - visibleFramePosition) / currentScaleDistance;
+                        final float calculatedDiameter = diameter * (dot - visibleFramePosition) / currentScaleDistance;
                         if (calculatedDiameter < diameter) {
                             diameter = calculatedDiameter;
                         }
                     } else if (dot - visibleFramePosition > canvas.getWidth() - currentScaleDistance) {
-                        float calculatedDiameter =
+                        final float calculatedDiameter =
                             diameter * (-dot + visibleFramePosition + canvas.getWidth()) / currentScaleDistance;
                         if (calculatedDiameter < diameter) {
                             diameter = calculatedDiameter;
@@ -416,7 +328,7 @@ public class ScrollingPagerIndicator extends View {
 
                 paint.setColor(calculateDotColor(scale));
                 canvas.drawCircle(dot - visibleFramePosition,
-                    getMeasuredHeight() / 2,
+                    getMeasuredHeight() / 2f,
                     diameter / 2,
                     paint);
             }
@@ -450,7 +362,7 @@ public class ScrollingPagerIndicator extends View {
             return;
         }
 
-        firstDotOffset = looped && this.itemCount > visibleDotCount ? 0 : dotSelectedSize / 2;
+        firstDotOffset = looped && this.itemCount > visibleDotCount ? 0 : dotSelectedSize / 2f;
         visibleFrameWidth = (visibleDotCount - 1) * spaceBetweenDotCenters + dotSelectedSize;
 
         requestLayout();
@@ -465,18 +377,18 @@ public class ScrollingPagerIndicator extends View {
         }
     }
 
-    private void adjustFramePosition(float offset, int pos) {
+    private void adjustFramePosition(final float offset, final int pos) {
         if (itemCount <= visibleDotCount) {
             // Without scroll
             visibleFramePosition = 0;
-        } else if (!looped && itemCount > visibleDotCount) {
+        } else if (!looped) {
             // Not looped with scroll
-            float center = getDotOffsetAt(pos) + spaceBetweenDotCenters * offset;
+            final float center = getDotOffsetAt(pos) + spaceBetweenDotCenters * offset;
             visibleFramePosition = center - visibleFrameWidth / 2;
 
             // Block frame offset near start and end
-            int firstCenteredDotIndex = visibleDotCount / 2;
-            float lastCenteredDot = getDotOffsetAt(getDotCount() - 1 - firstCenteredDotIndex);
+            final int firstCenteredDotIndex = visibleDotCount / 2;
+            final float lastCenteredDot = getDotOffsetAt(getDotCount() - 1 - firstCenteredDotIndex);
             if (visibleFramePosition + visibleFrameWidth / 2 < getDotOffsetAt(firstCenteredDotIndex)) {
                 visibleFramePosition = getDotOffsetAt(firstCenteredDotIndex) - visibleFrameWidth / 2;
             } else if (visibleFramePosition + visibleFrameWidth / 2 > lastCenteredDot) {
@@ -484,31 +396,31 @@ public class ScrollingPagerIndicator extends View {
             }
         } else {
             // Looped with scroll
-            float center = getDotOffsetAt(infiniteDotCount / 2) + spaceBetweenDotCenters * offset;
+            final float center = getDotOffsetAt(infiniteDotCount / 2) + spaceBetweenDotCenters * offset;
             visibleFramePosition = center - visibleFrameWidth / 2;
         }
     }
 
-    private void scaleDotByOffset(int position, float offset) {
+    private void scaleDotByOffset(final int position, final float offset) {
         if (dotScale == null || getDotCount() == 0) {
             return;
         }
         setDotScaleAt(position, 1 - Math.abs(offset));
     }
 
-    private float getDotOffsetAt(int index) {
+    private float getDotOffsetAt(final int index) {
         return firstDotOffset + index * spaceBetweenDotCenters;
     }
 
-    private float getDotScaleAt(int index) {
-        Float scale = dotScale.get(index);
+    private float getDotScaleAt(final int index) {
+        final Float scale = dotScale.get(index);
         if (scale != null) {
             return scale;
         }
         return 0;
     }
 
-    private void setDotScaleAt(int index, float scale) {
+    private void setDotScaleAt(final int index, final float scale) {
         if (scale == 0) {
             dotScale.remove(index);
         } else {
