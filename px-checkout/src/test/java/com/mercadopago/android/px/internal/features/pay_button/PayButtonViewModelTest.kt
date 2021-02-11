@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.mercadopago.android.px.any
 import com.mercadopago.android.px.argumentCaptor
+import com.mercadopago.android.px.internal.audio.AudioPlayer
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler
 import com.mercadopago.android.px.internal.core.ConnectionHelper
 import com.mercadopago.android.px.internal.core.ProductIdProvider
@@ -77,6 +78,8 @@ internal class PayButtonViewModelTest {
     private lateinit var cvvRequiredObserver: Observer<SecurityCodeParams>
     @Mock
     private lateinit var paymentResultViewModelFactory: PaymentResultViewModelFactory
+    @Mock
+    private lateinit var state: PayButtonViewModel.State
 
     private val paymentErrorLiveData = MutableSingleLiveData<MercadoPagoError>()
     private val paymentFinishedLiveData = MutableSingleLiveData<PaymentModel>()
@@ -108,6 +111,7 @@ internal class PayButtonViewModelTest {
             paymentCongratsMapper,
             mock(PostPaymentUrlsMapper::class.java),
             paymentResultViewModelFactory,
+            mock(AudioPlayer::class.java),
             mock(MPTracker::class.java))
 
         payButtonViewModel.stateUILiveData.observeForever(uiStateObserver)
@@ -115,7 +119,6 @@ internal class PayButtonViewModelTest {
         payButtonViewModel.cvvRequiredLiveData.observeForever(cvvRequiredObserver)
         payButtonViewModel.attach(handler)
 
-        val state = mock(PayButtonViewModel.State::class.java)
         `when`(state.paymentConfiguration).thenReturn(mock(PaymentConfiguration::class.java))
         payButtonViewModel.restoreState(state)
 
@@ -230,6 +233,36 @@ internal class PayButtonViewModelTest {
 
         val actual = (payButtonViewModel.stateUILiveData.value as UIProgress.ButtonLoadingFinished)
         assertTrue(ReflectionEquals(actual.explodeDecorator).matches(ExplodeDecorator.from(RemediesModel.DECORATOR)))
+    }
+
+    @Test
+    fun onResultIconAnimationAndPaymentSuccessThenPlayAudio() {
+        val paymentModel = mock(PaymentModel::class.java)
+        val paymentResult = mock(PaymentResult::class.java)
+        `when`(paymentResult.isApproved).thenReturn(true)
+        `when`(paymentModel.paymentResult).thenReturn(paymentResult)
+        `when`(state.paymentModel).thenReturn(paymentModel)
+
+        payButtonViewModel.onResultIconAnimation()
+
+        verify(uiStateObserver).onChanged(any(UIProgress.PlayResultAudio::class.java))
+        val actual = (payButtonViewModel.stateUILiveData.value as UIProgress.PlayResultAudio)
+        assertTrue(ReflectionEquals(actual.sound).matches(AudioPlayer.Sound.SUCCESS))
+    }
+
+    @Test
+    fun onResultIconAnimationAndPaymentRejectedThenPlayAudio() {
+        val paymentModel = mock(PaymentModel::class.java)
+        val paymentResult = mock(PaymentResult::class.java)
+        `when`(paymentResult.isRejected).thenReturn(true)
+        `when`(paymentModel.paymentResult).thenReturn(paymentResult)
+        `when`(state.paymentModel).thenReturn(paymentModel)
+
+        payButtonViewModel.onResultIconAnimation()
+
+        verify(uiStateObserver).onChanged(any(UIProgress.PlayResultAudio::class.java))
+        val actual = (payButtonViewModel.stateUILiveData.value as UIProgress.PlayResultAudio)
+        assertTrue(ReflectionEquals(actual.sound).matches(AudioPlayer.Sound.FAILURE))
     }
 
     @Test
