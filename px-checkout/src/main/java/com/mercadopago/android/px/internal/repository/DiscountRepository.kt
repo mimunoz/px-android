@@ -1,10 +1,8 @@
-package com.mercadopago.android.px.internal.repository;
+package com.mercadopago.android.px.internal.repository
 
-import androidx.annotation.NonNull;
-import com.mercadopago.android.px.model.DiscountConfigurationModel;
-import javax.annotation.Nonnull;
+import com.mercadopago.android.px.model.DiscountConfigurationModel
 
-public interface DiscountRepository {
+internal interface DiscountRepository : LocalRepository<Map<String, DiscountConfigurationModel>> {
 
     /**
      * Obtains the discount configuration that applies in a particular moment of the flow
@@ -16,14 +14,13 @@ public interface DiscountRepository {
      *
      * @return The current dominant configuration
      */
-    @NonNull
-    DiscountConfigurationModel getCurrentConfiguration();
+    fun getCurrentConfiguration(): DiscountConfigurationModel
 
     /**
      * Obtains the complete discount configuration for a specif custom option.
      *
-     * @param id The {@link com.mercadopago.android.px.model.CustomSearchItem} ID.
+     * @param customOptionId The [com.mercadopago.android.px.model.CustomSearchItem] ID.
      * @return The discount configuration, returns null if the ID is invalid.
      */
-    DiscountConfigurationModel getConfigurationFor(@Nonnull final String id);
+    fun getConfigurationFor(customOptionId: String): DiscountConfigurationModel
 }

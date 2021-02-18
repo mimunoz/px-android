@@ -38,14 +38,16 @@ import com.mercadopago.android.px.internal.repository.CustomTextsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
+import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
 import com.mercadopago.android.px.internal.repository.InitRepository;
+import com.mercadopago.android.px.internal.repository.ModalRepository;
 import com.mercadopago.android.px.internal.repository.PayerComplianceRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.ApiUtil;
 import com.mercadopago.android.px.internal.util.CardFormWrapper;
-import com.mercadopago.android.px.internal.util.PayerComplianceWrapper;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.AmountDescriptorView;
 import com.mercadopago.android.px.internal.view.ElementDescriptorView;
@@ -83,8 +85,6 @@ import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /* default */ class ExpressPaymentPresenter extends BasePresenterWithState<ExpressPayment.View, ExpressPaymentState>
     implements ExpressPayment.Actions, AmountDescriptorView.OnClickListener {
@@ -102,14 +102,12 @@ import java.util.Set;
     @NonNull private final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper;
     @NonNull private final CustomTextsRepository customTextsRepository;
     @NonNull private final AmountDescriptorMapper amountDescriptorMapper;
+    @NonNull private final ExpressMetadataRepository expressMetadataRepository;
+    @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
+    @NonNull private final ModalRepository modalRepository;
     @NonNull /* default */ final InitRepository initRepository;
     private final PayerCostSelectionRepository payerCostSelectionRepository;
     private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
-    private Set<String> cardsWithSplit;
-    /* default */ List<ExpressMetadata> expressMetadataList; //FIXME remove.
-    /* default */ Map<String, Modal> modals; //FIXME remove.
-    /* default */ PayerComplianceWrapper payerCompliance; //FIXME remove.
-    /* default */ ActionTypeWrapper actionTypeWrapper;
     /* default */ TriggerableQueue triggerableQueue;
 
     /* default */ ExpressPaymentPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -128,7 +126,10 @@ import java.util.Set;
         @NonNull final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper,
         @NonNull final CustomTextsRepository customTextsRepository,
         @NonNull final AmountDescriptorMapper amountDescriptorMapper,
-        @NonNull final MPTracker tracker) {
+        @NonNull final MPTracker tracker,
+        @NonNull final ExpressMetadataRepository expressMetadataRepository,
+        @NonNull final PayerPaymentMethodRepository payerPaymentMethodRepository,
+        @NonNull final ModalRepository modalRepository) {
         super(tracker);
         this.paymentSettingRepository = paymentSettingRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
@@ -146,6 +147,9 @@ import java.util.Set;
         this.paymentMethodDescriptorMapper = paymentMethodDescriptorMapper;
         this.customTextsRepository = customTextsRepository;
         this.amountDescriptorMapper = amountDescriptorMapper;
+        this.expressMetadataRepository = expressMetadataRepository;
+        this.payerPaymentMethodRepository = payerPaymentMethodRepository;
+        this.modalRepository = modalRepository;
 
         triggerableQueue = new TriggerableQueue();
     }
@@ -164,13 +168,13 @@ import java.util.Set;
     public void loadViewModel() {
         final SummaryInfo summaryInfo = new SummaryInfoMapper().map(paymentSettingRepository.getCheckoutPreference());
 
-        final ElementDescriptorView.Model elementDescriptorModel =
-            new ElementDescriptorMapper().map(summaryInfo);
+        final ElementDescriptorView.Model elementDescriptorModel = new ElementDescriptorMapper().map(summaryInfo);
 
+        final List<ExpressMetadata> expressMetadataList = expressMetadataRepository.getValue();
         final List<SummaryView.Model> summaryModels =
             new SummaryViewModelMapper(paymentSettingRepository.getCurrency(), discountRepository, amountRepository,
                 elementDescriptorModel, this, summaryInfo, chargeRepository, amountConfigurationRepository,
-                customTextsRepository, amountDescriptorMapper).map(new ArrayList<>(expressMetadataList));
+                customTextsRepository, amountDescriptorMapper).map(expressMetadataList);
 
         final List<PaymentMethodDescriptorView.Model> paymentModels =
             paymentMethodDescriptorMapper.map(expressMetadataList);
@@ -204,25 +208,10 @@ import java.util.Set;
     }
 
     private void initPresenter() {
-        initRepository.init().enqueue(new Callback<InitResponse>() {
-            @Override
-            public void success(final InitResponse initResponse) {
-                if (isViewAttached()) {
-                    expressMetadataList = initResponse.getExpress();
-                    actionTypeWrapper = new ActionTypeWrapper(expressMetadataList);
-                    modals = initResponse.getModals();
-                    payerCompliance = new PayerComplianceWrapper(initResponse.getPayerCompliance());
-                    cardsWithSplit = initResponse.getIdsWithSplitAllowed();
-                    triggerableQueue.execute();
-                    loadViewModel();
-                }
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                onFailToRetrieveInitResponse(apiException);
-            }
-        });
+        if (isViewAttached()) {
+            triggerableQueue.execute();
+            loadViewModel();
+        }
     }
 
     @Override
@@ -235,15 +224,17 @@ import java.util.Set;
 
     private void trackOneTapView() {
         final OneTapViewTracker oneTapViewTracker =
-            new OneTapViewTracker(expressMetadataList, paymentSettingRepository.getCheckoutPreference(),
-                discountRepository.getCurrentConfiguration(), escManagerBehaviour.getESCCardIds(), cardsWithSplit,
+            new OneTapViewTracker(expressMetadataRepository.getValue(),
+                paymentSettingRepository.getCheckoutPreference(),
+                discountRepository.getCurrentConfiguration(), escManagerBehaviour.getESCCardIds(),
+                payerPaymentMethodRepository.getIdsWithSplitAllowed(),
                 disabledPaymentMethodRepository.getDisabledPaymentMethods().size(),
                 experimentsRepository.getExperiments(Configuration.TrackingMode.NO_CONDITIONAL));
         setCurrentViewTracker(oneTapViewTracker);
     }
 
     private ExpressMetadata getCurrentExpressMetadata() {
-        return expressMetadataList.get(getState().getPaymentMethodIndex());
+        return expressMetadataRepository.getValue().get(getState().getPaymentMethodIndex());
     }
 
     @Override
@@ -408,19 +399,10 @@ import java.util.Set;
     }
 
     /* default */ void postDisableModelUpdate() {
-        initRepository.refresh().enqueue(new Callback<InitResponse>() {
-            @Override
-            public void success(final InitResponse initResponse) {
-                if (isViewAttached()) {
-                    resetState(initResponse);
-                }
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                onFailToRetrieveInitResponse(apiException);
-            }
-        });
+        expressMetadataRepository.sortByState();
+        if (isViewAttached()) {
+            reload();
+        }
     }
 
     @Override
@@ -440,13 +422,16 @@ import java.util.Set;
         final ExpressMetadata expressMetadata = getCurrentExpressMetadata();
 
         final CheckoutBehaviour behaviour = expressMetadata.getBehaviour(behaviourType);
-        final Modal modal = behaviour != null && behaviour.getModal() != null ? modals.get(behaviour.getModal()) : null;
+        final Modal modal = behaviour != null && behaviour.getModal() != null ?
+            modalRepository.getValue().get(behaviour.getModal()) : null;
         final String target = behaviour != null ? behaviour.getTarget() : null;
         final boolean isMethodSuspended = expressMetadata.getStatus().isSuspended();
 
         if (modal != null) {
             getView().showGenericDialog(
-                new FromModalToGenericDialogItem(actionTypeWrapper.getActionType(), behaviour.getModal()).map(modal));
+                new FromModalToGenericDialogItem(
+                    new ActionTypeWrapper(expressMetadataRepository.getValue()).getActionType(), behaviour.getModal())
+                    .map(modal));
             return true;
         } else if (TextUtil.isNotEmpty(target)) {
             track(new TargetBehaviourEvent(getViewTrack(), new TargetBehaviourTrackData(behaviourType, target)));
@@ -474,6 +459,7 @@ import java.util.Set;
 
     @Override
     public void handleGenericDialogAction(@NonNull final ActionType type) {
+        final ActionTypeWrapper actionTypeWrapper = new ActionTypeWrapper(expressMetadataRepository.getValue());
         switch (type) {
         case PAY_WITH_OTHER_METHOD:
         case PAY_WITH_OFFLINE_METHOD:
@@ -491,10 +477,11 @@ import java.util.Set;
     @Override
     public void onPaymentExecuted(@NonNull final PaymentConfiguration configuration) {
         final List<Experiment> experiments = new ArrayList<>();
-        final ConfirmData confirmData = new ConfirmData(ConfirmData.ReviewType.ONE_TAP, getState().getPaymentMethodIndex(),
-            new FromSelectedExpressMetadataToAvailableMethods(escManagerBehaviour.getESCCardIds(),
-                configuration.getPayerCost(), configuration.getSplitPayment())
-                .map(getCurrentExpressMetadata()));
+        final ConfirmData confirmData =
+            new ConfirmData(ConfirmData.ReviewType.ONE_TAP, getState().getPaymentMethodIndex(),
+                new FromSelectedExpressMetadataToAvailableMethods(escManagerBehaviour.getESCCardIds(),
+                    configuration.getPayerCost(), configuration.getSplitPayment())
+                    .map(getCurrentExpressMetadata()));
         final Experiment experiment = experimentsRepository.getExperiment(KnownExperiment.INSTALLMENTS_HIGHLIGHT);
         if (getCurrentPayerCosts().size() > 1 && experiment != null) {
             experiments.add(experiment);
@@ -509,11 +496,7 @@ import java.util.Set;
             currentExpressMetadata.getCustomOptionId()));
     }
 
-    /* default */ void resetState(@NonNull final InitResponse initResponse) {
-        expressMetadataList = initResponse.getExpress();
-        actionTypeWrapper = new ActionTypeWrapper(expressMetadataList);
-        modals = initResponse.getModals();
-        payerCompliance = new PayerComplianceWrapper(initResponse.getPayerCompliance());
+    /* default */ void reload() {
         resetPayerCostSelection();
         resetState();
         getView().clearAdapters();
@@ -526,14 +509,12 @@ import java.util.Set;
         if (isViewAttached()) {
             getView().showLoading();
         }
-        initRepository.cleanRefresh().enqueue(new Callback<InitResponse>() {
+        initRepository.init().enqueue(new Callback<InitResponse>() {
             @Override
             public void success(final InitResponse initResponse) {
                 if (isViewAttached()) {
-                    if (payerCompliance.turnedIFPECompliant(initResponse.getPayerCompliance())) {
-                        payerComplianceRepository.turnIFPECompliant();
-                    }
-                    resetState(initResponse);
+                    payerComplianceRepository.turnIFPECompliant();
+                    reload();
                     getView().hideLoading();
                 }
             }
@@ -542,6 +523,7 @@ import java.util.Set;
             public void failure(final ApiException apiException) {
                 if (isViewAttached()) {
                     getView().hideLoading();
+                    onFailToRetrieveInitResponse(apiException);
                 }
             }
         });

@@ -145,7 +145,8 @@ public class CheckoutPresenterTest {
     private CheckoutPresenter getBasePresenter(final Checkout.View view) {
 
         presenter = new CheckoutPresenter(paymentSettingRepository, userSelectionRepository,
-            initRepository, paymentRepository, experimentsRepository, postPaymentUrlsMapper, mock(MPTracker.class));
+            initRepository, paymentRepository, experimentsRepository, postPaymentUrlsMapper, mock(MPTracker.class),
+            false);
 
         presenter.attachView(view);
         return presenter;

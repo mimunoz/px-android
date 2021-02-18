@@ -28,7 +28,6 @@ import com.mercadopago.android.px.tracking.internal.events.BackEvent
 import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrack
 import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker
 import com.mercadopago.android.px.utils.StubFailMpCall
-import com.mercadopago.android.px.utils.StubSuccessMpCall
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,9 +65,6 @@ class ExpressPaymentPresenterTest {
 
     @Mock
     private lateinit var amountRepository: AmountRepository
-
-    @Mock
-    private lateinit var initResponse: InitResponse
 
     @Mock
     private lateinit var expressMetadata: ExpressMetadata
@@ -109,6 +105,15 @@ class ExpressPaymentPresenterTest {
     @Mock
     private lateinit var tracker: MPTracker
 
+    @Mock
+    private lateinit var expressMetadataRepository: ExpressMetadataRepository
+
+    @Mock
+    private lateinit var payerPaymentMethodRepository: PayerPaymentMethodRepository
+
+    @Mock
+    private lateinit var modalRepository: ModalRepository
+
     private lateinit var expressPaymentPresenter: ExpressPaymentPresenter
 
     @Before
@@ -123,31 +128,29 @@ class ExpressPaymentPresenterTest {
         `when`(paymentSettingRepository.checkoutPreference).thenReturn(preference)
         `when`(paymentSettingRepository.advancedConfiguration).thenReturn(advancedConfiguration)
         `when`(advancedConfiguration.dynamicDialogConfiguration).thenReturn(dynamicDialogConfiguration)
-        `when`<MPCall<InitResponse>>(initRepository.init()).thenReturn(StubSuccessMpCall(initResponse))
-        `when`(initResponse.express).thenReturn(listOf(expressMetadata))
         `when`(expressMetadata.isCard).thenReturn(true)
         `when`(expressMetadata.card).thenReturn(cardMetadata)
         `when`(cardMetadata.displayInfo).thenReturn(mock(CardDisplayInfo::class.java))
         `when`(expressMetadata.customOptionId).thenReturn("123")
         `when`(expressMetadata.status).thenReturn(mock(StatusMetadata::class.java))
-        `when`(discountRepository.currentConfiguration).thenReturn(discountConfigurationModel)
+        `when`(discountRepository.getCurrentConfiguration()).thenReturn(discountConfigurationModel)
         `when`(discountRepository.getConfigurationFor("123")).thenReturn(discountConfigurationModel)
         `when`(amountConfigurationRepository.getConfigurationFor("123")).thenReturn(amountConfiguration)
+        `when`(expressMetadataRepository.value).thenReturn(listOf(expressMetadata))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
             payerCostSelectionRepository, discountRepository, amountRepository, initRepository,
             amountConfigurationRepository, chargeRepository, escManagerBehaviour, paymentMethodDrawableItemMapper,
             experimentsRepository, payerComplianceRepository, trackingRepository,
             mock(PaymentMethodDescriptorMapper::class.java), mock(CustomTextsRepository::class.java),
-            mock(AmountDescriptorMapper::class.java), tracker)
+            mock(AmountDescriptorMapper::class.java), tracker, expressMetadataRepository, payerPaymentMethodRepository,
+            modalRepository)
         verifyAttachView()
     }
 
     @Test
     fun whenFailToRetrieveCheckoutThenShowError() {
         `when`<MPCall<InitResponse>>(initRepository.init()).thenReturn(StubFailMpCall(mock(ApiException::class.java)))
-
-        verifyAttachView()
-
+        expressPaymentPresenter.handleDeepLink()
         verify(view).showError(any(MercadoPagoError::class.java))
     }
 

@@ -8,7 +8,7 @@ import com.mercadopago.android.px.internal.features.security_code.data.SecurityC
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessSecurityCodeDisplayData
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
-import com.mercadopago.android.px.internal.repository.InitRepository
+import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository
 import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.internal.viewmodel.LazyString
 import com.mercadopago.android.px.model.CvvInfo
@@ -27,16 +27,16 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class DisplayDataUseCaseTest {
-
-    @Mock
-    private lateinit var initRepository: InitRepository
+internal class DisplayDataUseCaseTest {
 
     @Mock
     private lateinit var success: CallbackTest<BusinessSecurityCodeDisplayData>
 
     @Mock
     private lateinit var failure: CallbackTest<MercadoPagoError>
+
+    @Mock
+    private lateinit var expressMetadataRepository: ExpressMetadataRepository
 
     private lateinit var displayDataUseCase: DisplayDataUseCase
     private val securityCodeDisplayDataMapper = BusinessSecurityCodeDisplayDataMapper()
@@ -46,9 +46,9 @@ class DisplayDataUseCaseTest {
         val contextProvider = TestContextProvider()
 
         displayDataUseCase = DisplayDataUseCase(
-            initRepository,
             securityCodeDisplayDataMapper,
             mock(MPTracker::class.java),
+            expressMetadataRepository,
             contextProvider
         )
     }
@@ -95,7 +95,7 @@ class DisplayDataUseCaseTest {
         `when`(cardParams.id).thenReturn(cardId)
         `when`(cardParams.securityCodeLength).thenReturn(3)
         `when`(cardParams.securityCodeLocation).thenReturn("back")
-        `when`(initRepository.loadInitResponse()).thenReturn(initResponse)
+        `when`(expressMetadataRepository.value).thenReturn(initResponse.express)
         val expectedResult = SecurityCodeDisplayData(
             LazyString(0),
             LazyString(0, cardParams.securityCodeLength.toString()),
@@ -127,7 +127,7 @@ class DisplayDataUseCaseTest {
         val initResponse = loadInitResponseWithGroup()
         `when`(cardParams.securityCodeLength).thenReturn(3)
         `when`(cardParams.securityCodeLocation).thenReturn("back")
-        `when`(initRepository.loadInitResponse()).thenReturn(initResponse)
+        `when`(expressMetadataRepository.value).thenReturn(initResponse.express)
         val expectedResult = BusinessSecurityCodeDisplayData(
             LazyString(0),
             LazyString(0, cardParams.securityCodeLength.toString()),
@@ -155,7 +155,6 @@ class DisplayDataUseCaseTest {
         val cardParams = mock(DisplayDataUseCase.CardParams::class.java)
 
         `when`(cardParams.securityCodeLength).thenReturn(0)
-        `when`(initRepository.loadInitResponse()).thenReturn(null)
 
         displayDataUseCase.execute(
             cardParams,

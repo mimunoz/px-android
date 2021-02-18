@@ -144,9 +144,10 @@ public class PaymentMethodSearch implements Serializable {
 
     @NonNull
     public List<PaymentMethod> getPaymentMethods() {
-        return paymentMethods == null ? new ArrayList<PaymentMethod>() : paymentMethods;
+        return paymentMethods == null ? new ArrayList<>() : paymentMethods;
     }
 
+    @Deprecated
     public PaymentMethod getPaymentMethodBySearchItem(final PaymentMethodSearchItem item) {
         PaymentMethod requiredPaymentMethod = null;
         if (paymentMethods != null && item != null && item.getId() != null) {
@@ -160,6 +161,7 @@ public class PaymentMethodSearch implements Serializable {
         return requiredPaymentMethod;
     }
 
+    @Deprecated
     private String getPaymentTypeIdFromItem(final PaymentMethodSearchItem item, final PaymentMethod paymentMethod) {
         //Remove payment method id from item id and the splitter
         final String paymentType;
@@ -172,10 +174,12 @@ public class PaymentMethodSearch implements Serializable {
         return paymentType;
     }
 
+    @Deprecated
     private boolean itemMatchesPaymentMethod(final PaymentMethodSearchItem item, final PaymentMethod paymentMethod) {
         return item.getId().startsWith(paymentMethod.getId());
     }
 
+    @Deprecated
     public PaymentMethodSearchItem getSearchItemByPaymentMethod(final PaymentMethod selectedPaymentMethod) {
         PaymentMethodSearchItem requiredItem = null;
         if (selectedPaymentMethod != null) {
@@ -185,10 +189,12 @@ public class PaymentMethodSearch implements Serializable {
         return requiredItem;
     }
 
+    @Deprecated
     private PaymentMethodSearchItem searchItemMatchingPaymentMethod(final PaymentMethod paymentMethod) {
         return searchItemInList(groups, paymentMethod);
     }
 
+    @Deprecated
     private PaymentMethodSearchItem searchItemInList(final List<PaymentMethodSearchItem> list,
         final PaymentMethod paymentMethod) {
         PaymentMethodSearchItem requiredItem = null;
@@ -229,6 +235,7 @@ public class PaymentMethodSearch implements Serializable {
     }
 
     @Nullable
+    @Deprecated
     public Card getCardById(@NonNull final String cardId) {
         for (final CustomSearchItem customSearchItem : getCustomSearchItems()) {
             if (customSearchItem.getId().equals(cardId)) {
@@ -253,6 +260,7 @@ public class PaymentMethodSearch implements Serializable {
     }
 
     @Nullable
+    @Deprecated
     public CustomSearchItem getCustomSearchItemByPaymentMethodId(@NonNull final String paymentMethodId) {
         for (final CustomSearchItem customSearchItem : customSearchItems) {
             if (paymentMethodId.equals(customSearchItem.getPaymentMethodId())) {
@@ -283,25 +291,30 @@ public class PaymentMethodSearch implements Serializable {
     /**
      * @return boolean that represents if there is express information.
      */
+    @Deprecated
     public boolean hasExpressCheckoutMetadata() {
         return !getExpress().isEmpty();
     }
 
+    @Deprecated
     public boolean hasCustomSearchItems() {
         return !getCustomSearchItems().isEmpty();
     }
 
+    @Deprecated
     public boolean hasSearchItems() {
         return !getGroups().isEmpty();
     }
 
     @Nullable
+    @Deprecated
     public Issuer getIssuer(@NonNull final String cardId) {
         final Card foundCard = getCardById(cardId);
         return foundCard == null ? null : foundCard.getIssuer();
     }
 
     @Nullable
+    @Deprecated
     public String getLastFourDigits(@NonNull final String cardId) {
         final Card foundCard = getCardById(cardId);
         return foundCard == null ? null : foundCard.getLastFourDigits();
@@ -322,6 +335,7 @@ public class PaymentMethodSearch implements Serializable {
      *
      * @return set of ids
      */
+    @Deprecated
     @NonNull
     public Set<String> getIdsWithSplitAllowed() {
         final Set<String> cardsWithSplit = new HashSet<>();

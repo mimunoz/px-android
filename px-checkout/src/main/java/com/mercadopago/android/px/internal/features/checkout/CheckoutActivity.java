@@ -39,6 +39,7 @@ import static com.mercadopago.android.px.model.ExitAction.EXTRA_CLIENT_RES_CODE;
 public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     implements Checkout.View, ExpressPaymentFragment.CallBack, LifecycleListener {
 
+    private static final String ARGS_WITH_PREFETCH = "args_with_prefetch";
     private static final String EXTRA_PRIVATE_KEY = "extra_private_key";
     private static final String EXTRA_PUBLIC_KEY = "extra_public_key";
     private static final String TAG_ONETAP_FRAGMENT = "TAG_ONETAP";
@@ -50,8 +51,9 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     private Intent customDataBundle;
     private View progress;
 
-    public static Intent getIntent(@NonNull final Context context) {
-        return new Intent(context, CheckoutActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    public static Intent getIntent(@NonNull final Context context, final boolean withPrefetch) {
+        return new Intent(context, CheckoutActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .putExtra(ARGS_WITH_PREFETCH, withPrefetch);
     }
 
     @Override
@@ -112,12 +114,13 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
                 session.getPaymentRepository(),
                 session.getExperimentsRepository(),
                 MapperProvider.INSTANCE.getPostPaymentUrlsMapper(),
-                session.getTracker());
+                session.getTracker(),
+                getIntent().getBooleanExtra(ARGS_WITH_PREFETCH, false));
 
         privateKey = savedInstanceState.getString(EXTRA_PRIVATE_KEY);
         merchantPublicKey = savedInstanceState.getString(EXTRA_PUBLIC_KEY);
         presenter.attachView(this);
-        presenter.initialize();
+        presenter.onRestore();
     }
 
     @Override
@@ -171,7 +174,9 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
             session.getPaymentRepository(),
             session.getExperimentsRepository(),
             MapperProvider.INSTANCE.getPostPaymentUrlsMapper(),
-            session.getTracker());
+            session.getTracker(),
+            getIntent().getBooleanExtra(ARGS_WITH_PREFETCH, false)
+        );
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.mercadopago.android.px.internal.util.JsonUtil
 
 private const val PREF_EXPERIMENTS = "PREF_EXPERIMENTS"
 
-class ExperimentsRepositoryImpl(private val sharedPreferences: SharedPreferences) : ExperimentsRepository {
+internal class ExperimentsRepositoryImpl(private val sharedPreferences: SharedPreferences) : ExperimentsRepository {
     private var internalExperiments: List<Experiment>? = null
     override val experiments: List<Experiment>
         get() {
@@ -29,6 +29,7 @@ class ExperimentsRepositoryImpl(private val sharedPreferences: SharedPreferences
     }
 
     override fun configure(experiments: List<Experiment>?) {
+        internalExperiments = experiments
         sharedPreferences.edit().apply {
             putString(PREF_EXPERIMENTS, JsonUtil.toJson(experiments))
             apply()

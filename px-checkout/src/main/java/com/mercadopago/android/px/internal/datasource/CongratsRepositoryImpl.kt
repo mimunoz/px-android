@@ -14,21 +14,22 @@ import com.mercadopago.android.px.internal.viewmodel.BusinessPaymentModel
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
 import com.mercadopago.android.px.model.*
 import com.mercadopago.android.px.model.internal.CongratsResponse
-import com.mercadopago.android.px.model.internal.InitResponse
 import com.mercadopago.android.px.model.internal.remedies.RemediesResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CongratsRepositoryImpl(
-    private val congratsService: CongratsService, private val initService: InitRepository,
+internal class CongratsRepositoryImpl(
+    private val congratsService: CongratsService,
     private val paymentSetting: PaymentSettingRepository, private val platform: String,
     private val trackingRepository: TrackingRepository, private val userSelectionRepository: UserSelectionRepository,
     private val amountRepository: AmountRepository,
     private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
     private val payerComplianceRepository: PayerComplianceRepository,
-    private val escManagerBehaviour: ESCManagerBehaviour) : CongratsRepository {
+    private val escManagerBehaviour: ESCManagerBehaviour,
+    private val expressMetadataRepository: ExpressMetadataRepository,
+    private val alternativePayerPaymentMethodsMapper: AlternativePayerPaymentMethodsMapper) : CongratsRepository {
 
     private val paymentRewardCache = HashMap<String, CongratsResponse>()
     private val remediesCache = HashMap<String, RemediesResponse>()
@@ -40,12 +41,12 @@ class CongratsRepositoryImpl(
         val isSuccess = StatusHelper.isSuccess(payment)
         CoroutineScope(Dispatchers.IO).launch {
             val paymentId = payment.paymentIds?.get(0) ?: payment.id.toString()
-            val congratsResponse = when {
+            val congrats = when {
                 whiteLabel || !isSuccess -> CongratsResponse.EMPTY
                 paymentRewardCache.containsKey(paymentId) -> paymentRewardCache[paymentId]!!
                 else -> getCongratsResponse(payment, paymentResult).apply { paymentRewardCache[paymentId] = this }
             }
-            val remediesResponse = when {
+            val remedies = when {
                 whiteLabel || isSuccess || payment is BusinessPayment -> RemediesResponse.EMPTY
                 remediesCache.containsKey(paymentId) -> remediesCache[paymentId]!!
                 else -> {
@@ -53,7 +54,7 @@ class CongratsRepositoryImpl(
                 }
             }
             withContext(Dispatchers.Main) {
-                handleResult(payment, paymentResult, congratsResponse, remediesResponse, paymentSetting.currency, callback)
+                handleResult(payment, paymentResult, congrats, remedies, paymentSetting.currency, callback)
             }
         }
     }
@@ -72,34 +73,20 @@ class CongratsRepositoryImpl(
             CongratsResponse.EMPTY
         }
 
-    private fun getPayerPaymentMethods(response: InitResponse?) =
-        mutableListOf<Triple<SecurityCode?, String, CustomSearchItem>>()
-            .also { mapPayerPaymentMethods ->
-                response?.run {
-                    customSearchItems.forEach { customSearchItem ->
-                        express.find { it.customOptionId == customSearchItem.id }?.let { expressMetadata ->
-                            mapPayerPaymentMethods.add(
-                                Triple(getCardById(customSearchItem.id)?.securityCode, expressMetadata.customOptionId,
-                                    customSearchItem)
-                            )
-                        }
-                    }
-                }
-            }.filter { !disabledPaymentMethodRepository.hasPaymentMethodId(it.second) }
-
     private suspend fun getRemedies(payment: IPaymentDescriptor, paymentData: PaymentData) =
         try {
-            val initResponse = initService.loadInitResponse()
-            val payerPaymentMethods = getPayerPaymentMethods(initResponse)
-            val hasOneTap = initResponse?.hasExpressCheckoutMetadata() ?: false
-            val customOptionId = paymentData.token?.cardId ?: paymentData.paymentMethod.id
+            val hasOneTap = expressMetadataRepository.value.isNotEmpty()
+            val usedPayerPaymentMethodId = paymentData.token?.cardId ?: paymentData.paymentMethod.id
             val escCardIds = escManagerBehaviour.escCardIds
             val body = RemediesBodyMapper(
                 userSelectionRepository,
                 amountRepository,
-                customOptionId,
-                escCardIds.contains(customOptionId),
-                AlternativePayerPaymentMethodsMapper(escCardIds).map(payerPaymentMethods.filter { it.second != customOptionId })
+                usedPayerPaymentMethodId,
+                escCardIds.contains(usedPayerPaymentMethodId),
+                alternativePayerPaymentMethodsMapper.map(expressMetadataRepository.value).filter {
+                    it.customOptionId != usedPayerPaymentMethodId ||
+                        !disabledPaymentMethodRepository.hasPaymentMethodId(it.customOptionId)
+                }
             ).map(paymentData)
             congratsService.getRemedies(
                 payment.id.toString(),
@@ -111,15 +98,15 @@ class CongratsRepositoryImpl(
             RemediesResponse.EMPTY
         }
 
-    private fun handleResult(payment: IPaymentDescriptor, paymentResult: PaymentResult, congratsResponse: CongratsResponse,
+    private fun handleResult(payment: IPaymentDescriptor, paymentResult: PaymentResult, congrats: CongratsResponse,
         remedies: RemediesResponse, currency: Currency, callback: PostPaymentCallback) {
         payment.process(object : IPaymentDescriptorHandler {
             override fun visit(payment: IPaymentDescriptor) {
-                callback.handleResult(PaymentModel(payment, paymentResult, congratsResponse, remedies, currency))
+                callback.handleResult(PaymentModel(payment, paymentResult, congrats, remedies, currency))
             }
 
             override fun visit(businessPayment: BusinessPayment) {
-                callback.handleResult(BusinessPaymentModel(businessPayment, paymentResult, congratsResponse, remedies,
+                callback.handleResult(BusinessPaymentModel(businessPayment, paymentResult, congrats, remedies,
                     currency))
             }
         })

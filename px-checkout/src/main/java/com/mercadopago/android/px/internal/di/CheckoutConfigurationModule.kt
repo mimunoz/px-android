@@ -4,7 +4,7 @@ import android.content.Context
 import com.mercadopago.android.px.internal.datasource.*
 import com.mercadopago.android.px.internal.repository.*
 
-class CheckoutConfigurationModule(context: Context) : ConfigurationModule(context) {
+internal class CheckoutConfigurationModule(context: Context) : ConfigurationModule(context) {
 
     val userSelectionRepository: UserSelectionRepository by lazy { UserSelectionService(sharedPreferences, fileManager) }
     val paymentSettings: PaymentSettingRepository by lazy { PaymentSettingService(sharedPreferences, fileManager) }
@@ -14,7 +14,7 @@ class CheckoutConfigurationModule(context: Context) : ConfigurationModule(contex
     val payerCostSelectionRepository: PayerCostSelectionRepository by lazy {
         PayerCostSelectionRepositoryImpl(sharedPreferences)
     }
-    val payerComplianceRepository: PayerComplianceRepository by lazy { PayerComplianceRepositoryImpl(sharedPreferences) }
+    val payerComplianceRepository: PayerComplianceRepository by lazy { PayerComplianceRepositoryImpl(sharedPreferences, fileManager) }
     private var internalChargeRepository: ChargeRepository? = null
     val chargeRepository: ChargeRepository
         get() {

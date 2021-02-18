@@ -49,7 +49,7 @@ class MercadoPagoCheckout internal constructor(builder: Builder) {
      * @param requestCode it's the number that identifies the checkout flow request for [ ][Activity.onActivityResult]
      */
     fun startPayment(context: Context, requestCode: Int) {
-        startIntent(context, CheckoutActivity.getIntent(context), requestCode)
+        startIntent(context, CheckoutActivity.getIntent(context, prefetch != null), requestCode)
     }
 
     private fun startIntent(context: Context, checkoutIntent: Intent, requestCode: Int) {

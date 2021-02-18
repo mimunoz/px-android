@@ -4,7 +4,7 @@ import com.mercadopago.android.px.addons.model.internal.Configuration
 import com.mercadopago.android.px.addons.model.internal.Experiment
 import com.mercadopago.android.px.internal.experiments.KnownExperiment
 
-interface ExperimentsRepository {
+internal interface ExperimentsRepository {
     val experiments: List<Experiment>
     fun getExperiments(trackingMode: Configuration.TrackingMode): List<Experiment>
     fun getExperiment(knownExperiment: KnownExperiment): Experiment?

@@ -13,19 +13,21 @@ import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.AmountConfigurationRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.AmountService;
 import com.mercadopago.android.px.internal.datasource.CardTokenService;
-import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
+import com.mercadopago.android.px.internal.datasource.ConfigurationSolverImpl;
 import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.DiscountServiceImp;
+import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.ExpressMetadataRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.InitService;
 import com.mercadopago.android.px.internal.datasource.InstructionsService;
+import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.PayerPaymentMethodRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.PaymentMethodRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PaymentService;
 import com.mercadopago.android.px.internal.datasource.PrefetchInitService;
 import com.mercadopago.android.px.internal.datasource.TokenizeService;
-import com.mercadopago.android.px.internal.datasource.cache.Cache;
-import com.mercadopago.android.px.internal.datasource.cache.InitCacheCoordinator;
-import com.mercadopago.android.px.internal.datasource.cache.InitDiskCache;
-import com.mercadopago.android.px.internal.datasource.cache.InitMemCache;
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PXPaymentCongratsTracking;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel;
@@ -36,8 +38,12 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
+import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
 import com.mercadopago.android.px.internal.repository.InitRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
+import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
+import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
@@ -48,7 +54,6 @@ import com.mercadopago.android.px.internal.services.InstructionsClient;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.model.Device;
-import com.mercadopago.android.px.model.internal.InitResponse;
 import com.mercadopago.android.px.services.MercadoPagoServices;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 
@@ -64,13 +69,12 @@ public final class Session extends ApplicationModule {
     private static Session instance;
 
     // mem cache - lazy init.
-    private CheckoutConfigurationModule configurationModule;
+    private final CheckoutConfigurationModule configurationModule;
     private DiscountRepository discountRepository;
     private AmountRepository amountRepository;
     private InitRepository initRepository;
     private PaymentRepository paymentRepository;
     private AmountConfigurationRepository amountConfigurationRepository;
-    private Cache<InitResponse> initCache;
     private InstructionsService instructionsRepository;
     private CardTokenRepository cardTokenRepository;
     private CongratsRepository congratsRepository;
@@ -79,6 +83,11 @@ public final class Session extends ApplicationModule {
     private MPTracker tracker;
     private PaymentResultViewModelFactory paymentResultViewModelFactory;
     private ViewModelModule viewModelModule;
+    private PayerPaymentMethodRepository payerPaymentMethodRepository;
+    private ExpressMetadataRepository expressMetadataRepository;
+    private PaymentMethodRepository paymentMethodRepository;
+    private ModalRepository modalRepository;
+    private ConfigurationSolver configurationSolver;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -162,29 +171,42 @@ public final class Session extends ApplicationModule {
         getPaymentRepository().reset();
         getExperimentsRepository().reset();
         getConfigurationModule().reset();
-        getInitCache().evict();
+        getExperimentsRepository().reset();
+        getPayerPaymentMethodRepository().reset();
+        getPaymentMethodRepository().reset();
+        getModalRepository().reset();
+        getAmountConfigurationRepository().reset();
+        getDiscountRepository().reset();
         networkModule.reset();
         discountRepository = null;
         amountRepository = null;
         initRepository = null;
         paymentRepository = null;
-        initCache = null;
         instructionsRepository = null;
         amountConfigurationRepository = null;
         cardTokenRepository = null;
         congratsRepository = null;
         escPaymentManager = null;
         viewModelModule = null;
+        expressMetadataRepository = null;
+        payerPaymentMethodRepository = null;
+        paymentMethodRepository = null;
+        modalRepository = null;
+        configurationSolver = null;
     }
 
     @NonNull
     public InitRepository getInitRepository() {
         if (initRepository == null) {
             final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
-            initRepository = new CheckoutRepositoryImpl(paymentSettings, getExperimentsRepository(),
+            initRepository = new InitService(paymentSettings, getExperimentsRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
-                configurationModule.getTrackingRepository(), getInitCache(), getTracker());
+                configurationModule.getTrackingRepository(), getTracker(),
+                getPayerPaymentMethodRepository(), getExpressMetadataRepository(), getPaymentMethodRepository(),
+                getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
+                getAmountConfigurationRepository(), getDiscountRepository()) {
+            };
         }
         return initRepository;
     }
@@ -230,7 +252,8 @@ public final class Session extends ApplicationModule {
     public DiscountRepository getDiscountRepository() {
         if (discountRepository == null) {
             discountRepository =
-                new DiscountServiceImp(getInitRepository(), getConfigurationModule().getUserSelectionRepository());
+                new DiscountServiceImpl(getFileManager(), getConfigurationModule().getUserSelectionRepository(),
+                    getAmountConfigurationRepository(), getConfigurationSolver());
         }
         return discountRepository;
     }
@@ -238,8 +261,8 @@ public final class Session extends ApplicationModule {
     @NonNull
     public AmountConfigurationRepository getAmountConfigurationRepository() {
         if (amountConfigurationRepository == null) {
-            amountConfigurationRepository = new AmountConfigurationRepositoryImpl(getInitRepository(),
-                getConfigurationModule().getUserSelectionRepository());
+            amountConfigurationRepository = new AmountConfigurationRepositoryImpl(getFileManager(),
+                getConfigurationModule().getUserSelectionRepository(), getConfigurationSolver());
         }
         return amountConfigurationRepository;
     }
@@ -247,14 +270,6 @@ public final class Session extends ApplicationModule {
     @NonNull
     public CheckoutConfigurationModule getConfigurationModule() {
         return configurationModule;
-    }
-
-    @NonNull
-    private Cache<InitResponse> getInitCache() {
-        if (initCache == null) {
-            initCache = new InitCacheCoordinator(new InitDiskCache(getFileManager()), new InitMemCache());
-        }
-        return initCache;
     }
 
     @NonNull
@@ -270,10 +285,12 @@ public final class Session extends ApplicationModule {
                 getMercadoPagoESC(),
                 getTokenRepository(),
                 getInstructionsRepository(),
-                getInitRepository(),
                 getAmountConfigurationRepository(),
                 getCongratsRepository(),
-                getFileManager());
+                getFileManager(),
+                MapperProvider.INSTANCE.getFromPayerPaymentMethodIdToCardMapper(),
+                MapperProvider.INSTANCE.getPaymentMethodMapper(),
+                getPaymentMethodRepository());
         }
 
         return paymentRepository;
@@ -319,11 +336,12 @@ public final class Session extends ApplicationModule {
         if (congratsRepository == null) {
             final CongratsService congratsService = networkModule.getRetrofitClient().create(CongratsService.class);
             final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
-            congratsRepository = new CongratsRepositoryImpl(congratsService, getInitRepository(), paymentSettings,
+            congratsRepository = new CongratsRepositoryImpl(congratsService, paymentSettings,
                 getPlatform(getApplicationContext()), configurationModule.getTrackingRepository(),
                 configurationModule.getUserSelectionRepository(), getAmountRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(),
-                configurationModule.getPayerComplianceRepository(), getMercadoPagoESC());
+                configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getExpressMetadataRepository(),
+                MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper());
         }
         return congratsRepository;
     }
@@ -334,6 +352,42 @@ public final class Session extends ApplicationModule {
             viewModelModule = new ViewModelModule();
         }
         return viewModelModule;
+    }
+
+    public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
+        if (payerPaymentMethodRepository == null) {
+            payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(getFileManager());
+        }
+        return payerPaymentMethodRepository;
+    }
+
+    public ExpressMetadataRepository getExpressMetadataRepository() {
+        if (expressMetadataRepository == null) {
+            expressMetadataRepository = new ExpressMetadataRepositoryImpl(getFileManager(),
+                getConfigurationModule().getDisabledPaymentMethodRepository());
+        }
+        return expressMetadataRepository;
+    }
+
+    public PaymentMethodRepository getPaymentMethodRepository() {
+        if (paymentMethodRepository == null) {
+            paymentMethodRepository = new PaymentMethodRepositoryImpl(getFileManager());
+        }
+        return paymentMethodRepository;
+    }
+
+    public ModalRepository getModalRepository() {
+        if (modalRepository == null) {
+            modalRepository = new ModalRepositoryImpl(getFileManager());
+        }
+        return modalRepository;
+    }
+
+    public ConfigurationSolver getConfigurationSolver() {
+        if (configurationSolver == null) {
+            configurationSolver = new ConfigurationSolverImpl(getPayerPaymentMethodRepository());
+        }
+        return configurationSolver;
     }
 
     @NonNull

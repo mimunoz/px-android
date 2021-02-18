@@ -4,7 +4,7 @@ import com.mercadopago.android.px.internal.viewmodel.PaymentModel
 import com.mercadopago.android.px.model.IPaymentDescriptor
 import com.mercadopago.android.px.model.PaymentResult
 
-interface CongratsRepository {
+internal interface CongratsRepository {
     fun getPostPaymentData(payment: IPaymentDescriptor, paymentResult: PaymentResult,
                            callback: PostPaymentCallback)
 

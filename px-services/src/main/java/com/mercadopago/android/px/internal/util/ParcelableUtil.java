@@ -90,7 +90,7 @@ public final class ParcelableUtil {
         return bytes;
     }
 
-    @Nullable
+    @NonNull
     public static <T> T unmarshall(@NonNull final byte[] bytes, @NonNull final Parcelable.Creator<T> creator) {
         final Parcel parcel = unmarshall(bytes);
         final T result = creator.createFromParcel(parcel);

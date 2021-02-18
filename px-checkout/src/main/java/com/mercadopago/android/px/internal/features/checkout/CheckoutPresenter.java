@@ -29,6 +29,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     @NonNull private final InitRepository initRepository;
     @NonNull private final PostPaymentUrlsMapper postPaymentUrlsMapper;
     @NonNull /* default */ ExperimentsRepository experimentsRepository;
+    private final boolean withPrefetch;
 
     /* default */ CheckoutPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
         @NonNull final UserSelectionRepository userSelectionRepository,
@@ -36,7 +37,8 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
         @NonNull final PaymentRepository paymentRepository,
         @NonNull final ExperimentsRepository experimentsRepository,
         @NonNull final PostPaymentUrlsMapper postPaymentUrlsMapper,
-        @NonNull final MPTracker tracker) {
+        @NonNull final MPTracker tracker,
+        final boolean withPrefetch) {
         super(tracker);
         this.paymentSettingRepository = paymentSettingRepository;
         this.userSelectionRepository = userSelectionRepository;
@@ -44,31 +46,45 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
         this.paymentRepository = paymentRepository;
         this.experimentsRepository = experimentsRepository;
         this.postPaymentUrlsMapper = postPaymentUrlsMapper;
+        this.withPrefetch = withPrefetch;
     }
 
     @Override
     public void initialize() {
-        getView().showProgress();
-        if (isViewAttached()) {
-            initRepository.init().enqueue(new Callback<InitResponse>() {
-                @Override
-                public void success(final InitResponse initResponse) {
-                    if (isViewAttached()) {
-                        getView().hideProgress();
-                        getView().showOneTap(ExperimentHelper.INSTANCE.getVariantFrom(
-                            experimentsRepository.getExperiments(), KnownVariant.SCROLLED));
+        if (!withPrefetch) {
+            getView().showProgress();
+            if (isViewAttached()) {
+                initRepository.init().enqueue(new Callback<InitResponse>() {
+                    @Override
+                    public void success(final InitResponse initResponse) {
+                        showOneTap();
                     }
-                }
 
-                @Override
-                public void failure(final ApiException apiException) {
-                    if (isViewAttached()) {
-                        getView().showError(
-                            new MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT));
+                    @Override
+                    public void failure(final ApiException apiException) {
+                        if (isViewAttached()) {
+                            getView().showError(
+                                new MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT));
+                        }
                     }
-                }
-            });
+                });
+            }
+        } else {
+            showOneTap();
         }
+    }
+
+    /* default */ void showOneTap() {
+        if (isViewAttached()) {
+            getView().hideProgress();
+            getView().showOneTap(ExperimentHelper.INSTANCE.getVariantFrom(
+                experimentsRepository.getExperiments(), KnownVariant.SCROLLED));
+        }
+    }
+
+    @Override
+    public void onRestore() {
+        showOneTap();
     }
 
     @Override

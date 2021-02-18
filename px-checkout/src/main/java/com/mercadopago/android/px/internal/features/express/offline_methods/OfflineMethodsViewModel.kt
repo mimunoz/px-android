@@ -6,10 +6,7 @@ import com.mercadopago.android.px.internal.base.BaseViewModel
 import com.mercadopago.android.px.internal.extensions.orIfEmpty
 import com.mercadopago.android.px.internal.features.pay_button.PayButton.OnReadyForPaymentCallback
 import com.mercadopago.android.px.internal.livedata.MutableSingleLiveData
-import com.mercadopago.android.px.internal.repository.AmountRepository
-import com.mercadopago.android.px.internal.repository.DiscountRepository
-import com.mercadopago.android.px.internal.repository.InitRepository
-import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
+import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.AmountLocalized
 import com.mercadopago.android.px.model.OfflineMethodsCompliance
@@ -25,12 +22,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal class OfflineMethodsViewModel(private val initRepository: InitRepository,
+internal class OfflineMethodsViewModel(
     private val paymentSettingRepository: PaymentSettingRepository,
     private val amountRepository: AmountRepository,
     private val discountRepository: DiscountRepository,
-    tracker: MPTracker
-) : BaseViewModel(tracker), OfflineMethods.ViewModel {
+    private val expressMetadataRepository: ExpressMetadataRepository,
+    private val payerComplianceRepository: PayerComplianceRepository,
+    tracker: MPTracker) : BaseViewModel(tracker), OfflineMethods.ViewModel {
 
     private lateinit var viewTracker: OfflineMethodsViewTracker
     private var payerCompliance: OfflineMethodsCompliance? = null
@@ -42,18 +40,17 @@ internal class OfflineMethodsViewModel(private val initRepository: InitRepositor
     override fun onViewLoaded(): LiveData<OfflineMethods.Model> {
         val liveData = MutableLiveData<OfflineMethods.Model>()
         CoroutineScope(Dispatchers.IO).launch {
-            initRepository.loadInitResponse()?.let {
-                val offlineMethods = it.express.firstOrNull { express -> express.isOfflineMethods }?.offlineMethods
-                val bottomDescription = offlineMethods?.displayInfo?.bottomDescription
-                val defaultPaymentTypeId = offlineMethods?.paymentTypes?.firstOrNull()?.id ?: TextUtil.EMPTY
-                val amountLocalized = AmountLocalized(
-                    amountRepository.getAmountToPay(defaultPaymentTypeId, discountRepository.currentConfiguration),
-                    paymentSettingRepository.currency)
-                payerCompliance = it.payerCompliance?.offlineMethods
-                val offlinePaymentTypes = offlineMethods?.paymentTypes.orEmpty()
-                viewTracker = OfflineMethodsViewTracker(offlinePaymentTypes)
-                liveData.postValue(OfflineMethods.Model(bottomDescription, amountLocalized, offlinePaymentTypes))
-            }
+            val offlineMethods = expressMetadataRepository.value
+                .firstOrNull { express -> express.isOfflineMethods }?.offlineMethods
+            val bottomDescription = offlineMethods?.displayInfo?.bottomDescription
+            val defaultPaymentTypeId = offlineMethods?.paymentTypes?.firstOrNull()?.id ?: TextUtil.EMPTY
+            val amountLocalized = AmountLocalized(
+                amountRepository.getAmountToPay(defaultPaymentTypeId, discountRepository.getCurrentConfiguration()),
+                paymentSettingRepository.currency)
+            payerCompliance = payerComplianceRepository.value?.offlineMethods
+            val offlinePaymentTypes = offlineMethods?.paymentTypes.orEmpty()
+            viewTracker = OfflineMethodsViewTracker(offlinePaymentTypes)
+            liveData.postValue(OfflineMethods.Model(bottomDescription, amountLocalized, offlinePaymentTypes))
         }
         return liveData
     }

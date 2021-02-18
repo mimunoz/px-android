@@ -5,19 +5,18 @@ import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.base.use_case.UseCase
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.callbacks.map
-import com.mercadopago.android.px.internal.extensions.notNull
 import com.mercadopago.android.px.internal.features.security_code.data.SecurityCodeDisplayData
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessSecurityCodeDisplayData
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
-import com.mercadopago.android.px.internal.repository.InitRepository
+import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository
 import com.mercadopago.android.px.internal.viewmodel.LazyString
 import com.mercadopago.android.px.model.CvvInfo
 import com.mercadopago.android.px.tracking.internal.MPTracker
 
 internal class DisplayDataUseCase(
-    private val initRepository: InitRepository,
     private val securityCodeDisplayDataMapper: BusinessSecurityCodeDisplayDataMapper,
     tracker: MPTracker,
+    private val expressMetadataRepository: ExpressMetadataRepository,
     override val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
 ) : UseCase<DisplayDataUseCase.CardParams, BusinessSecurityCodeDisplayData>(tracker) {
 
@@ -25,8 +24,8 @@ internal class DisplayDataUseCase(
         val securityCodeLength = param.securityCodeLength ?: 0
         param.cvvInfo?.let {
             Response.Success(SecurityCodeDisplayData(LazyString(it.title), LazyString(it.message), securityCodeLength))
-        } ?: notNull(initRepository.loadInitResponse()).let { initResponse ->
-            val cardDisplayInfo = initResponse.express.takeIf { it.isNotEmpty() }?.find { data ->
+        } ?: run {
+            val cardDisplayInfo = expressMetadataRepository.value.find { data ->
                 data.isCard && data.card.id == param.id
             }?.card?.displayInfo
 

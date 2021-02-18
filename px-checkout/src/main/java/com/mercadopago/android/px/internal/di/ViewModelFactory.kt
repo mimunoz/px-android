@@ -38,12 +38,12 @@ internal class ViewModelFactory : ViewModelProvider.Factory {
                 )
             }
             modelClass.isAssignableFrom(OfflineMethodsViewModel::class.java) -> {
-                OfflineMethodsViewModel(session.initRepository,
-                    paymentSetting,
+                OfflineMethodsViewModel(paymentSetting,
                     session.amountRepository,
                     session.discountRepository,
-                    session.tracker
-                )
+                    session.expressMetadataRepository,
+                    session.configurationModule.payerComplianceRepository,
+                    session.tracker)
             }
             modelClass.isAssignableFrom(SecurityCodeViewModel::class.java) -> {
                 val tokenizeUseCase = TokenizeUseCase(
@@ -54,10 +54,9 @@ internal class ViewModelFactory : ViewModelProvider.Factory {
                 )
 
                 val displayDataUseCase = DisplayDataUseCase(
-                    session.initRepository,
                     BusinessSecurityCodeDisplayDataMapper(),
-                    session.tracker
-                )
+                    session.tracker,
+                    session.expressMetadataRepository)
 
                 SecurityCodeViewModel(
                     tokenizeUseCase,

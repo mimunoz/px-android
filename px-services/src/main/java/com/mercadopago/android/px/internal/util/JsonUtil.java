@@ -30,6 +30,12 @@ public final class JsonUtil {
         return GSON.fromJson(json, typeOfT);
     }
 
+    public static <K, V> Map<K, V> getCustomMapFromJson(@Nullable final String json, @NonNull final Class<K> classOfK,
+        @NonNull final Class<V> classOfV) {
+        final Type typeOfT = TypeToken.getParameterized(Map.class, classOfK, classOfV).getType();
+        return GSON.fromJson(json, typeOfT);
+    }
+
     public static <T> T fromJson(@Nullable final String json, @NonNull final Class<T> classOfT) {
         return GSON.fromJson(json, classOfT);
     }
@@ -46,7 +52,8 @@ public final class JsonUtil {
     }
 
     public static Map<String, String> getStringMapFromJson(@Nullable final String json) {
-        return GSON.fromJson(json, new TypeToken<Map<String, String>>() {}.getType());
+        return GSON.fromJson(json, new TypeToken<Map<String, String>>() {
+        }.getType());
     }
 
     public static Map<String, Object> getMapFromObject(@Nullable final Object src) {

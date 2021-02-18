@@ -9,6 +9,7 @@ import com.mercadopago.android.px.core.internal.PaymentWrapper;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.core.FileManager;
+import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodIdToCardMapper;
 import com.mercadopago.android.px.internal.model.EscStatus;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
@@ -16,8 +17,8 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
-import com.mercadopago.android.px.internal.repository.InitRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
+import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
@@ -41,7 +42,6 @@ import com.mercadopago.android.px.model.Split;
 import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
-import com.mercadopago.android.px.model.internal.InitResponse;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
@@ -62,7 +62,6 @@ public class PaymentService implements PaymentRepository {
     @NonNull private final AmountRepository amountRepository;
     @NonNull private final Context context;
     @NonNull private final TokenRepository tokenRepository;
-    @NonNull private final InitRepository initRepository;
     @NonNull private final FileManager fileManager;
     @NonNull private final EscPaymentManager escPaymentManager;
     @NonNull private final ESCManagerBehaviour escManagerBehaviour;
@@ -73,6 +72,9 @@ public class PaymentService implements PaymentRepository {
 
     @Nullable private PaymentWrapper payment;
     @NonNull private final File paymentFile;
+    @NonNull private FromPayerPaymentMethodIdToCardMapper fromPayerPaymentMethodIdToCardMapper;
+    private PaymentMethodMapper paymentMethodMapper;
+    private PaymentMethodRepository paymentMethodRepository;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -84,10 +86,12 @@ public class PaymentService implements PaymentRepository {
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
         @NonNull final TokenRepository tokenRepository,
         @NonNull final InstructionsRepository instructionsRepository,
-        @NonNull final InitRepository initRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final CongratsRepository congratsRepository,
-        @NonNull final FileManager fileManager) {
+        @NonNull final FileManager fileManager,
+        @NonNull final FromPayerPaymentMethodIdToCardMapper fromPayerPaymentMethodIdToCardMapper,
+        @NonNull final PaymentMethodMapper paymentMethodMapper,
+        @NonNull final PaymentMethodRepository paymentMethodRepository) {
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.escPaymentManager = escPaymentManager;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -97,10 +101,12 @@ public class PaymentService implements PaymentRepository {
         this.amountRepository = amountRepository;
         this.context = context;
         this.tokenRepository = tokenRepository;
-        this.initRepository = initRepository;
         this.fileManager = fileManager;
 
         paymentFile = fileManager.create(FILE_PAYMENT);
+        this.fromPayerPaymentMethodIdToCardMapper = fromPayerPaymentMethodIdToCardMapper;
+        this.paymentMethodMapper = paymentMethodMapper;
+        this.paymentMethodRepository = paymentMethodRepository;
 
         handlerWrapper =
             new PaymentServiceHandlerWrapper(this, disabledPaymentMethodRepository, escPaymentManager,
@@ -165,38 +171,28 @@ public class PaymentService implements PaymentRepository {
     @Override
     public void startExpressPayment(@NonNull final PaymentConfiguration configuration) {
         handlerWrapper.createTransactionLiveData();
-        initRepository.init().enqueue(new Callback<InitResponse>() {
-            @Override
-            public void success(final InitResponse initResponse) {
-                final Pair<String, String> pair = new Pair<>(configuration.getPaymentMethodId(),
-                    configuration.getPaymentTypeId());
-                final PaymentMethod paymentMethod = new PaymentMethodMapper(initResponse).map(pair);
-                userSelectionRepository.select(paymentMethod, null);
-                if (PaymentTypes.isCardPaymentType(paymentMethod.getPaymentTypeId())) {
-                    // cards
-                    final Card card = initResponse.getCardById(configuration.getCustomOptionId());
-                    if (configuration.getSplitPayment()) {
-                        //TODO refactor
-                        final String secondaryPaymentMethodId =
-                            amountConfigurationRepository
-                                .getConfigurationFor(card.getId())
-                                .getSplitConfiguration().secondaryPaymentMethod.paymentMethodId;
-                        userSelectionRepository
-                            .select(card, initResponse.getPaymentMethodById(secondaryPaymentMethodId));
-                    } else if (card != null) {
-                        userSelectionRepository.select(card, null);
-                    }
-                }
-                userSelectionRepository.select(configuration.getPayerCost());
 
-                startPayment();
+        final Pair<String, String> pair = new Pair<>(configuration.getPaymentMethodId(),
+            configuration.getPaymentTypeId());
+        final PaymentMethod paymentMethod = paymentMethodMapper.map(pair);
+        userSelectionRepository.select(paymentMethod, null);
+        if (PaymentTypes.isCardPaymentType(paymentMethod.getPaymentTypeId())) {
+            // cards
+            final Card card = fromPayerPaymentMethodIdToCardMapper.map(configuration.getCustomOptionId());
+            if (configuration.getSplitPayment()) {
+                //TODO refactor
+                final String secondaryPaymentMethodId =
+                    amountConfigurationRepository.getConfigurationFor(card.getId())
+                        .getSplitConfiguration().secondaryPaymentMethod.paymentMethodId;
+                userSelectionRepository
+                    .select(card, paymentMethodRepository.getPaymentMethodById(secondaryPaymentMethodId));
+            } else if (card != null) {
+                userSelectionRepository.select(card, null);
             }
+        }
+        userSelectionRepository.select(configuration.getPayerCost());
 
-            @Override
-            public void failure(final ApiException apiException) {
-                throw new IllegalStateException("empty payment methods");
-            }
-        });
+        startPayment();
     }
 
     @Override

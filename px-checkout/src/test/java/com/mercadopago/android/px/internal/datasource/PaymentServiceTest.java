@@ -11,6 +11,7 @@ import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.core.internal.PaymentWrapper;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.core.FileManager;
+import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodIdToCardMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
@@ -20,10 +21,12 @@ import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.InitRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
+import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.mocks.InitResponseStub;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.model.Card;
@@ -43,7 +46,6 @@ import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.tracking.internal.model.Reason;
 import com.mercadopago.android.px.utils.StubFailMpCall;
-import com.mercadopago.android.px.utils.StubSuccessMpCall;
 import kotlin.Pair;
 import kotlin.Unit;
 import org.junit.Before;
@@ -98,6 +100,9 @@ public class PaymentServiceTest {
     @Mock private PayerCost payerCost;
     @Mock private PaymentMethod paymentMethod;
     @Mock private FileManager fileManager;
+    @Mock private FromPayerPaymentMethodIdToCardMapper fromPayerPaymentMethodIdToCardMapper;
+    @Mock private PaymentMethodMapper paymentMethodMapper;
+    @Mock private PaymentMethodRepository paymentMethodRepository;
 
     private PaymentService paymentService;
 
@@ -116,17 +121,23 @@ public class PaymentServiceTest {
             escManagerBehaviour,
             tokenRepository,
             instructionsRepository,
-            initRepository,
             amountConfigurationRepository,
             congratsRepository,
-            fileManager);
+            fileManager,
+            fromPayerPaymentMethodIdToCardMapper,
+            paymentMethodMapper,
+            paymentMethodRepository
+        );
 
         when(paymentSettingRepository.getCheckoutPreference()).thenReturn(mock(CheckoutPreference.class));
-        when(paymentSettingRepository.getPaymentConfiguration()).thenReturn(mock(com.mercadopago.android.px.configuration.PaymentConfiguration.class));
+        when(paymentSettingRepository.getPaymentConfiguration())
+            .thenReturn(mock(com.mercadopago.android.px.configuration.PaymentConfiguration.class));
         when(paymentSettingRepository.getPaymentConfiguration().getPaymentProcessor()).thenReturn(paymentProcessor);
         when(discountRepository.getCurrentConfiguration()).thenReturn(WITHOUT_DISCOUNT);
         when(userSelectionRepository.getPaymentMethod()).thenReturn(paymentMethod);
         when(paymentMethod.getPaymentTypeId()).thenReturn(PaymentTypes.CREDIT_CARD);
+        //noinspection unchecked
+        when(paymentMethodMapper.map((Pair<String, String>) any())).thenReturn(paymentMethod);
     }
 
     private PaymentConfiguration mockPaymentConfiguration(@NonNull final ExpressMetadata expressMetadata,
@@ -183,7 +194,7 @@ public class PaymentServiceTest {
 
     @Test
     public void whenSavedCardAndESCSavedThenAskTokenButFailApiCallThenCVVIsRequiered() {
-        final Observer<Pair<Card,Reason>> cvvRequiredObserver = mock(Observer.class);
+        final Observer<Pair<Card, Reason>> cvvRequiredObserver = mock(Observer.class);
         final Card card = savedCreditCardOneTapPresent(CARD_ID_ESC_APPROVED);
         when(escPaymentManager.hasEsc(card)).thenReturn(true);
         when(tokenRepository.createToken(card)).thenReturn(new StubFailMpCall(mock(ApiException.class)));
@@ -316,9 +327,8 @@ public class PaymentServiceTest {
         assertTrue(new ReflectionEquals(actualPc).matches(payerCost));
     }
 
-
     @NonNull
-    private Card savedCreditCardOneTapPresent(String cardId) {
+    private Card savedCreditCardOneTapPresent(final String cardId) {
         final Card card = creditCardPresetMock(cardId);
         when(userSelectionRepository.getPayerCost()).thenReturn(mock(PayerCost.class));
         when(userSelectionRepository.getCard()).thenReturn(card);
@@ -327,13 +337,14 @@ public class PaymentServiceTest {
         return card;
     }
 
-    private Card creditCardPresetMock(String cardId) {
+    private Card creditCardPresetMock(final String cardId) {
         final InitResponse initResponse = InitResponseStub.FULL.get();
-        when(initRepository.init()).thenReturn(new StubSuccessMpCall<>(initResponse));
+        final Card card = initResponse.getCardById(cardId);
         when(node.getPaymentMethodId()).thenReturn(PaymentMethods.ARGENTINA.AMEX);
         when(node.getPaymentTypeId()).thenReturn(PaymentTypes.CREDIT_CARD);
         when(node.isCard()).thenReturn(true);
         when(node.getCustomOptionId()).thenReturn(cardId);
-        return initResponse.getCardById(cardId);
+        when(fromPayerPaymentMethodIdToCardMapper.map(cardId)).thenReturn(card);
+        return card;
     }
 }

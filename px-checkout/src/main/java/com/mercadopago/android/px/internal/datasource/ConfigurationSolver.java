@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.datasource;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.AmountConfiguration;
-import javax.annotation.Nonnull;
 
 public interface ConfigurationSolver {
 
@@ -14,15 +13,7 @@ public interface ConfigurationSolver {
      * @return The hash associated to the discount configuration.
      */
     @NonNull
-    String getConfigurationHashFor(@Nonnull final String customOptionId);
-
-    /**
-     * Retrieves the general discount hash
-     *
-     * @return The hash associated to the general discount configuration.
-     */
-    @NonNull
-    String getDefaultSelectedAmountConfiguration();
+    String getConfigurationHashFor(@NonNull final String customOptionId);
 
     /**
      * Retrieves the dominant payer cost model for a custom option.
@@ -32,15 +23,4 @@ public interface ConfigurationSolver {
      */
     @Nullable
     AmountConfiguration getAmountConfigurationFor(@NonNull final String customOptionId);
-
-    /**
-     * Retrieves the dominant payer cost model for a custom option and a particular configuration hash.
-     *
-     * @param customOptionId The custom option ID.
-     * @param configurationHash The configuration hash.
-     * @return The payer cost model associated to the custom option ID and configuration hash.
-     */
-    @Nullable
-    AmountConfiguration getAmountConfigurationFor(@NonNull final String customOptionId,
-        @NonNull final String configurationHash);
 }

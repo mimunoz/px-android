@@ -5,7 +5,7 @@ import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
 import com.mercadopago.android.px.model.internal.AdditionalInfo
 import com.mercadopago.android.px.model.internal.CustomTexts
 
-class CustomTextsRepositoryImpl(paymentSettings: PaymentSettingRepository) : CustomTextsRepository {
+internal class CustomTextsRepositoryImpl(paymentSettings: PaymentSettingRepository) : CustomTextsRepository {
 
     override val customTexts: CustomTexts =
         AdditionalInfo.newInstance(paymentSettings.checkoutPreference?.additionalInfo)?.customTexts ?:

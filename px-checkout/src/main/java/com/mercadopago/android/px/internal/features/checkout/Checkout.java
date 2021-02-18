@@ -41,5 +41,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
             @Nullable final String redirectUrl);
 
         void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback);
+
+        void onRestore();
     }
 }

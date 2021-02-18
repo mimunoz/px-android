@@ -3,18 +3,19 @@ package com.mercadopago.android.px.internal.features.payment_result.remedies
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.R
+import com.mercadopago.android.px.internal.di.MapperProvider
 import com.mercadopago.android.px.internal.di.Session
 import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
+import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.CvvRemedy
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.HighRiskRemedy
-import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.RetryPaymentFragment
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil
 import com.mercadopago.android.px.internal.util.nonNullObserve
@@ -42,7 +43,8 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             val session = Session.getInstance()
             viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
-                session.initRepository, session.amountConfigurationRepository, session.tracker)
+                session.amountConfigurationRepository, session.tracker,
+                session.expressMetadataRepository, MapperProvider.getFromPayerPaymentMethodIdToCardMapper())
             retryPaymentFragment = childFragmentManager.findFragmentById(R.id.retry_payment) as RetryPaymentFragment
             retryPaymentFragment.setListener(this@RemediesFragment)
             buildViewModel()

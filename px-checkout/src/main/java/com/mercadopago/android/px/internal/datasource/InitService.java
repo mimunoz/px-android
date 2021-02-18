@@ -8,15 +8,21 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.configuration.DiscountParamsConfiguration;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
-import com.mercadopago.android.px.internal.datasource.cache.Cache;
+import com.mercadopago.android.px.internal.mappers.ExpressMetadataToDisabledIdMapper;
+import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
+import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
+import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
 import com.mercadopago.android.px.internal.repository.InitRepository;
+import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.PayerComplianceRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
+import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.services.CheckoutService;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.JsonUtil;
-import com.mercadopago.android.px.internal.mappers.ExpressMetadataToDisabledIdMapper;
 import com.mercadopago.android.px.model.ExpressMetadata;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.internal.CheckoutFeatures;
@@ -27,10 +33,9 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public abstract class InitService implements InitRepository {
+public class InitService implements InitRepository {
 
     private static final int MAX_REFRESH_RETRIES = 4;
     private static final int RETRY_DELAY = 500;
@@ -40,9 +45,14 @@ public abstract class InitService implements InitRepository {
     @NonNull /* default */ final PaymentSettingRepository paymentSettingRepository;
     @NonNull /* default */ final ExperimentsRepository experimentsRepository;
     @NonNull /* default */ DisabledPaymentMethodRepository disabledPaymentMethodRepository;
-    @NonNull /* default */ final Cache<InitResponse> initCache;
     @NonNull private final MPTracker tracker;
-    @NonNull /* default */ final List<OnChangedListener> listeners = new ArrayList<>();
+    @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
+    @NonNull private final ExpressMetadataRepository expressMetadataRepository;
+    @NonNull private final PaymentMethodRepository paymentMethodRepository;
+    @NonNull private final ModalRepository modalRepository;
+    @NonNull private PayerComplianceRepository payerComplianceRepository;
+    @NonNull private AmountConfigurationRepository amountConfigurationRepository;
+    @NonNull private DiscountRepository discountRepository;
     @NonNull private final TrackingRepository trackingRepository;
     /* default */ int refreshRetriesAvailable = MAX_REFRESH_RETRIES;
     /* default */ Handler retryHandler;
@@ -51,29 +61,37 @@ public abstract class InitService implements InitRepository {
         @NonNull final ExperimentsRepository experimentsRepository,
         @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final ESCManagerBehaviour escManagerBehaviour, @NonNull final CheckoutService checkoutService,
-        @NonNull final TrackingRepository trackingRepository, @NonNull final Cache<InitResponse> initCache,
-        @NonNull final MPTracker tracker) {
+        @NonNull final TrackingRepository trackingRepository, @NonNull final MPTracker tracker,
+        @NonNull final PayerPaymentMethodRepository payerPaymentMethodRepository,
+        @NonNull final ExpressMetadataRepository expressMetadataRepository,
+        @NonNull final PaymentMethodRepository paymentMethodRepository,
+        @NonNull final ModalRepository modalRepository,
+        @NonNull final PayerComplianceRepository payerComplianceRepository,
+        @NonNull final AmountConfigurationRepository amountConfigurationRepository,
+        @NonNull final DiscountRepository discountRepository) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.experimentsRepository = experimentsRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         this.escManagerBehaviour = escManagerBehaviour;
         this.checkoutService = checkoutService;
         this.trackingRepository = trackingRepository;
-        this.initCache = initCache;
         this.tracker = tracker;
+        this.payerPaymentMethodRepository = payerPaymentMethodRepository;
+        this.expressMetadataRepository = expressMetadataRepository;
+        this.paymentMethodRepository = paymentMethodRepository;
+        this.modalRepository = modalRepository;
+        this.payerComplianceRepository = payerComplianceRepository;
+        this.amountConfigurationRepository = amountConfigurationRepository;
+        this.discountRepository = discountRepository;
     }
 
     @NonNull
     @Override
     public MPCall<InitResponse> init() {
-        return init(getPostResponse());
+        return newCall(getPostResponse());
     }
 
-    private MPCall<InitResponse> init(@NonNull final PostResponse postResponse) {
-        return initCache.isCached() ? initCache.get() : newCall(postResponse);
-    }
-
-    private void configure(@NonNull final InitResponse initResponse) {
+    protected void configure(@NonNull final InitResponse initResponse) {
         if (initResponse.getCheckoutPreference() != null) {
             paymentSettingRepository.configure(initResponse.getCheckoutPreference());
         }
@@ -81,6 +99,13 @@ public abstract class InitService implements InitRepository {
         paymentSettingRepository.configure(initResponse.getCurrency());
         paymentSettingRepository.configure(initResponse.getConfiguration());
         experimentsRepository.configure(initResponse.getExperiments());
+        payerPaymentMethodRepository.configure(initResponse.getCustomSearchItems());
+        expressMetadataRepository.configure(initResponse.getExpress());
+        paymentMethodRepository.configure(initResponse.getPaymentMethods());
+        modalRepository.configure(initResponse.getModals());
+        payerComplianceRepository.configure(initResponse.getPayerCompliance());
+        amountConfigurationRepository.configure(initResponse.getDefaultAmountConfiguration());
+        discountRepository.configure(initResponse.getDiscountsConfigurations());
 
         disabledPaymentMethodRepository.storeDisabledPaymentMethodsIds(
             new ExpressMetadataToDisabledIdMapper().map(initResponse.getExpress()));
@@ -90,7 +115,6 @@ public abstract class InitService implements InitRepository {
 
     @Override
     public void lazyConfigure(@NonNull final InitResponse initResponse) {
-        configure(initResponse);
         getPostResponse().call(initResponse);
     }
 
@@ -99,10 +123,7 @@ public abstract class InitService implements InitRepository {
     }
 
     /* default */ PostResponse getPostResponse() {
-        return initResponse -> {
-            initCache.put(initResponse);
-            notifyListeners(initResponse);
-        };
+        return this::configure;
     }
 
     private PostResponse noPostResponse() {
@@ -124,7 +145,6 @@ public abstract class InitService implements InitRepository {
                 return new Callback<InitResponse>() {
                     @Override
                     public void success(final InitResponse initResponse) {
-                        configure(initResponse);
                         postResponse.call(initResponse);
                         callback.success(initResponse);
                     }
@@ -172,36 +192,6 @@ public abstract class InitService implements InitRepository {
 
     @NonNull
     @Override
-    public MPCall<InitResponse> refresh() {
-        return callback -> init(noPostResponse()).enqueue(getRefreshCallback(callback));
-    }
-
-    @NonNull
-    @Override
-    public MPCall<InitResponse> cleanRefresh() {
-        return newCall(getPostResponse());
-    }
-
-    /* default */ Callback<InitResponse> getRefreshCallback(@NonNull final Callback<InitResponse> originalCallback) {
-        return new Callback<InitResponse>() {
-            @Override
-            public void success(final InitResponse initResponse) {
-                final Map<String, DisabledPaymentMethod> disabledPaymentMethodMap =
-                    disabledPaymentMethodRepository.getDisabledPaymentMethods();
-                new ExpressMetadataSorter(initResponse.getExpress(), disabledPaymentMethodMap).sort();
-                getPostResponse().call(initResponse);
-                originalCallback.success(initResponse);
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                originalCallback.failure(apiException);
-            }
-        };
-    }
-
-    @NonNull
-    @Override
     public MPCall<InitResponse> refreshWithNewCard(@NonNull final String cardId) {
         return callback -> newCall(noPostResponse()).enqueue(getRefreshWithNewCardCallback(cardId, callback));
     }
@@ -241,29 +231,5 @@ public abstract class InitService implements InitRepository {
                 callback.failure(apiException);
             }
         };
-    }
-
-    @Override
-    public void addOnChangedListener(@NonNull final OnChangedListener listener) {
-        listeners.add(listener);
-        if (initCache.isCached()) {
-            initCache.get().enqueue(new Callback<InitResponse>() {
-                @Override
-                public void success(final InitResponse initResponse) {
-                    listener.onInitResponseChanged(initResponse);
-                }
-
-                @Override
-                public void failure(final ApiException apiException) {
-                    //Shouldn't happen because it's cached
-                }
-            });
-        }
-    }
-
-    /* default */ void notifyListeners(@NonNull final InitResponse initResponse) {
-        for (final OnChangedListener listener : listeners) {
-            listener.onInitResponseChanged(initResponse);
-        }
     }
 }

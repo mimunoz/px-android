@@ -3,9 +3,11 @@ package com.mercadopago.android.px.internal.mappers
 import com.mercadopago.android.px.internal.extensions.isNotNull
 import java.util.*
 
-internal abstract class NonNullMapper<T, V> : Mapper<T, V>() {
+internal abstract class NonNullMapper<T, V> {
 
-    override fun map(values: Iterable<T>): List<V> {
+    abstract fun map(value: T): V?
+
+    fun map(values: Iterable<T>): List<V> {
         val returned: MutableList<V> = ArrayList()
         for (value in values) {
             val mappedValue = map(value)

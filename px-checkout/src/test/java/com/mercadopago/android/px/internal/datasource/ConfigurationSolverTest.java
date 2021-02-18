@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.model.CustomSearchItem;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +21,13 @@ public class ConfigurationSolverTest {
 
     private static final String HASH_SAMPLE_ACCOUNT_MONEY_CONFIGURATION = "HASH_ACCOUNT_MONEY_CONFIGURATION";
     private static final String HASH_SAMPLE_SAVED_CARD_CONFIGURATION = "HASH_SAVED_CARD_CONFIGURATION";
-    private static final String HASH_SAMPLE_GENERAL_CONFIGURATION = "HASH_GENERAL_CONFIGURATION";
 
     private ConfigurationSolverImpl discountConfigurationSolver;
     private List<CustomSearchItem> customSearchItems;
 
     @Mock private CustomSearchItem accountMoneyCustomSearchItem;
     @Mock private CustomSearchItem cardCustomSearchItem;
+    @Mock private PayerPaymentMethodRepository payerPaymentMethodRepository;
 
     @Before
     public void setUp() {
@@ -34,8 +35,7 @@ public class ConfigurationSolverTest {
         customSearchItems.add(accountMoneyCustomSearchItem);
         customSearchItems.add(cardCustomSearchItem);
 
-        discountConfigurationSolver =
-            new ConfigurationSolverImpl(HASH_SAMPLE_GENERAL_CONFIGURATION, customSearchItems);
+        discountConfigurationSolver = new ConfigurationSolverImpl(payerPaymentMethodRepository);
 
         when(accountMoneyCustomSearchItem.getId()).thenReturn(ACCOUNT_MONEY_SAMPLE_ID);
         when(accountMoneyCustomSearchItem.getDefaultAmountConfiguration())
@@ -43,6 +43,8 @@ public class ConfigurationSolverTest {
 
         when(cardCustomSearchItem.getId()).thenReturn(CARD_SAMPLE_ID);
         when(cardCustomSearchItem.getDefaultAmountConfiguration()).thenReturn(HASH_SAMPLE_SAVED_CARD_CONFIGURATION);
+
+        when(payerPaymentMethodRepository.getValue()).thenReturn(customSearchItems);
     }
 
     @Test
@@ -55,17 +57,6 @@ public class ConfigurationSolverTest {
     public void whenHasConfigurationByCardIdIdThenReturnCardConfigurationHash() {
         assertEquals(HASH_SAMPLE_SAVED_CARD_CONFIGURATION,
             discountConfigurationSolver.getConfigurationHashFor(CARD_SAMPLE_ID));
-    }
-
-    @Test
-    public void whenIdIsNullThenReturnGeneralConfiguration() {
-        assertEquals(HASH_SAMPLE_GENERAL_CONFIGURATION, discountConfigurationSolver.getDefaultSelectedAmountConfiguration());
-    }
-
-    @Test
-    public void whenIdIsNullAndHasNotGeneralConfigurationThenReturnEmptyHash() {
-        discountConfigurationSolver = new ConfigurationSolverImpl("", customSearchItems);
-        assertEquals("", discountConfigurationSolver.getDefaultSelectedAmountConfiguration());
     }
 
     @Test
