@@ -1,19 +1,16 @@
 package com.mercadopago.android.px.testcheckout.assertions;
 
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.test.espresso.matcher.ViewMatchers;
-import android.view.View;
-import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.testcheckout.pages.DiscountDetailPage;
 import com.mercadopago.android.px.testcheckout.pages.InstallmentsPage;
 import com.mercadopago.android.px.testcheckout.pages.OneTapPage;
 import com.mercadopago.android.px.testcheckout.pages.PaymentMethodPage;
 import org.hamcrest.Matcher;
 
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.hasTextColor;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -31,33 +28,14 @@ public class UsedUpDiscountValidator extends DefaultValidator {
 
     @Override
     public void validate(@NonNull final PaymentMethodPage paymentMethodPage) {
-        validateAmountView();
     }
 
     @Override
     public void validate(@NonNull final InstallmentsPage installmentsPage) {
-        validateAmountView();
     }
 
     @Override
     public void validate(@NonNull final OneTapPage oneTapPage) {
         // TODO implement.
-    }
-
-    private void validateAmountView() {
-        final Matcher<View> amountDescription = withId(R.id.amount_description);
-        final Matcher<View> maxCouponAmount = withId(R.id.max_coupon_amount);
-        final Matcher<View> amountBeforeDiscount =
-            withId(R.id.amount_before_discount);
-        final Matcher<View> finalAmount = withId(R.id.final_amount);
-        final Matcher<View> arrow = withId(R.id.blue_arrow);
-        onView(amountDescription).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-        onView(maxCouponAmount).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-        onView(amountBeforeDiscount).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-        onView(finalAmount).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-        onView(arrow).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-        onView(amountDescription).check(matches(withText(
-            getInstrumentation().getTargetContext().getString(R.string.px_used_up_discount_row))));
-        onView(amountDescription).check(matches(hasTextColor(R.color.px_form_text)));
     }
 }
