@@ -39,7 +39,7 @@ import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepos
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
 import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
-import com.mercadopago.android.px.internal.repository.InitRepository;
+import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
 import com.mercadopago.android.px.internal.repository.PayerComplianceRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
@@ -64,8 +64,9 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.PaymentData;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.model.internal.OneTapItem;
 import com.mercadopago.android.px.model.internal.FromExpressMetadataToPaymentConfiguration;
-import com.mercadopago.android.px.model.internal.InitResponse;
+import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.model.internal.Modal;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.model.internal.SummaryInfo;
@@ -105,7 +106,7 @@ import java.util.List;
     @NonNull private final ExpressMetadataRepository expressMetadataRepository;
     @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
     @NonNull private final ModalRepository modalRepository;
-    @NonNull /* default */ final InitRepository initRepository;
+    @NonNull /* default */ final CheckoutRepository checkoutRepository;
     private final PayerCostSelectionRepository payerCostSelectionRepository;
     private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
     /* default */ TriggerableQueue triggerableQueue;
@@ -115,7 +116,7 @@ import java.util.List;
         @NonNull final PayerCostSelectionRepository payerCostSelectionRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
-        @NonNull final InitRepository initRepository,
+        @NonNull final CheckoutRepository checkoutRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final ChargeRepository chargeRepository,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
@@ -136,7 +137,7 @@ import java.util.List;
         this.payerCostSelectionRepository = payerCostSelectionRepository;
         this.discountRepository = discountRepository;
         this.amountRepository = amountRepository;
-        this.initRepository = initRepository;
+        this.checkoutRepository = checkoutRepository;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.chargeRepository = chargeRepository;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -170,7 +171,7 @@ import java.util.List;
 
         final ElementDescriptorView.Model elementDescriptorModel = new ElementDescriptorMapper().map(summaryInfo);
 
-        final List<ExpressMetadata> expressMetadataList = expressMetadataRepository.getValue();
+        final List<OneTapItem> expressMetadataList = expressMetadataRepository.getValue();
         final List<SummaryView.Model> summaryModels =
             new SummaryViewModelMapper(paymentSettingRepository.getCurrency(), discountRepository, amountRepository,
                 elementDescriptorModel, this, summaryInfo, chargeRepository, amountConfigurationRepository,
@@ -509,9 +510,9 @@ import java.util.List;
         if (isViewAttached()) {
             getView().showLoading();
         }
-        initRepository.init().enqueue(new Callback<InitResponse>() {
+        checkoutRepository.checkout().enqueue(new Callback<CheckoutResponse>() {
             @Override
-            public void success(final InitResponse initResponse) {
+            public void success(final CheckoutResponse checkoutResponse) {
                 if (isViewAttached()) {
                     payerComplianceRepository.turnIFPECompliant();
                     reload();
@@ -531,9 +532,9 @@ import java.util.List;
 
     @Override
     public void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback) {
-        initRepository.refreshWithNewCard(cardId).enqueue(new Callback<InitResponse>() {
+        checkoutRepository.refreshWithNewCard(cardId).enqueue(new Callback<CheckoutResponse>() {
             @Override
-            public void success(final InitResponse initResponse) {
+            public void success(final CheckoutResponse checkoutResponse) {
                 callback.onSuccess();
             }
 

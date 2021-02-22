@@ -20,7 +20,7 @@ import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.ExpressMetadataRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.InitService;
+import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.InstructionsService;
 import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PayerPaymentMethodRepositoryImpl;
@@ -39,7 +39,7 @@ import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
 import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
-import com.mercadopago.android.px.internal.repository.InitRepository;
+import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
@@ -72,7 +72,7 @@ public final class Session extends ApplicationModule {
     private final CheckoutConfigurationModule configurationModule;
     private DiscountRepository discountRepository;
     private AmountRepository amountRepository;
-    private InitRepository initRepository;
+    private CheckoutRepository checkoutRepository;
     private PaymentRepository paymentRepository;
     private AmountConfigurationRepository amountConfigurationRepository;
     private InstructionsService instructionsRepository;
@@ -180,7 +180,7 @@ public final class Session extends ApplicationModule {
         networkModule.reset();
         discountRepository = null;
         amountRepository = null;
-        initRepository = null;
+        checkoutRepository = null;
         paymentRepository = null;
         instructionsRepository = null;
         amountConfigurationRepository = null;
@@ -196,10 +196,10 @@ public final class Session extends ApplicationModule {
     }
 
     @NonNull
-    public InitRepository getInitRepository() {
-        if (initRepository == null) {
+    public CheckoutRepository getCheckoutRepository() {
+        if (checkoutRepository == null) {
             final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
-            initRepository = new InitService(paymentSettings, getExperimentsRepository(),
+            checkoutRepository = new CheckoutRepositoryImpl(paymentSettings, getExperimentsRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
                 configurationModule.getTrackingRepository(), getTracker(),
@@ -208,7 +208,7 @@ public final class Session extends ApplicationModule {
                 getAmountConfigurationRepository(), getDiscountRepository()) {
             };
         }
-        return initRepository;
+        return checkoutRepository;
     }
 
     @NonNull
@@ -393,7 +393,8 @@ public final class Session extends ApplicationModule {
     @NonNull
     public PrefetchInitService getPrefetchInitService(@NonNull final MercadoPagoCheckout checkout) {
         configIds(checkout);
-        return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(CheckoutService.class),
+        return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(
+            CheckoutService.class),
             getMercadoPagoESC(), configurationModule.getTrackingRepository());
     }
 

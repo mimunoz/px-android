@@ -4,7 +4,7 @@ import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
-import com.mercadopago.android.px.model.internal.InitResponse;
+import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.services.BuildConfig;
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,13 +20,13 @@ public interface CheckoutService {
     String CHECKOUT_VERSION = "v2";
     String ENVIRONMENT = BuildConfig.API_ENVIRONMENT_NEW;
 
-    @POST("https://run.mocky.io/v3/2dbc0a57-b3f0-4f4b-826e-6a21c2707be8/" + ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout")
-    MPCall<InitResponse> checkout(
+    @POST("https://run.mocky.io/v3/0dd94609-c590-4fb2-8a41-87ae61b3dd30/" + ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout")
+    MPCall<CheckoutResponse> checkout(
         @Query("access_token") String privateKey,
         @Body Map<String, Object> body);
 
-    @POST("https://run.mocky.io/v3/2dbc0a57-b3f0-4f4b-826e-6a21c2707be8/" + ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout/{preference_id}")
-    MPCall<InitResponse> checkout(
+    @POST("https://run.mocky.io/v3/0dd94609-c590-4fb2-8a41-87ae61b3dd30/" + ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout/{preference_id}")
+    MPCall<CheckoutResponse> checkout(
         @Path(value = "preference_id", encoded = true) String preferenceId,
         @Query("access_token") String privateKey,
         @Body Map<String, Object> body);
