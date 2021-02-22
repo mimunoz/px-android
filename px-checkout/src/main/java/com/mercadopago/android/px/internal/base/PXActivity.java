@@ -1,12 +1,10 @@
 package com.mercadopago.android.px.internal.base;
 
-import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.mercadopago.android.px.R;
-import com.mercadopago.android.px.addons.BehaviourProvider;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.font.FontHelper;
@@ -49,11 +47,6 @@ public abstract class PXActivity<P extends BasePresenter> extends AppCompatActiv
         if (presenter != null) {
             presenter.detachView();
         }
-    }
-
-    @Override
-    public void attachBaseContext(@NonNull final Context context) {
-        super.attachBaseContext(BehaviourProvider.getLocaleBehaviour().attachBaseContext(context));
     }
 
     @Override
