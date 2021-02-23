@@ -19,7 +19,7 @@ import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.ExpressMetadataRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.InstructionsService;
 import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
@@ -38,7 +38,7 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.ExpressMetadataRepository;
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
@@ -84,7 +84,7 @@ public final class Session extends ApplicationModule {
     private PaymentResultViewModelFactory paymentResultViewModelFactory;
     private ViewModelModule viewModelModule;
     private PayerPaymentMethodRepository payerPaymentMethodRepository;
-    private ExpressMetadataRepository expressMetadataRepository;
+    private OneTapItemRepository oneTapItemRepository;
     private PaymentMethodRepository paymentMethodRepository;
     private ModalRepository modalRepository;
     private ConfigurationSolver configurationSolver;
@@ -188,7 +188,7 @@ public final class Session extends ApplicationModule {
         congratsRepository = null;
         escPaymentManager = null;
         viewModelModule = null;
-        expressMetadataRepository = null;
+        oneTapItemRepository = null;
         payerPaymentMethodRepository = null;
         paymentMethodRepository = null;
         modalRepository = null;
@@ -203,7 +203,7 @@ public final class Session extends ApplicationModule {
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
                 configurationModule.getTrackingRepository(), getTracker(),
-                getPayerPaymentMethodRepository(), getExpressMetadataRepository(), getPaymentMethodRepository(),
+                getPayerPaymentMethodRepository(), getOneTapItemRepository(), getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
                 getAmountConfigurationRepository(), getDiscountRepository()) {
             };
@@ -288,7 +288,7 @@ public final class Session extends ApplicationModule {
                 getAmountConfigurationRepository(),
                 getCongratsRepository(),
                 getFileManager(),
-                MapperProvider.INSTANCE.getFromPayerPaymentMethodIdToCardMapper(),
+                MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
                 getPaymentMethodRepository());
         }
@@ -340,7 +340,7 @@ public final class Session extends ApplicationModule {
                 getPlatform(getApplicationContext()), configurationModule.getTrackingRepository(),
                 configurationModule.getUserSelectionRepository(), getAmountRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(),
-                configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getExpressMetadataRepository(),
+                configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getOneTapItemRepository(),
                 MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper());
         }
         return congratsRepository;
@@ -361,12 +361,12 @@ public final class Session extends ApplicationModule {
         return payerPaymentMethodRepository;
     }
 
-    public ExpressMetadataRepository getExpressMetadataRepository() {
-        if (expressMetadataRepository == null) {
-            expressMetadataRepository = new ExpressMetadataRepositoryImpl(getFileManager(),
+    public OneTapItemRepository getOneTapItemRepository() {
+        if (oneTapItemRepository == null) {
+            oneTapItemRepository = new OneTapItemRepositoryImpl(getFileManager(),
                 getConfigurationModule().getDisabledPaymentMethodRepository());
         }
-        return expressMetadataRepository;
+        return oneTapItemRepository;
     }
 
     public PaymentMethodRepository getPaymentMethodRepository() {

@@ -44,7 +44,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
                 session.amountConfigurationRepository, session.tracker,
-                session.expressMetadataRepository, MapperProvider.getFromPayerPaymentMethodIdToCardMapper())
+                session.oneTapItemRepository, MapperProvider.getFromPayerPaymentMethodToCardMapper())
             retryPaymentFragment = childFragmentManager.findFragmentById(R.id.retry_payment) as RetryPaymentFragment
             retryPaymentFragment.setListener(this@RemediesFragment)
             buildViewModel()

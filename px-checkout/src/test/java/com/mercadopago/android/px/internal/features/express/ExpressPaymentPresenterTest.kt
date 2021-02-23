@@ -107,7 +107,7 @@ class ExpressPaymentPresenterTest {
     private lateinit var tracker: MPTracker
 
     @Mock
-    private lateinit var expressMetadataRepository: ExpressMetadataRepository
+    private lateinit var oneTapItemRepository: OneTapItemRepository
 
     @Mock
     private lateinit var payerPaymentMethodRepository: PayerPaymentMethodRepository
@@ -137,13 +137,13 @@ class ExpressPaymentPresenterTest {
         `when`(discountRepository.getCurrentConfiguration()).thenReturn(discountConfigurationModel)
         `when`(discountRepository.getConfigurationFor("123")).thenReturn(discountConfigurationModel)
         `when`(amountConfigurationRepository.getConfigurationFor("123")).thenReturn(amountConfiguration)
-        `when`(expressMetadataRepository.value).thenReturn(listOf(oneTapItem))
+        `when`(oneTapItemRepository.value).thenReturn(listOf(oneTapItem))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
-            payerCostSelectionRepository, discountRepository, amountRepository, checkoutRepository,
+            payerCostSelectionRepository, mock(ApplicationSelectionRepository::class.java), discountRepository, amountRepository, checkoutRepository,
             amountConfigurationRepository, chargeRepository, escManagerBehaviour, paymentMethodDrawableItemMapper,
             experimentsRepository, payerComplianceRepository, trackingRepository,
             mock(PaymentMethodDescriptorMapper::class.java), mock(CustomTextsRepository::class.java),
-            mock(AmountDescriptorMapper::class.java), tracker, expressMetadataRepository, payerPaymentMethodRepository,
+            mock(AmountDescriptorMapper::class.java), tracker, oneTapItemRepository, payerPaymentMethodRepository,
             modalRepository)
         verifyAttachView()
     }

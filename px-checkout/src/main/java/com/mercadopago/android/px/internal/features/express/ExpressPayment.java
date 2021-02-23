@@ -127,6 +127,8 @@ public interface ExpressPayment {
         void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback);
 
         void onCardFormResult();
+
+        void onApplicationChanged(@NonNull final String paymentTypeId);
     }
 
     enum NavigationState {
