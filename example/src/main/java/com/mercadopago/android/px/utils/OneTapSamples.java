@@ -154,7 +154,7 @@ public final class OneTapSamples {
 
         return new MercadoPagoCheckout.Builder(Credentials.ONE_TAP_DIRECT_DISCOUNT_MERCHANT_PUBLIC_KEY, preference,
             paymentConfiguration)
-            .setPrivateKey(Credentials.ONE_TAP_PAYER_1_ACCESS_TOKEN)
+            .setPrivateKey("TEST-3774255615657160-020616-9ef3ce48d70f2f538c865b4bd2068634-62044014")
             .setAdvancedConfiguration(advancedConfiguration)
             .setTrackingConfiguration(trackingConfiguration);
     }

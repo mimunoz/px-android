@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.nds.threeds</groupId>
+  <artifactId>client</artifactId>
+  <versioning>
+    <latest>1.0.trunk</latest>
+    <release>1.0.trunk</release>
+    <versions>
+      <version>1.0.trunk</version>
+    </versions>
+    <lastUpdated>20191030111126</lastUpdated>
+  </versioning>
+</metadata>

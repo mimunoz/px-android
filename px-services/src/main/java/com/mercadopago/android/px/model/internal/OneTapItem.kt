@@ -6,7 +6,7 @@ import java.lang.UnsupportedOperationException
 
 class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
 
-    private lateinit var applications: List<Application>
+    private var applications: List<Application>? = null
 
     init {
         throw UnsupportedOperationException("Parcelable implementation not available")
@@ -17,5 +17,5 @@ class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
         throw UnsupportedOperationException("Parcelable implementation not available")
     }
 
-    fun getApplications() = applications
+    fun getApplications() = applications ?: listOf()
 }

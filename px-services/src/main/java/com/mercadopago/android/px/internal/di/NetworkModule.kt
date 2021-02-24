@@ -16,6 +16,15 @@ class NetworkModule(context: Context) : ApplicationModule(context) {
             return internalRetrofit!!
         }
 
+    private var internalRetrofit2: Retrofit? = null
+    val retrofitClient2: Retrofit
+        get() {
+            if (internalRetrofit2 == null) {
+                internalRetrofit2 = RetrofitUtil.getRetrofitClient2(applicationContext)
+            }
+            return internalRetrofit2!!
+        }
+
     fun reset() {
         internalRetrofit = null
     }

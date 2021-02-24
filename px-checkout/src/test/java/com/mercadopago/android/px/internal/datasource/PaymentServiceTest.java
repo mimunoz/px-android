@@ -12,6 +12,7 @@ import com.mercadopago.android.px.core.internal.PaymentWrapper;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
+import com.mercadopago.android.px.internal.features.three_ds.AuthenticateUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -106,6 +107,7 @@ public class PaymentServiceTest {
     @Mock private FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     @Mock private PaymentMethodMapper paymentMethodMapper;
     @Mock private PaymentMethodRepository paymentMethodRepository;
+    @Mock private AuthenticateUseCase authenticateUseCase;
 
     private PaymentService paymentService;
 
@@ -129,7 +131,8 @@ public class PaymentServiceTest {
             fileManager,
             fromPayerPaymentMethodToCardMapper,
             paymentMethodMapper,
-            paymentMethodRepository
+            paymentMethodRepository,
+            authenticateUseCase
         );
 
         when(paymentSettingRepository.getCheckoutPreference()).thenReturn(mock(CheckoutPreference.class));

@@ -7,6 +7,7 @@ import com.mercadopago.android.px.model.SavedCardToken;
 import com.mercadopago.android.px.model.SavedESCCardToken;
 import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.requests.SecurityCodeIntent;
+import okhttp3.RequestBody;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.POST;
@@ -15,6 +16,9 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface GatewayService {
+
+    @POST("/v1/card_tokens")
+    MPCall<Token> createToken(@Query("public_key") String publicKey, @Body RequestBody body);
 
     @POST("/v1/card_tokens")
     MPCall<Token> createToken(@Query("public_key") String publicKey, @Nullable @Query("access_token") String privateKey,

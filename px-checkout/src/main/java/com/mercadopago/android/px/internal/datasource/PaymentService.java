@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.datasource;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
@@ -10,6 +11,7 @@ import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
+import com.mercadopago.android.px.internal.features.three_ds.AuthenticateUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.EscStatus;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -76,6 +78,7 @@ public class PaymentService implements PaymentRepository {
     @NonNull private FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     private PaymentMethodMapper paymentMethodMapper;
     private PaymentMethodRepository paymentMethodRepository;
+    private AuthenticateUseCase authenticateUseCase;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -92,7 +95,8 @@ public class PaymentService implements PaymentRepository {
         @NonNull final FileManager fileManager,
         @NonNull final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper,
         @NonNull final PaymentMethodMapper paymentMethodMapper,
-        @NonNull final PaymentMethodRepository paymentMethodRepository) {
+        @NonNull final PaymentMethodRepository paymentMethodRepository,
+        @NonNull final AuthenticateUseCase authenticateUseCase) {
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.escPaymentManager = escPaymentManager;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -103,6 +107,7 @@ public class PaymentService implements PaymentRepository {
         this.context = context;
         this.tokenRepository = tokenRepository;
         this.fileManager = fileManager;
+        this.authenticateUseCase = authenticateUseCase;
 
         paymentFile = fileManager.create(FILE_PAYMENT);
         this.fromPayerPaymentMethodToCardMapper = fromPayerPaymentMethodToCardMapper;
@@ -182,7 +187,7 @@ public class PaymentService implements PaymentRepository {
             final Card card = fromPayerPaymentMethodToCardMapper.map(
                 new PayerPaymentMethodRepository.Key(configuration.getCustomOptionId(),
                     paymentMethod.getId(), paymentMethod.getPaymentTypeId()));
-            if(card == null) {
+            if (card == null) {
                 throw new IllegalStateException("Cannot find selected card");
             }
             if (configuration.getSplitPayment()) {
@@ -301,6 +306,20 @@ public class PaymentService implements PaymentRepository {
         if (getPaymentProcessor().shouldShowFragmentOnPayment(checkoutPreference)) {
             handlerWrapper.onVisualPayment();
         } else {
+
+            authenticateUseCase.execute(new AuthenticateUseCase.Params(
+                    getPaymentDataList().get(0),
+                    userSelectionRepository.getCard(),
+                    paymentSettingRepository.getSite(),
+                    paymentSettingRepository.getCurrency()),
+                s -> {
+                    Log.v("CRIS", s);
+                    return null;
+                }, mercadoPagoError -> {
+                    Log.v("CRIS", mercadoPagoError.toString());
+                    return null;
+                });
+
             final SplitPaymentProcessor.CheckoutData checkoutData =
                 new SplitPaymentProcessor.CheckoutData(getPaymentDataList(), checkoutPreference, securityType);
             getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);

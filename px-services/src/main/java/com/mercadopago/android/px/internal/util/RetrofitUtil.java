@@ -21,6 +21,11 @@ public final class RetrofitUtil {
             DEFAULT_WRITE_TIMEOUT);
     }
 
+    public static Retrofit getRetrofitClient2(final Context context) {
+        return getRetrofit2(context, MP_API_BASE_URL, DEFAULT_CONNECT_TIMEOUT, DEFAULT_READ_TIMEOUT,
+            DEFAULT_WRITE_TIMEOUT);
+    }
+
     private static Retrofit getRetrofit(final Context context,
         final String baseUrl,
         final int connectTimeout,
@@ -30,6 +35,20 @@ public final class RetrofitUtil {
         return new Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(JsonUtil.getGson()))
+            .client(HttpClientUtil.getClient(context, connectTimeout, readTimeout, writeTimeout))
+            .addCallAdapterFactory(new ErrorHandlingCallAdapter.ErrorHandlingCallAdapterFactory())
+            .build();
+    }
+
+    private static Retrofit getRetrofit2(final Context context,
+        final String baseUrl,
+        final int connectTimeout,
+        final int readTimeout,
+        final int writeTimeout) {
+
+        return new Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create(JsonUtil.getGson2()))
             .client(HttpClientUtil.getClient(context, connectTimeout, readTimeout, writeTimeout))
             .addCallAdapterFactory(new ErrorHandlingCallAdapter.ErrorHandlingCallAdapterFactory())
             .build();

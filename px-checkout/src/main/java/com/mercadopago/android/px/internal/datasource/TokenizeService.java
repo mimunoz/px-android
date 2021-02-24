@@ -11,7 +11,6 @@ import com.mercadopago.android.px.model.Card;
 import com.mercadopago.android.px.model.CardInformation;
 import com.mercadopago.android.px.model.Device;
 import com.mercadopago.android.px.model.SavedCardToken;
-import com.mercadopago.android.px.model.SavedESCCardToken;
 import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.services.Callback;
@@ -19,6 +18,8 @@ import com.mercadopago.android.px.tracking.internal.MPTracker;
 import com.mercadopago.android.px.tracking.internal.events.EscFrictionEventTracker;
 import com.mercadopago.android.px.tracking.internal.events.TokenFrictionEventTracker;
 import java.util.Objects;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 public class TokenizeService implements TokenRepository {
 
@@ -46,10 +47,21 @@ public class TokenizeService implements TokenRepository {
             final String cardId = Objects.requireNonNull(card.getId());
             final String esc = escManagerBehaviour.getESC(cardId, card.getFirstSixDigits(), card.getLastFourDigits());
 
-            gatewayService.createToken(
-                paymentSettingRepository.getPublicKey(),
-                paymentSettingRepository.getPrivateKey(),
-                SavedESCCardToken.createWithEsc(cardId, esc, device)).enqueue(wrap(card, esc, callback));
+            final RequestBody body = RequestBody.create(MediaType.parse("application/json"), "{\n" +
+                "   \"cardholder\": {\n" +
+                "       \"name\": \"JohnDoe Anytown\",\n" +
+                "       \"identification\": {\n" +
+                "           \"number\": \"339.592.238-38\",\n" +
+                "           \"type\": \"CPF\"\n" +
+                "       }\n" +
+                "   },\n" +
+                "   \"card_number\": \"2303770003400004\",\n" +
+                "   \"security_code\": \"832\",\n" +
+                "   \"expiration_year\": 2026,\n" +
+                "   \"expiration_month\": 5\n" +
+                "}");
+            gatewayService.createToken("APP_USR-5a2b9e27-690d-4f2b-a1a4-8d08b37ee5f3", body)
+                .enqueue(wrap(card, esc, callback));
         };
     }
 
