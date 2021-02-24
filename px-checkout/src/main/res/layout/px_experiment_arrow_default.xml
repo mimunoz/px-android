@@ -7,5 +7,5 @@
     android:layout_marginEnd="@dimen/px_l_margin"
     android:scaleType="center"
     android:layout_gravity="center_vertical"
-    android:tint="@color/ui_components_primary_color"
+    app:tint="@color/ui_components_primary_color"
     app:srcCompat="@drawable/px_arrow_down" />
