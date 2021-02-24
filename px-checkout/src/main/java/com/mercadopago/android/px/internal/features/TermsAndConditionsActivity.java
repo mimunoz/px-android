@@ -2,6 +2,8 @@ package com.mercadopago.android.px.internal.features;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import com.mercadopago.android.px.BuildConfig;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.PXActivity;
 import com.mercadopago.android.px.internal.di.Session;
@@ -71,7 +72,14 @@ public class TermsAndConditionsActivity extends PXActivity {
         });
 
         if (URLUtil.isValidUrl(data)) {
-            mTermsAndConditionsWebView.getSettings().setUserAgentString("MercadoLibre-Android/"+ BuildConfig.VERSION_NAME);
+            String version;
+            try {
+                final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version = packageInfo.versionName;
+            } catch (final PackageManager.NameNotFoundException e) {
+                version = "1.0.0";
+            }
+            mTermsAndConditionsWebView.getSettings().setUserAgentString("MercadoLibre-Android/" + version);
             mTermsAndConditionsWebView.loadUrl(data);
         } else {
             mTermsAndConditionsWebView.loadData(data, "text/html", "UTF-8");
