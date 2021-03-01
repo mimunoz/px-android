@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 import com.mercadolibre.android.andesui.bottomsheet.AndesBottomSheet;
 import com.mercadolibre.android.cardform.CardForm;
 import com.mercadolibre.android.cardform.internal.CardFormWithFragment;
@@ -94,7 +95,7 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class ExpressPaymentFragment extends BaseFragment implements ExpressPayment.View, ViewPager.OnPageChangeListener,
+public class ExpressPaymentFragment extends BaseFragment implements ExpressPayment.View,
     SplitPaymentHeaderAdapter.SplitListener, PaymentMethodFragment.DisabledDetailDialogLauncher,
     OtherPaymentMethodFragment.OnOtherPaymentMethodClickListener, TitlePagerAdapter.InstallmentChanged,
     PayButton.Handler, GenericDialog.Listener, BackHandler {
@@ -106,7 +107,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private static final String EXTRA_NAVIGATION_STATE = "navigation_state";
 
     private static final int REQ_CODE_DISABLE_DIALOG = 105;
-    private static final float PAGER_NEGATIVE_MARGIN_MULTIPLIER = -1.5f;
+    private static final float PAGER_MARGIN_MULTIPLIER = 1.5f;
     public static final int REQ_CARD_FORM_WEB_VIEW = 953;
     public static final int REQ_CODE_CARD_FORM = 106;
 
@@ -119,7 +120,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private SummaryView summaryView;
     private View payButtonContainer;
     private RecyclerView installmentsRecyclerView;
-    /* default */ ViewPager paymentMethodPager;
+    /* default */ ViewPager2 paymentMethodPager;
     /* default */ View pagerAndConfirmButtonContainer;
     /* default */ RenderMode renderMode;
     private ScrollingPagerIndicator indicator;
@@ -136,7 +137,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private AndesBottomSheet cardFormBottomSheet;
     private OneTapTransition transition;
 
-    private HubAdapter hubAdapter;
+    /* default */ HubAdapter hubAdapter;
 
     private PayButtonFragment payButtonFragment;
     private OfflineMethodsFragment offlineMethodsFragment;
@@ -239,7 +240,25 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
         summaryView.setOnLogoClickListener(v -> presenter.onHeaderClicked());
 
-        paymentMethodPager.addOnPageChangeListener(this);
+        paymentMethodPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                hubAdapter.updatePosition(positionOffset, position);
+            }
+
+            @Override
+            public void onPageSelected(final int position) {
+                super.onPageSelected(position);
+                presenter.onSliderOptionSelected(position);
+                VibrationUtils.smallVibration(getContext());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(final int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
 
         fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
             @Override
@@ -278,9 +297,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         paymentMethodPager = view.findViewById(R.id.payment_method_pager);
         indicator = view.findViewById(R.id.indicator);
 
-        paymentMethodPager.setPageMargin(
-            ((int) (getResources().getDimensionPixelSize(R.dimen.px_m_margin) * PAGER_NEGATIVE_MARGIN_MULTIPLIER)));
-        paymentMethodPager.setOffscreenPageLimit(2);
+        paymentMethodPager.setOffscreenPageLimit(1);
         slideDownAndFadeAnimation.setAnimationListener(new FadeAnimationListener(paymentMethodPager, INVISIBLE));
         slideUpAndFadeAnimation.setAnimationListener(new FadeAnimationListener(paymentMethodPager, VISIBLE));
 
@@ -443,7 +460,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         // Order is important, should update all others adapters before update paymentMethodAdapter
 
         if (paymentMethodPager.getAdapter() == null) {
-            paymentMethodFragmentAdapter = new PaymentMethodFragmentAdapter(getChildFragmentManager());
+            paymentMethodFragmentAdapter = new PaymentMethodFragmentAdapter(this);
             if (renderMode == null) {
                 summaryView.setMeasureListener((itemsClipped) -> {
                     renderMode = itemsClipped ? RenderMode.LOW_RES : RenderMode.HIGH_RES;
@@ -453,7 +470,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
                 onRenderModeDecided();
             }
             paymentMethodPager.setAdapter(paymentMethodFragmentAdapter);
-            indicator.attachToPager(paymentMethodPager);
+            //indicator.attachToPager(paymentMethodPager);
         }
     }
 
@@ -577,22 +594,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     @Override
-    public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
-        hubAdapter.updatePosition(positionOffset, position);
-    }
-
-    @Override
-    public void onPageSelected(final int position) {
-        presenter.onSliderOptionSelected(position);
-        VibrationUtils.smallVibration(getContext());
-    }
-
-    @Override
-    public void onPageScrollStateChanged(final int state) {
-        // do nothing.
-    }
-
-    @Override
     public void showDiscountDetailDialog(@NonNull final Currency currency,
         @NonNull final DiscountConfigurationModel discountModel) {
         DiscountDetailDialog.showDialog(getChildFragmentManager(), discountModel);
@@ -614,8 +615,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     private void onRenderModeDecided() {
-        //Workaround to pager not updating the fragments
-        paymentMethodPager.post(() -> paymentMethodFragmentAdapter.setRenderMode(renderMode));
+        paymentMethodFragmentAdapter.setRenderMode(renderMode);
     }
 
     @Override

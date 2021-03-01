@@ -9,11 +9,14 @@
     app:layout_constraintBottom_toBottomOf="parent"
     tools:showIn="@layout/px_fragment_express_payment">
 
-    <com.mercadopago.android.px.internal.view.DynamicHeightViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/payment_method_pager"
-        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/px_onetap_pager_padding"
+        android:paddingEnd="@dimen/px_onetap_pager_padding"
         tools:layout_height="500dp" />
 
     <com.mercadopago.android.px.internal.view.ScrollingPagerIndicator

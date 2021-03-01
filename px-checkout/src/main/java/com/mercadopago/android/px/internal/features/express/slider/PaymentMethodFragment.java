@@ -2,16 +2,17 @@ package com.mercadopago.android.px.internal.features.express.slider;
 
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.CallSuper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BasePagerFragment;
 import com.mercadopago.android.px.internal.di.Session;
@@ -22,7 +23,6 @@ import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogA
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogItem;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
-import com.mercadopago.android.px.internal.view.DynamicHeightViewPager;
 import com.mercadopago.android.px.internal.view.MPTextView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
@@ -150,12 +150,13 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
     }
 
-    private void setDescriptionForAccessibility(@NonNull final String description) {
+    private void setDescriptionForAccessibility(@NonNull final CharSequence description) {
         final View rootView = getView();
-        final DynamicHeightViewPager parent;
-        if (rootView != null && rootView.getParent() instanceof DynamicHeightViewPager &&
-            (parent = (DynamicHeightViewPager) rootView.getParent()).hasAccessibilityFocus()) {
-            parent.announceForAccessibility(description);
+        if (rootView != null && rootView.getParent() instanceof View) {
+            final View parent = (View) rootView.getParent();
+            if (hasAccessibilityFocus(parent)) {
+                parent.announceForAccessibility(description);
+            }
         }
         if (handler != null) {
             handler.postDelayed(() -> card.setContentDescription(description), 800);
@@ -245,5 +246,12 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         default int getRequestCode() {
             return 0;
         }
+    }
+
+    private boolean hasAccessibilityFocus(@NonNull final View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return view.isAccessibilityFocused();
+        }
+        return false;
     }
 }

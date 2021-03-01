@@ -38,11 +38,5 @@ public class DynamicHeightViewPager extends ViewPager {
         return super.dispatchPopulateAccessibilityEvent(event);
     }
 
-    public boolean hasAccessibilityFocus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return isAccessibilityFocused();
-        } else {
-            return isAccessibilityFocused;
-        }
-    }
+
 }

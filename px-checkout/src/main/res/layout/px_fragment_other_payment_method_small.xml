@@ -6,8 +6,8 @@
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingBottom="@dimen/px_s_margin"
-    android:paddingStart="@dimen/px_m_margin"
-    android:paddingEnd="@dimen/px_m_margin">
+    android:paddingStart="@dimen/px_onetap_pager_item_padding"
+    android:paddingEnd="@dimen/px_onetap_pager_item_padding">
 
     <LinearLayout
         android:id="@+id/px_other_payment_method_small"
