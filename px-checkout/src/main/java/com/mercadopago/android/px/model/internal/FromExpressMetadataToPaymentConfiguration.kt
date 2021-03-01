@@ -15,20 +15,20 @@ internal class FromExpressMetadataToPaymentConfiguration(
 ) : Mapper<OneTapItem, PaymentConfiguration>() {
 
     override fun map(value: OneTapItem): PaymentConfiguration {
-        var payerCost: PayerCost? = null
 
         val customOptionId = value.customOptionId
-        val amountConfiguration = amountConfigurationRepository.getConfigurationFor(customOptionId)
+        val (paymentMethodId, paymentTypeId) = applicationSelectionRepository[customOptionId]?.let { application ->
+            with(application.paymentMethod) { id to type }
+        } ?: value.paymentMethodId to value.paymentTypeId
+
+        var payerCost: PayerCost? = null
+        val amountConfiguration = amountConfigurationRepository.getConfigurationSelectedFor(customOptionId)
         val splitPayment = splitSelectionState.userWantsToSplit() && amountConfiguration!!.allowSplit()
 
         if (value.isCard || value.isConsumerCredits) {
             payerCost = amountConfiguration!!.getCurrentPayerCost(splitSelectionState.userWantsToSplit(),
                 payerCostSelectionRepository.get(customOptionId))
         }
-
-        val (paymentMethodId, paymentTypeId) = applicationSelectionRepository[customOptionId]?.let { application ->
-            with(application.paymentMethod) { id to type }
-        } ?: value.paymentMethodId to value.paymentTypeId
 
         return PaymentConfiguration(paymentMethodId, paymentTypeId, customOptionId, value.isCard,
             splitPayment, payerCost)

@@ -203,7 +203,8 @@ public final class Session extends ApplicationModule {
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
                 configurationModule.getTrackingRepository(), getTracker(),
-                getPayerPaymentMethodRepository(), getOneTapItemRepository(), getPaymentMethodRepository(),
+                getPayerPaymentMethodRepository(), getOneTapItemRepository(),
+                getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
                 getAmountConfigurationRepository(), getDiscountRepository()) {
             };
@@ -290,7 +291,8 @@ public final class Session extends ApplicationModule {
                 getFileManager(),
                 MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
-                getPaymentMethodRepository());
+                getPaymentMethodRepository()
+            );
         }
 
         return paymentRepository;
@@ -356,7 +358,9 @@ public final class Session extends ApplicationModule {
 
     public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
         if (payerPaymentMethodRepository == null) {
-            payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(getFileManager());
+            payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(
+                getFileManager(),
+                getConfigurationModule().getApplicationSelectionRepository());
         }
         return payerPaymentMethodRepository;
     }

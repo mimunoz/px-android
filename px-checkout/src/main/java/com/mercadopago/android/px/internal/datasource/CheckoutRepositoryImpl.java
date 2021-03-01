@@ -52,9 +52,9 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
     @NonNull private final OneTapItemRepository oneTapItemRepository;
     @NonNull private final PaymentMethodRepository paymentMethodRepository;
     @NonNull private final ModalRepository modalRepository;
-    @NonNull private PayerComplianceRepository payerComplianceRepository;
-    @NonNull private AmountConfigurationRepository amountConfigurationRepository;
-    @NonNull private DiscountRepository discountRepository;
+    @NonNull private final PayerComplianceRepository payerComplianceRepository;
+    @NonNull private final AmountConfigurationRepository amountConfigurationRepository;
+    @NonNull private final DiscountRepository discountRepository;
     @NonNull private final TrackingRepository trackingRepository;
     /* default */ int refreshRetriesAvailable = MAX_REFRESH_RETRIES;
     /* default */ Handler retryHandler;

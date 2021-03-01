@@ -7,13 +7,20 @@ import com.mercadopago.android.px.model.AmountConfiguration
 internal class ConfigurationSolverImpl(
     private val payerPaymentMethodRepository: PayerPaymentMethodRepository) : ConfigurationSolver {
 
-    override fun getConfigurationHashFor(customOptionId: String): String {
-        return payerPaymentMethodRepository.value.firstOrNull { it.id.equals(customOptionId, ignoreCase = true) }
-            ?.defaultAmountConfiguration ?: TextUtil.EMPTY
+    override fun getAmountConfigurationSelectedFor(customOptionId: String): AmountConfiguration? {
+        return payerPaymentMethodRepository[customOptionId]
+            ?.let { it.getAmountConfiguration(it.defaultAmountConfiguration) }
     }
 
-    override fun getAmountConfigurationFor(customOptionId: String): AmountConfiguration? {
-        return payerPaymentMethodRepository.value.firstOrNull { it.id.equals(customOptionId, ignoreCase = true) }
-            ?.let { it.getAmountConfiguration(it.defaultAmountConfiguration) }
+    override fun getConfigurationHashSelectedFor(customOptionId: String): String {
+        return payerPaymentMethodRepository[customOptionId]?.defaultAmountConfiguration ?: TextUtil.EMPTY
+    }
+
+    override fun getAmountConfigurationFor(key: PayerPaymentMethodRepository.Key): AmountConfiguration? {
+        return payerPaymentMethodRepository[key]?.let { it.getAmountConfiguration(it.defaultAmountConfiguration) }
+    }
+
+    override fun getConfigurationHashFor(key: PayerPaymentMethodRepository.Key): String {
+        return payerPaymentMethodRepository[key]?.defaultAmountConfiguration ?: TextUtil.EMPTY
     }
 }

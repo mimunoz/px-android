@@ -83,6 +83,7 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.model.StatusMetadata;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import java.util.Arrays;
@@ -383,7 +384,9 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             configurationModule.getTrackingRepository(),
             MapperProvider.INSTANCE.getPaymentMethodDescriptorMapper(),
             configurationModule.getCustomTextsRepository(),
-            MapperProvider.INSTANCE.getAmountDescriptorMapper(),
+            MapperProvider.INSTANCE.getSummaryDetailDescriptorMapper(),
+            MapperProvider.INSTANCE.getSummaryInfoMapper(),
+            MapperProvider.INSTANCE.getElementDescriptorMapper(),
             session.getTracker(),
             session.getOneTapItemRepository(),
             session.getPayerPaymentMethodRepository(),
@@ -574,8 +577,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     @Override
     public void updateViewForPosition(final int paymentMethodIndex,
         final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
-        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, splitSelectionState);
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application) {
+        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, splitSelectionState, application);
     }
 
     /* default */ void onInstallmentSelected(final PayerCost payerCostSelected) {

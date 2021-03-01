@@ -50,7 +50,7 @@ internal class RemediesViewModel(
         CoroutineScope(Dispatchers.IO).launch {
             val methodData = oneTapItemRepository.value.first { it.customOptionId == customOptionId }
             card = fromPayerPaymentMethodToCardMapper.map(
-                PayerPaymentMethodRepository.Key(methodData.customOptionId, methodIds.methodId, methodIds.typeId))
+                PayerPaymentMethodRepository.Key(methodData.customOptionId, methodIds.typeId))
             paymentConfiguration = PaymentConfiguration(methodIds.methodId, methodIds.typeId, customOptionId,
                 card != null, false, getPayerCost(customOptionId))
             withContext(Dispatchers.Main) {
@@ -94,7 +94,8 @@ internal class RemediesViewModel(
                 remedies.suggestedPaymentMethod?.alternativePaymentMethod?.installmentsList?.run {
                     if (isNotEmpty()) {
                         get(0).let {
-                            amountConfigurationRepository.getConfigurationFor(customOptionId)?.run {
+                            amountConfigurationRepository.getConfigurationSelectedFor(
+                                customOptionId)?.run {
                                 for (i in 0 until payerCosts.size) {
                                     val payerCost = payerCosts[i]
                                     if (payerCost.installments == it.installments) {

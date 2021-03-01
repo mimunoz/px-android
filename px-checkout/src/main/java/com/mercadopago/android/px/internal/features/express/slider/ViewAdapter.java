@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.view.View;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.model.internal.Application;
 
 public abstract class ViewAdapter<T, V extends View> {
 
@@ -19,7 +20,7 @@ public abstract class ViewAdapter<T, V extends View> {
     }
 
     public abstract void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState);
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application);
 
     public void updateViewsOrder(@NonNull final View previousView,
         @NonNull final View currentView,

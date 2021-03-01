@@ -6,6 +6,7 @@ import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.TitlePager;
 import com.mercadopago.android.px.internal.viewmodel.GoingToModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
 import static com.mercadopago.android.px.internal.util.AccessibilityUtilsKt.executeIfAccessibilityTalkBackEnable;
@@ -31,7 +32,8 @@ public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescript
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
+        @NonNull final SplitSelectionState splitSelectionState,
+        final @NonNull Application application) {
         if (this.currentIndex != currentIndex) {
             final GoingToModel goingTo =
                 this.currentIndex < currentIndex ? GoingToModel.BACKWARDS : GoingToModel.FORWARD;

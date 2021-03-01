@@ -73,9 +73,9 @@ public class PaymentService implements PaymentRepository {
 
     @Nullable private PaymentWrapper payment;
     @NonNull private final File paymentFile;
-    @NonNull private FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
-    private PaymentMethodMapper paymentMethodMapper;
-    private PaymentMethodRepository paymentMethodRepository;
+    @NonNull private final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
+    @NonNull private final PaymentMethodMapper paymentMethodMapper;
+    @NonNull private final PaymentMethodRepository paymentMethodRepository;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -181,14 +181,14 @@ public class PaymentService implements PaymentRepository {
             // cards
             final Card card = fromPayerPaymentMethodToCardMapper.map(
                 new PayerPaymentMethodRepository.Key(configuration.getCustomOptionId(),
-                    paymentMethod.getId(), paymentMethod.getPaymentTypeId()));
+                    paymentMethod.getPaymentTypeId()));
             if(card == null) {
                 throw new IllegalStateException("Cannot find selected card");
             }
             if (configuration.getSplitPayment()) {
                 //TODO refactor
                 final String secondaryPaymentMethodId =
-                    amountConfigurationRepository.getConfigurationFor(card.getId())
+                    amountConfigurationRepository.getConfigurationSelectedFor(card.getId())
                         .getSplitConfiguration().secondaryPaymentMethod.paymentMethodId;
                 userSelectionRepository
                     .select(card, paymentMethodRepository.getPaymentMethodById(secondaryPaymentMethodId));
