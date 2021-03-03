@@ -47,7 +47,7 @@ public class PaymentMethodDescriptorMapper extends Mapper<ExpressMetadata, Payme
             return mapCredit(expressMetadata);
         } else if (PaymentTypes.isCardPaymentType(paymentTypeId)) {
             return DebitCardDescriptorModel
-                .createFrom(currency, amountConfigurationRepository.getConfigurationFor(customOptionId));
+                .createFrom(currency, amountConfigurationRepository.getConfigurationSelectedFor(customOptionId));
         } else if (PaymentTypes.isAccountMoney(expressMetadata.getPaymentMethodId())) {
             return AccountMoneyDescriptorModel.createFrom(expressMetadata.getAccountMoney(), currency,
                 amountRepository.getAmountToPay(expressMetadata.getPaymentTypeId(), (PayerCost) null));
@@ -65,6 +65,6 @@ public class PaymentMethodDescriptorMapper extends Mapper<ExpressMetadata, Payme
             expressMetadata.hasBenefits() ? expressMetadata.getBenefits().getInterestFree() : null;
         return CreditCardDescriptorModel
             .createFrom(paymentSettings.getCurrency(), installmentsRightHeader, interestFree,
-                amountConfigurationRepository.getConfigurationFor(expressMetadata.getCustomOptionId()));
+                amountConfigurationRepository.getConfigurationSelectedFor(expressMetadata.getCustomOptionId()));
     }
 }

@@ -17,5 +17,10 @@ class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
         throw UnsupportedOperationException("Parcelable implementation not available")
     }
 
-    fun getApplications() = applications ?: listOf()
+    fun getApplications() = applications
+
+    fun getDefaultPaymentMethodType(): String = displayInfo
+        ?.cardDrawerSwitch
+        ?.default
+        ?: paymentTypeId ?: paymentMethodId
 }

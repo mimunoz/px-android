@@ -5,6 +5,7 @@ import android.view.View;
 import com.mercadopago.android.px.internal.features.pay_button.PayButtonFragment;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
 public class ConfirmButtonAdapter extends HubableAdapter<List<ConfirmButtonViewModel>, View> {
@@ -18,7 +19,8 @@ public class ConfirmButtonAdapter extends HubableAdapter<List<ConfirmButtonViewM
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
+        @NonNull final SplitSelectionState splitSelectionState,
+        final @NonNull Application application) {
         if (data.get(currentIndex).isDisabled()) {
             payButton.disable();
         } else {

@@ -21,6 +21,7 @@ object JsonUtil {
         .setDateFormat("yyyyMMddHHmmss")
         .create()
 
+    @JvmStatic
     fun <T> getListFromJson(json: String?, classOfT: Class<T>): List<T> {
         val typeOfT = TypeToken.getParameterized(MutableList::class.java, classOfT).type
         return gson.fromJson(json, typeOfT) ?: mutableListOf()
@@ -37,6 +38,7 @@ object JsonUtil {
         return gson.fromJson(json, classOfT)
     }
 
+    @JvmStatic
     fun getMapFromJson(json: String?): Map<String, Any> {
         return gson.fromJson(
             json, object : TypeToken<ObjectMapType>() {}.type

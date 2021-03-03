@@ -23,14 +23,13 @@ import com.mercadopago.android.px.internal.features.generic_modal.ActionType;
 import com.mercadopago.android.px.internal.features.generic_modal.ActionTypeWrapper;
 import com.mercadopago.android.px.internal.features.generic_modal.FromModalToGenericDialogItem;
 import com.mercadopago.android.px.internal.features.pay_button.PayButton;
-import com.mercadopago.android.px.internal.mappers.AmountDescriptorMapper;
+import com.mercadopago.android.px.internal.mappers.SummaryViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.ConfirmButtonViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.mappers.InstallmentViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.mappers.SplitHeaderMapper;
 import com.mercadopago.android.px.internal.mappers.SummaryInfoMapper;
-import com.mercadopago.android.px.internal.mappers.SummaryViewModelMapper;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository;
@@ -53,10 +52,11 @@ import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.AmountDescriptorView;
 import com.mercadopago.android.px.internal.view.ElementDescriptorView;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
-import com.mercadopago.android.px.internal.view.SummaryView;
+import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper;
 import com.mercadopago.android.px.internal.view.experiments.ExperimentHelper;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.PostPaymentAction;
+import com.mercadopago.android.px.internal.viewmodel.SummaryModel;
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
@@ -104,7 +104,9 @@ import java.util.List;
     @NonNull private final TrackingRepository trackingRepository;
     @NonNull private final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper;
     @NonNull private final CustomTextsRepository customTextsRepository;
-    @NonNull private final AmountDescriptorMapper amountDescriptorMapper;
+    @NonNull private final SummaryInfoMapper summaryInfoMapper;
+    @NonNull private final ElementDescriptorMapper elementDescriptorMapper;
+    @NonNull private final SummaryDetailDescriptorMapper summaryDetailDescriptorMapper;
     @NonNull private final OneTapItemRepository oneTapItemRepository;
     @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
     @NonNull private final ModalRepository modalRepository;
@@ -129,7 +131,9 @@ import java.util.List;
         @NonNull final TrackingRepository trackingRepository,
         @NonNull final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper,
         @NonNull final CustomTextsRepository customTextsRepository,
-        @NonNull final AmountDescriptorMapper amountDescriptorMapper,
+        @NonNull final SummaryDetailDescriptorMapper summaryDetailDescriptorMapper,
+        @NonNull final SummaryInfoMapper summaryInfoMapper,
+        @NonNull final ElementDescriptorMapper elementDescriptorMapper,
         @NonNull final MPTracker tracker,
         @NonNull final OneTapItemRepository oneTapItemRepository,
         @NonNull final PayerPaymentMethodRepository payerPaymentMethodRepository,
@@ -151,7 +155,9 @@ import java.util.List;
         this.trackingRepository = trackingRepository;
         this.paymentMethodDescriptorMapper = paymentMethodDescriptorMapper;
         this.customTextsRepository = customTextsRepository;
-        this.amountDescriptorMapper = amountDescriptorMapper;
+        this.summaryInfoMapper = summaryInfoMapper;
+        this.elementDescriptorMapper = elementDescriptorMapper;
+        this.summaryDetailDescriptorMapper = summaryDetailDescriptorMapper;
         this.oneTapItemRepository = oneTapItemRepository;
         this.payerPaymentMethodRepository = payerPaymentMethodRepository;
         this.modalRepository = modalRepository;
@@ -171,21 +177,23 @@ import java.util.List;
 
     @Override
     public void loadViewModel() {
-        final SummaryInfo summaryInfo = new SummaryInfoMapper().map(paymentSettingRepository.getCheckoutPreference());
-
-        final ElementDescriptorView.Model elementDescriptorModel = new ElementDescriptorMapper().map(summaryInfo);
-
+        final SummaryInfo summaryInfo = summaryInfoMapper.map(paymentSettingRepository.getCheckoutPreference());
+        final ElementDescriptorView.Model elementDescriptorModel = elementDescriptorMapper.map(summaryInfo);
         final List<OneTapItem> oneTapItemList = oneTapItemRepository.getValue();
-        final List<SummaryView.Model> summaryModels =
+        final List<SummaryModel> summaryModels =
             new SummaryViewModelMapper(paymentSettingRepository.getCurrency(), discountRepository, amountRepository,
-                elementDescriptorModel, this, summaryInfo, chargeRepository, amountConfigurationRepository,
-                customTextsRepository, amountDescriptorMapper).map(oneTapItemList);
+                elementDescriptorModel, this, chargeRepository, amountConfigurationRepository,
+                customTextsRepository, summaryDetailDescriptorMapper, applicationSelectionRepository)
+                .map(oneTapItemList);
 
         final List<PaymentMethodDescriptorView.Model> paymentModels =
             paymentMethodDescriptorMapper.map(oneTapItemList);
 
         final List<SplitPaymentHeaderAdapter.Model> splitHeaderModels =
-            new SplitHeaderMapper(paymentSettingRepository.getCurrency(), amountConfigurationRepository)
+            new SplitHeaderMapper(
+                paymentSettingRepository.getCurrency(),
+                amountConfigurationRepository,
+                applicationSelectionRepository)
                 .map(oneTapItemList);
 
         final List<ConfirmButtonViewModel> confirmButtonViewModels =
@@ -264,19 +272,20 @@ import java.util.List;
         getView().animateInstallmentsList();
         final OneTapItem oneTapItem = getCurrentOneTapItem();
         final AmountConfiguration amountConfiguration =
-            amountConfigurationRepository.getConfigurationFor(oneTapItem.getCustomOptionId());
+            amountConfigurationRepository.getConfigurationSelectedFor(oneTapItem.getCustomOptionId());
         track(new InstallmentsEventTrack(oneTapItem, amountConfiguration));
     }
 
     @Override
     public void updateInstallments() {
         final OneTapItem oneTapItem = getCurrentOneTapItem();
+        final String customOptionId = oneTapItem.getCustomOptionId();
         final AmountConfiguration amountConfiguration =
-            amountConfigurationRepository.getConfigurationFor(oneTapItem.getCustomOptionId());
+            amountConfigurationRepository.getConfigurationSelectedFor(customOptionId);
         final List<PayerCost> payerCostList = getCurrentPayerCosts();
         final int selectedIndex = amountConfiguration.getCurrentPayerCostIndex(
             getState().getSplitSelectionState().userWantsToSplit(),
-            payerCostSelectionRepository.get(oneTapItem.getCustomOptionId()));
+            payerCostSelectionRepository.get(customOptionId));
         final List<InstallmentRowHolder.Model> models =
             new InstallmentViewModelMapper(paymentSettingRepository.getCurrency(), oneTapItem.getBenefits(),
                 getVariants()).map(payerCostList);
@@ -286,7 +295,8 @@ import java.util.List;
     private List<PayerCost> getCurrentPayerCosts() {
         final OneTapItem oneTapItem = getCurrentOneTapItem();
         final AmountConfiguration amountConfiguration =
-            amountConfigurationRepository.getConfigurationFor(oneTapItem.getCustomOptionId());
+            amountConfigurationRepository.getConfigurationSelectedFor(oneTapItem.getCustomOptionId());
+
         return amountConfiguration.getAppliedPayerCost(getState().getSplitSelectionState().userWantsToSplit());
     }
 
@@ -312,9 +322,11 @@ import java.util.List;
     }
 
     private void updateElements() {
+        final String customOptionId = getCurrentOneTapItem().getCustomOptionId();
         getView().updateViewForPosition(getState().getPaymentMethodIndex(),
-            payerCostSelectionRepository.get(getCurrentOneTapItem().getCustomOptionId()),
-            getState().getSplitSelectionState());
+            payerCostSelectionRepository.get(customOptionId),
+            getState().getSplitSelectionState(),
+            applicationSelectionRepository.get(customOptionId));
     }
 
     /**
@@ -325,7 +337,7 @@ import java.util.List;
     @Override
     public void onPayerCostSelected(final PayerCost payerCostSelected) {
         final String customOptionId = getCurrentOneTapItem().getCustomOptionId();
-        final int selected = amountConfigurationRepository.getConfigurationFor(customOptionId)
+        final int selected = amountConfigurationRepository.getConfigurationSelectedFor(customOptionId)
             .getAppliedPayerCost(getState().getSplitSelectionState().userWantsToSplit())
             .indexOf(payerCostSelected);
         updateElementPosition(selected);
@@ -558,9 +570,11 @@ import java.util.List;
     @Override
     public void onApplicationChanged(@NonNull final String paymentTypeId) {
         final OneTapItem oneTapItem = getCurrentOneTapItem();
+
         for (final Application application : oneTapItem.getApplications()) {
             if (application.getPaymentMethod().getType().equals(paymentTypeId)) {
                 applicationSelectionRepository.set(oneTapItem.getCustomOptionId(), application);
+                updateElements();
             }
         }
     }

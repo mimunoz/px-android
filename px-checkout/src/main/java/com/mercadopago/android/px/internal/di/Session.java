@@ -14,16 +14,16 @@ import com.mercadopago.android.px.internal.datasource.AmountConfigurationReposit
 import com.mercadopago.android.px.internal.datasource.AmountService;
 import com.mercadopago.android.px.internal.datasource.CardHolderAuthenticatorRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.CardTokenService;
+import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolverImpl;
 import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.InstructionsService;
 import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PayerPaymentMethodRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PaymentMethodRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PaymentService;
@@ -37,14 +37,14 @@ import com.mercadopago.android.px.internal.repository.AmountConfigurationReposit
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRepository;
 import com.mercadopago.android.px.internal.repository.CardTokenRepository;
+import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
-import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -210,7 +210,8 @@ public final class Session extends ApplicationModule {
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
                 configurationModule.getTrackingRepository(), getTracker(),
-                getPayerPaymentMethodRepository(), getOneTapItemRepository(), getPaymentMethodRepository(),
+                getPayerPaymentMethodRepository(), getOneTapItemRepository(),
+                getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
                 getAmountConfigurationRepository(), getDiscountRepository()) {
             };
@@ -365,7 +366,9 @@ public final class Session extends ApplicationModule {
 
     public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
         if (payerPaymentMethodRepository == null) {
-            payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(getFileManager());
+            payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(
+                getFileManager(),
+                getConfigurationModule().getApplicationSelectionRepository());
         }
         return payerPaymentMethodRepository;
     }

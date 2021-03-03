@@ -1,0 +1,145 @@
+package com.mercadopago.android.px.internal.mappers
+
+import com.mercadopago.android.px.internal.repository.*
+import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository
+import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository
+import com.mercadopago.android.px.internal.repository.CustomTextsRepository
+import com.mercadopago.android.px.internal.repository.DiscountRepository
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
+import com.mercadopago.android.px.internal.util.ChargeRuleHelper
+import com.mercadopago.android.px.internal.view.AmountDescriptorView
+import com.mercadopago.android.px.internal.view.ElementDescriptorView
+import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
+import com.mercadopago.android.px.internal.view.SummaryView
+import com.mercadopago.android.px.internal.viewmodel.AmountLocalized
+import com.mercadopago.android.px.internal.viewmodel.SummaryModel
+import com.mercadopago.android.px.internal.viewmodel.SummaryViewDefaultColor
+import com.mercadopago.android.px.internal.viewmodel.TotalLocalized
+import com.mercadopago.android.px.model.AmountConfiguration
+import com.mercadopago.android.px.model.Currency
+import com.mercadopago.android.px.model.DiscountConfigurationModel
+import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
+import com.mercadopago.android.px.model.internal.OneTapItem
+
+internal class SummaryViewModelMapper(
+    private val currency: Currency,
+    private val discountRepository: DiscountRepository,
+    private val amountRepository: AmountRepository,
+    private val elementDescriptorViewModel: ElementDescriptorView.Model,
+    private val onClickListener: AmountDescriptorView.OnClickListener,
+    private val chargeRepository: ChargeRepository,
+    private val amountConfigurationRepository: AmountConfigurationRepository,
+    private val customTextsRepository: CustomTextsRepository,
+    private val summaryDetailDescriptorMapper: SummaryDetailDescriptorMapper,
+    private val applicationSelectionRepository: ApplicationSelectionRepository
+) : Mapper<OneTapItem, SummaryModel>() {
+
+    private val cache = mutableMapOf<Key, SummaryView.Model>()
+
+    override fun map(values: Iterable<OneTapItem>) = mutableListOf<SummaryModel>().also {
+        values.forEach { value ->
+            val currentPmTypeSelection = getCurrentPmTypeSelection(value)
+            it.add(SummaryModel(currentPmTypeSelection, mapToSummaryViewModel(value)))
+        }
+    }
+
+    override fun map(value: OneTapItem) = SummaryModel(
+        value.getDefaultPaymentMethodType(),
+        mapToSummaryViewModel(value))
+
+    private fun mapToSummaryViewModel(value: OneTapItem): Map<String, SummaryView.Model> {
+        val map = mutableMapOf<String, SummaryView.Model>()
+        val customOptionId = value.customOptionId
+        val currentPmTypeSelection = getCurrentPmTypeSelection(value)
+        value.getApplications()?.takeIf { it.isNotEmpty() }?.forEach { application ->
+            val paymentMethodTypeId = application.paymentMethod.type
+            map[paymentMethodTypeId] = mapWithCache(customOptionId, paymentMethodTypeId)
+        } ?: let { map[currentPmTypeSelection] = mapWithCache(customOptionId, currentPmTypeSelection) }
+
+        return map
+    }
+
+    private fun mapWithCache(customOptionId: String, paymentMethodTypeId: String): SummaryView.Model {
+        val key = getKey(customOptionId, paymentMethodTypeId)
+        return if (cache.containsKey(key)) {
+            cache[key]!!
+        } else {
+            createModel(paymentMethodTypeId,
+                getDiscountConfiguration(customOptionId, paymentMethodTypeId),
+                getAmountConfiguration(customOptionId, paymentMethodTypeId))
+                .also { cache[key] = it }
+        }
+    }
+
+    private fun getCurrentPmTypeSelection(oneTapItem: OneTapItem) =
+        applicationSelectionRepository[oneTapItem.customOptionId]
+            ?.paymentMethod
+            ?.type
+            ?: oneTapItem.getDefaultPaymentMethodType()
+
+    private fun createModel(
+        paymentTypeId: String,
+        discountModel: DiscountConfigurationModel,
+        amountConfiguration: AmountConfiguration?): SummaryView.Model {
+        val chargeRule = chargeRepository.getChargeRule(paymentTypeId)
+        val summaryDetailList = summaryDetailDescriptorMapper.map(
+            SummaryDetailDescriptorMapper.Model(discountModel, chargeRule, amountConfiguration, onClickListener))
+        val totalRow = AmountDescriptorView.Model(
+            TotalLocalized(customTextsRepository),
+            AmountLocalized(amountRepository.getAmountToPay(paymentTypeId, discountModel), currency),
+            SummaryViewDefaultColor())
+        return SummaryView.Model(elementDescriptorViewModel, summaryDetailList, totalRow)
+    }
+
+    private fun getDiscountConfiguration(
+        customOptionId: String,
+        paymentMethodTypeId: String): DiscountConfigurationModel {
+        return discountRepository.getConfigurationFor(
+            PayerPaymentMethodRepository.Key(customOptionId, paymentMethodTypeId))
+    }
+
+    private fun getAmountConfiguration(
+        customOptionId: String,
+        paymentMethodTypeId: String): AmountConfiguration? {
+        return amountConfigurationRepository.getConfigurationFor(
+            PayerPaymentMethodRepository.Key(customOptionId, paymentMethodTypeId))
+    }
+
+    private fun getKey(customOptionId: String, paymentMethodTypeId: String): Key {
+        val chargeRule = chargeRepository.getChargeRule(paymentMethodTypeId)
+        val amountConfiguration: AmountConfiguration? = getAmountConfiguration(customOptionId, paymentMethodTypeId)
+        val hasSplit = amountConfiguration != null && amountConfiguration.allowSplit()
+
+        return Key(getDiscountConfiguration(customOptionId, paymentMethodTypeId), chargeRule, hasSplit)
+    }
+
+    internal class Key(
+        discountConfigurationModel: DiscountConfigurationModel,
+        paymentTypeChargeRule: PaymentTypeChargeRule?,
+        hasSplit: Boolean) {
+        private val discountConfigurationModel: DiscountConfigurationModel?
+        private val paymentTypeChargeRule: PaymentTypeChargeRule?
+        private val hasSplit: Boolean?
+        override fun hashCode(): Int {
+            return (discountConfigurationModel?.hashCode() ?: 0) xor
+                (paymentTypeChargeRule?.hashCode() ?: 0) xor
+                (hasSplit?.hashCode() ?: 0)
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Key) {
+                return false
+            }
+            return (other.discountConfigurationModel == discountConfigurationModel
+                && other.paymentTypeChargeRule == paymentTypeChargeRule
+                && other.hasSplit == hasSplit)
+        }
+
+        init {
+            this.discountConfigurationModel = discountConfigurationModel
+            this.paymentTypeChargeRule = if (ChargeRuleHelper.isHighlightCharge(paymentTypeChargeRule))
+                null else paymentTypeChargeRule
+            this.hasSplit = hasSplit
+        }
+    }
+}

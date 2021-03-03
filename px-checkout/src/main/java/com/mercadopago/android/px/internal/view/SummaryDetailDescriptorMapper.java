@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.view;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.mercadopago.android.px.internal.mappers.Mapper;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.util.ChargeRuleHelper;
 import com.mercadopago.android.px.internal.viewmodel.AmountLocalized;
@@ -21,63 +22,52 @@ import com.mercadopago.android.px.model.internal.SummaryInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
-public class SummaryDetailDescriptorFactory {
+public class SummaryDetailDescriptorMapper extends Mapper<
+    SummaryDetailDescriptorMapper.Model,
+    List<AmountDescriptorView.Model>> {
 
-    @NonNull private final AmountDescriptorView.OnClickListener listener;
-    @NonNull private final DiscountConfigurationModel discountModel;
     @NonNull private final AmountRepository amountRepository;
     @NonNull private final SummaryInfo summaryInfo;
     @NonNull private final Currency currency;
-    @Nullable private final PaymentTypeChargeRule chargeRule;
-    @Nullable private final AmountConfiguration amountConfiguration;
-    private AmountDescriptorMapper amountDescriptorMapper;
+    @NonNull private final AmountDescriptorMapper amountDescriptorMapper;
 
-    public SummaryDetailDescriptorFactory(@NonNull final AmountDescriptorView.OnClickListener listener,
-        @NonNull final DiscountConfigurationModel discountModel, @NonNull final AmountRepository amountRepository,
+    public SummaryDetailDescriptorMapper(
+        @NonNull final AmountRepository amountRepository,
         @NonNull final SummaryInfo summaryInfo, @NonNull final Currency currency,
-        @Nullable final PaymentTypeChargeRule chargeRule, @Nullable final AmountConfiguration amountConfiguration,
         @NonNull final AmountDescriptorMapper amountDescriptorMapper) {
-        this.listener = listener;
-        this.discountModel = discountModel;
         this.amountRepository = amountRepository;
         this.summaryInfo = summaryInfo;
         this.currency = currency;
-        this.chargeRule = chargeRule;
-        this.amountConfiguration = amountConfiguration;
         this.amountDescriptorMapper = amountDescriptorMapper;
     }
 
-    public List<AmountDescriptorView.Model> create() {
-        final List<AmountDescriptorView.Model> list = new ArrayList<>();
-
-        addDiscountRow(list);
-        if (chargeRule != null && !ChargeRuleHelper.isHighlightCharge(chargeRule)) {
-            addChargesRow(list);
-        }
-        addPurchaseRow(list);
-
-        return list;
-    }
-
-    private void addDiscountRow(@NonNull final Collection<AmountDescriptorView.Model> list) {
+    private void addDiscountRow(@NonNull final Model value,
+        @NonNull final Collection<AmountDescriptorView.Model> list) {
+        final DiscountConfigurationModel discountModel = value.discountModel;
+        final AmountConfiguration amountConfiguration = value.amountConfiguration;
         final DiscountOverview discountOverview = discountModel.getDiscountOverview();
         final IDetailColor detailColor = new DiscountDetailColor();
         final boolean hasSplit = amountConfiguration != null && amountConfiguration.allowSplit();
+
         if (discountOverview != null) {
             list.add(new AmountDescriptorView.Model(amountDescriptorMapper.map(discountOverview), detailColor,
                 hasSplit)
                 .setDetailDrawable(new SummaryViewDetailDrawable(), detailColor)
-                .setListener(v -> listener.onDiscountAmountDescriptorClicked(discountModel)));
+                .setListener(v -> value.onClickListener.onDiscountAmountDescriptorClicked(discountModel)));
         }
     }
 
-    private void addChargesRow(@NonNull final Collection<AmountDescriptorView.Model> list) {
+    private void addChargesRow(@NonNull final Model value,
+        @NonNull final Collection<AmountDescriptorView.Model> list) {
+        final PaymentTypeChargeRule chargeRule = Objects.requireNonNull(value.chargeRule);
+        final AmountDescriptorView.OnClickListener  onClickListener = value.onClickListener;
         final AmountDescriptorView.Model model = new AmountDescriptorView.Model(new ChargeLocalized(summaryInfo),
             new AmountLocalized(chargeRule.charge(), currency), new SummaryViewDefaultColor());
         if (chargeRule.hasDetailModal()) {
             model.setDetailDrawable(new SummaryViewDetailDrawable(), new SummaryViewDefaultColor())
-                .setListener(v -> listener.onChargesAmountDescriptorClicked(chargeRule.getDetailModal()));
+                .setListener(v -> onClickListener.onChargesAmountDescriptorClicked(chargeRule.getDetailModal()));
         }
         list.add(model);
     }
@@ -86,6 +76,38 @@ public class SummaryDetailDescriptorFactory {
         if (!list.isEmpty()) {
             list.add(0, new AmountDescriptorView.Model(new ItemLocalized(summaryInfo),
                 new AmountLocalized(amountRepository.getItemsAmount(), currency), new SummaryViewDefaultColor()));
+        }
+    }
+
+    @Override
+    public List<AmountDescriptorView.Model> map(@NonNull final Model value) {
+        final List<AmountDescriptorView.Model> list = new ArrayList<>();
+
+        addDiscountRow(value, list);
+        if (value.chargeRule != null && !ChargeRuleHelper.isHighlightCharge(value.chargeRule)) {
+            addChargesRow(value, list);
+        }
+        addPurchaseRow(list);
+
+        return list;
+    }
+
+    public static class Model {
+        @NonNull final DiscountConfigurationModel discountModel;
+        @Nullable final PaymentTypeChargeRule chargeRule;
+        @Nullable final AmountConfiguration amountConfiguration;
+        @NonNull final AmountDescriptorView.OnClickListener onClickListener;
+
+        public Model(
+            @NonNull final DiscountConfigurationModel discountModel,
+            @Nullable final PaymentTypeChargeRule chargeRule,
+            @Nullable final AmountConfiguration amountConfiguration,
+            @NonNull final AmountDescriptorView.OnClickListener onClickListener
+        ) {
+            this.discountModel = discountModel;
+            this.chargeRule = chargeRule;
+            this.amountConfiguration = amountConfiguration;
+            this.onClickListener = onClickListener;
         }
     }
 }
