@@ -1,11 +1,6 @@
 package com.mercadopago.android.px.internal.mappers
 
 import com.mercadopago.android.px.internal.repository.*
-import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository
-import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository
-import com.mercadopago.android.px.internal.repository.CustomTextsRepository
-import com.mercadopago.android.px.internal.repository.DiscountRepository
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
 import com.mercadopago.android.px.internal.util.ChargeRuleHelper
 import com.mercadopago.android.px.internal.view.AmountDescriptorView
 import com.mercadopago.android.px.internal.view.ElementDescriptorView
@@ -72,10 +67,7 @@ internal class SummaryViewModelMapper(
     }
 
     private fun getCurrentPmTypeSelection(oneTapItem: OneTapItem) =
-        applicationSelectionRepository[oneTapItem.customOptionId]
-            ?.paymentMethod
-            ?.type
-            ?: oneTapItem.getDefaultPaymentMethodType()
+        applicationSelectionRepository[oneTapItem.customOptionId].paymentMethod.type
 
     private fun createModel(
         paymentTypeId: String,
@@ -95,14 +87,14 @@ internal class SummaryViewModelMapper(
         customOptionId: String,
         paymentMethodTypeId: String): DiscountConfigurationModel {
         return discountRepository.getConfigurationFor(
-            PayerPaymentMethodRepository.Key(customOptionId, paymentMethodTypeId))
+            PayerPaymentMethodKey(customOptionId, paymentMethodTypeId))
     }
 
     private fun getAmountConfiguration(
         customOptionId: String,
         paymentMethodTypeId: String): AmountConfiguration? {
         return amountConfigurationRepository.getConfigurationFor(
-            PayerPaymentMethodRepository.Key(customOptionId, paymentMethodTypeId))
+            PayerPaymentMethodKey(customOptionId, paymentMethodTypeId))
     }
 
     private fun getKey(customOptionId: String, paymentMethodTypeId: String): Key {

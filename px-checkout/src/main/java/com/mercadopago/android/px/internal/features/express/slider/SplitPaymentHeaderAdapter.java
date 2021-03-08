@@ -105,8 +105,7 @@ public class SplitPaymentHeaderAdapter extends HubableAdapter<List<SplitPaymentH
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState,
-        final @NonNull Application application) {
+        @NonNull final SplitSelectionState splitSelectionState, final @NonNull Application application) {
         // Empty data case
         if (currentIndex >= data.size()) {
             new Empty().visit(view);

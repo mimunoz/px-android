@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.model.CustomSearchItem;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class ConfigurationSolverTest {
     @Mock private CustomSearchItem accountMoneyCustomSearchItem;
     @Mock private CustomSearchItem cardCustomSearchItem;
     @Mock private PayerPaymentMethodRepository payerPaymentMethodRepository;
-    @Mock private PayerPaymentMethodRepository.Key accountMoneyKey;
-    @Mock private PayerPaymentMethodRepository.Key debitCardKey;
+    @Mock private PayerPaymentMethodKey accountMoneyKey;
+    @Mock private PayerPaymentMethodKey debitCardKey;
 
     @Before
     public void setUp() {
@@ -81,7 +82,6 @@ public class ConfigurationSolverTest {
 
     @Test
     public void whenHasNotConfigurationByKeyThenReturnEmptyConfiguration() {
-        assertEquals("",
-            discountConfigurationSolver.getConfigurationHashFor(mock(PayerPaymentMethodRepository.Key.class)));
+        assertEquals("", discountConfigurationSolver.getConfigurationHashFor(mock(PayerPaymentMethodKey.class)));
     }
 }

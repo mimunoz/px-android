@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
+import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.view.View;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.model.internal.Application;
 

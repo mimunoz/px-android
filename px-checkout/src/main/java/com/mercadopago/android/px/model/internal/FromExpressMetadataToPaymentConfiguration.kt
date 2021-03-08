@@ -17,9 +17,8 @@ internal class FromExpressMetadataToPaymentConfiguration(
     override fun map(value: OneTapItem): PaymentConfiguration {
 
         val customOptionId = value.customOptionId
-        val (paymentMethodId, paymentTypeId) = applicationSelectionRepository[customOptionId]?.let { application ->
-            with(application.paymentMethod) { id to type }
-        } ?: value.paymentMethodId to value.paymentTypeId
+        val (paymentMethodId, paymentTypeId) =
+            with(applicationSelectionRepository[customOptionId].paymentMethod) { id to type }
 
         var payerCost: PayerCost? = null
         val amountConfiguration = amountConfigurationRepository.getConfigurationSelectedFor(customOptionId)

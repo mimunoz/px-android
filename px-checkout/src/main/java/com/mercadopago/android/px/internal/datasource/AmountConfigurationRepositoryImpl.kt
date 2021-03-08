@@ -2,7 +2,7 @@ package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.internal.core.FileManager
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository
 import com.mercadopago.android.px.model.AmountConfiguration
 import com.mercadopago.android.px.model.PaymentTypes.*
@@ -36,8 +36,8 @@ internal class AmountConfigurationRepositoryImpl(private val fileManager: FileMa
         return configurationSolver.getAmountConfigurationSelectedFor(customOptionId)
     }
 
-    override fun getConfigurationFor(key: PayerPaymentMethodRepository.Key): AmountConfiguration? {
-        return configurationSolver.getAmountConfigurationFor(key)
+    override fun getConfigurationFor(payerPaymentMethodKey: PayerPaymentMethodKey): AmountConfiguration? {
+        return configurationSolver.getAmountConfigurationFor(payerPaymentMethodKey)
     }
 
     override fun readFromStorage() = fileManager.readText(file)

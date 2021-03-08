@@ -34,6 +34,11 @@ internal open class AccountMoneyFragment : PaymentMethodFragment<AccountMoneyDra
         cardView.isEnabled = false
     }
 
+    override fun enable() {
+        super.enable()
+        cardView.isEnabled = true
+    }
+
     override fun getAccessibilityContentDescription() = model.description
 
     companion object {

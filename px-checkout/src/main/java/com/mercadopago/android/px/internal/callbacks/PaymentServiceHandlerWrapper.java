@@ -54,7 +54,7 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
                 paymentRepository.storePayment(payment);
                 //Must be after store
                 final PaymentResult paymentResult = paymentRepository.createPaymentResult(payment);
-                disabledPaymentMethodRepository.handleDisableablePayment(paymentResult);
+                disabledPaymentMethodRepository.handleRejectedPayment(paymentResult);
                 if (paymentResult.isOffPayment()) {
                     instructionsRepository.getInstructions(paymentResult)
                         .enqueue(new Callback<List<Instruction>>() {
@@ -79,7 +79,7 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
             verifyAndHandleEsc(businessPayment);
             paymentRepository.storePayment(businessPayment);
             final PaymentResult paymentResult = paymentRepository.createPaymentResult(businessPayment);
-            disabledPaymentMethodRepository.handleDisableablePayment(paymentResult);
+            disabledPaymentMethodRepository.handleRejectedPayment(paymentResult);
             onPostPayment(businessPayment, paymentResult);
         }
     };

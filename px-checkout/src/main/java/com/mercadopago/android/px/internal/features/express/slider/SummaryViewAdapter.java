@@ -20,11 +20,8 @@ public class SummaryViewAdapter extends HubableAdapter<List<SummaryModel>, Summa
     }
 
     @Override
-    public void updateData(
-        final int index,
-        final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState,
-        @NonNull final Application application) {
+    public void updateData(final int index, final int payerCostSelected,
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application) {
         final SummaryModel model = data.get(index);
         model.update(application);
 

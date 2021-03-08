@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
-import android.content.SharedPreferences;
+import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.PaymentData;
 import com.mercadopago.android.px.model.PaymentMethod;
@@ -25,16 +25,13 @@ public class DisabledPaymentMethodServiceTest {
 
     private static final String CARD_ID = "123456789";
 
-    private DisabledPaymentMethodService disabledPaymentMethodService;
+    private DisabledPaymentMethodRepositoryImpl disabledPaymentMethodRepositoryImpl;
 
-    @Mock private SharedPreferences sharedPreferences;
+    @Mock private FileManager fileManager;
 
     @Before
     public void setUp() {
-        final SharedPreferences.Editor editor = mock(SharedPreferences.Editor.class);
-        when(sharedPreferences.edit()).thenReturn(editor);
-        when(editor.putString(any(), any())).thenReturn(editor);
-        disabledPaymentMethodService = new DisabledPaymentMethodService(sharedPreferences);
+        disabledPaymentMethodRepositoryImpl = new DisabledPaymentMethodRepositoryImpl(fileManager);
     }
 
     @Test
@@ -42,8 +39,8 @@ public class DisabledPaymentMethodServiceTest {
         final PaymentResult paymentResult = mock(PaymentResult.class);
         mockPayment(paymentResult, PaymentTypes.ACCOUNT_MONEY, PaymentMethods.ACCOUNT_MONEY);
 
-        disabledPaymentMethodService.handleDisableablePayment(paymentResult);
-        verifyDisableablePaymentManaged(true);
+        disabledPaymentMethodRepositoryImpl.handleRejectedPayment(paymentResult);
+        verifyRejectedPaymentManaged(true);
     }
 
     @Test
@@ -51,9 +48,9 @@ public class DisabledPaymentMethodServiceTest {
         final PaymentResult paymentResult = mock(PaymentResult.class);
         mockPayment(paymentResult, PaymentTypes.ACCOUNT_MONEY, PaymentMethods.ACCOUNT_MONEY);
 
-        disabledPaymentMethodService.handleDisableablePayment(paymentResult);
+        disabledPaymentMethodRepositoryImpl.handleRejectedPayment(paymentResult);
 
-        verifyDisableablePaymentManaged(true);
+        verifyRejectedPaymentManaged(true);
     }
 
     @Test
@@ -61,9 +58,9 @@ public class DisabledPaymentMethodServiceTest {
         final PaymentResult paymentResult = mock(PaymentResult.class);
         mockPayment(paymentResult, PaymentTypes.ACCOUNT_MONEY, PaymentMethods.ACCOUNT_MONEY);
 
-        disabledPaymentMethodService.handleDisableablePayment(paymentResult);
+        disabledPaymentMethodRepositoryImpl.handleRejectedPayment(paymentResult);
 
-        verifyDisableablePaymentManaged(true);
+        verifyRejectedPaymentManaged(true);
     }
 
     @Test
@@ -74,9 +71,9 @@ public class DisabledPaymentMethodServiceTest {
         when(paymentResult.getPaymentData().getToken()).thenReturn(mock(Token.class));
         when(paymentResult.getPaymentData().getToken().getCardId()).thenReturn(CARD_ID);
 
-        disabledPaymentMethodService.handleDisableablePayment(paymentResult);
+        disabledPaymentMethodRepositoryImpl.handleRejectedPayment(paymentResult);
 
-        verifyDisableablePaymentManaged(true);
+        verifyRejectedPaymentManaged(true);
     }
 
     @Test
@@ -86,9 +83,9 @@ public class DisabledPaymentMethodServiceTest {
 
         when(paymentResult.getPaymentData().getToken()).thenReturn(mock(Token.class));
 
-        disabledPaymentMethodService.handleDisableablePayment(paymentResult);
+        disabledPaymentMethodRepositoryImpl.handleRejectedPayment(paymentResult);
 
-        verifyDisableablePaymentManaged(false);
+        verifyRejectedPaymentManaged(false);
     }
 
     private void mockPayment(final PaymentResult paymentResult, final String paymentMethodType,
@@ -102,11 +99,11 @@ public class DisabledPaymentMethodServiceTest {
         when(paymentResult.getPaymentData().getPaymentMethod().getId()).thenReturn(paymentMethodId);
     }
 
-    private void verifyDisableablePaymentManaged(final boolean shouldStorePaymentId) {
+    private void verifyRejectedPaymentManaged(final boolean shouldStorePaymentId) {
         if (shouldStorePaymentId) {
-            verify(sharedPreferences.edit()).putString(any(), any());
+            verify(fileManager).writeToFile(any(), any());
         } else {
-            verify(sharedPreferences.edit(), times(0)).putString(any(), any());
+            verify(fileManager, times(0)).writeToFile(any(), any());
         }
     }
 }

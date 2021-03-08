@@ -3,7 +3,7 @@ package com.mercadopago.android.px.internal.datasource
 import com.mercadopago.android.px.internal.core.FileManager
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository
 import com.mercadopago.android.px.internal.repository.DiscountRepository
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository
 import com.mercadopago.android.px.model.DiscountConfigurationModel
 import java.io.File
@@ -32,7 +32,7 @@ internal class DiscountServiceImpl(private val fileManager: FileManager,
         return getConfiguration(configurationSolver.getConfigurationHashSelectedFor(customOptionId))
     }
 
-    override fun getConfigurationFor(key: PayerPaymentMethodRepository.Key): DiscountConfigurationModel {
+    override fun getConfigurationFor(key: PayerPaymentMethodKey): DiscountConfigurationModel {
         return getConfiguration(configurationSolver.getConfigurationHashFor(key))
     }
 

@@ -16,9 +16,6 @@ import androidx.fragment.app.Fragment;
 import com.meli.android.carddrawer.model.CardDrawerSwitchView;
 import com.meli.android.carddrawer.model.CardDrawerView;
 import com.meli.android.carddrawer.model.SwitchModel;
-import com.meli.android.carddrawer.model.CardDrawerSwitchView;
-import com.meli.android.carddrawer.model.CardDrawerView;
-import com.meli.android.carddrawer.model.SwitchModel;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BasePagerFragment;
 import com.mercadopago.android.px.internal.di.Session;
@@ -77,22 +74,27 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initializeViews(view);
-        final GenericDialogItem genericDialogItem = model.getGenericDialogItem();
-        if (isDisableMethod()) {
-            disable();
-        } else if (genericDialogItem != null) {
-            card.setOnClickListener(v -> GenericDialog.showDialog(getChildFragmentManager(), genericDialogItem));
-        }
+        updateState();
     }
 
     protected boolean isDisableMethod() {
-        return model.getDisabledPaymentMethod() != null;
+        return model.getCommonsByApplication().getCurrent().getDisabledPaymentMethod() != null;
     }
 
     @CallSuper
     public void initializeViews(@NonNull final View view) {
         card = view.findViewById(R.id.payment_method);
         bottomDescription = view.findViewById(R.id.bottom_description);
+        updateView();
+        final CardDrawerView cardDrawerView = view.findViewById(R.id.card);
+        if (cardDrawerView != null) {
+            setUpCardDrawerView(cardDrawerView);
+        }
+    }
+
+    @Override
+    public void updateView() {
+        final View view = getView();
         if (model.shouldHighlightBottomDescription()) {
             final View highlightContainer = view.findViewById(R.id.bottom_description_container);
             highlightContainer.setVisibility(View.INVISIBLE);
@@ -107,9 +109,14 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         if (hasFocus()) {
             onFocusIn();
         }
-        final CardDrawerView cardDrawerView = view.findViewById(R.id.card);
-        if (cardDrawerView != null) {
-            setUpCardDrawerView(cardDrawerView);
+    }
+
+    @Override
+    public void updateState() {
+        if (isDisableMethod()) {
+            disable();
+        } else {
+            enable();
         }
     }
 
@@ -124,8 +131,13 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
             final CardDrawerSwitchView cardDrawerSwitch = new CardDrawerSwitchView(getContext());
             cardDrawerSwitch.setSwitchModel(switchModel);
             cardDrawerView.setCustomView(cardDrawerSwitch);
-            cardDrawerSwitch.setSwitchListener(paymentMethodId -> listener.onApplicationChanged(paymentMethodId));
+            cardDrawerSwitch.setSwitchListener(this::onApplicationChanged);
         }
+    }
+
+    private void onApplicationChanged(@NonNull final String paymentTypeId) {
+        listener.onApplicationChanged(paymentTypeId);
+        presenter.onApplicationChanged(paymentTypeId);
     }
 
     protected String getAccessibilityContentDescription() {
@@ -179,7 +191,7 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
 
         if (isDisableMethod()) {
-            String statusMessage = model.getStatus().getMainMessage().getMessage();
+            String statusMessage = model.getCommonsByApplication().getCurrent().getStatus().getMainMessage().getMessage();
             statusMessage = TextUtil.isNotEmpty(statusMessage) ? statusMessage : TextUtil.EMPTY;
             if (TextUtil.isNotEmpty(statusMessage)) {
                 setDescriptionForAccessibility(statusMessage);
@@ -233,7 +245,8 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @Override
     public void disable() {
         final Fragment parentFragment = getParentFragment();
-        final DisabledPaymentMethod disabledPaymentMethod = model.getDisabledPaymentMethod();
+        final DisabledPaymentMethod disabledPaymentMethod =
+            model.getCommonsByApplication().getCurrent().getDisabledPaymentMethod();
 
         if (!(parentFragment instanceof DisabledDetailDialogLauncher)) {
             throw new IllegalStateException(
@@ -247,7 +260,14 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         card.setOnClickListener(
             v -> DisabledPaymentMethodDetailDialog
                 .showDialog(parentFragment, ((DisabledDetailDialogLauncher) parentFragment).getRequestCode(),
-                    disabledPaymentMethod.getPaymentStatusDetail(), model.getStatus()));
+                    disabledPaymentMethod.getPaymentStatusDetail(), model.getCommonsByApplication().getCurrent().getStatus()));
+    }
+
+    public void enable() {
+        final GenericDialogItem genericDialogItem = model.getGenericDialogItem();
+        if (genericDialogItem != null) {
+            card.setOnClickListener(v -> GenericDialog.showDialog(getChildFragmentManager(), genericDialogItem));
+        }
     }
 
     @Override

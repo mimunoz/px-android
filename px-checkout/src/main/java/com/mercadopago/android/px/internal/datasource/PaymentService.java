@@ -19,7 +19,7 @@ import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepos
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
@@ -180,9 +180,8 @@ public class PaymentService implements PaymentRepository {
         if (PaymentTypes.isCardPaymentType(paymentMethod.getPaymentTypeId())) {
             // cards
             final Card card = fromPayerPaymentMethodToCardMapper.map(
-                new PayerPaymentMethodRepository.Key(configuration.getCustomOptionId(),
-                    paymentMethod.getPaymentTypeId()));
-            if(card == null) {
+                new PayerPaymentMethodKey(configuration.getCustomOptionId(), paymentMethod.getPaymentTypeId()));
+            if (card == null) {
                 throw new IllegalStateException("Cannot find selected card");
             }
             if (configuration.getSplitPayment()) {

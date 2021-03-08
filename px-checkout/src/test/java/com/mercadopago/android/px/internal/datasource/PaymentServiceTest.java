@@ -18,11 +18,12 @@ import com.mercadopago.android.px.internal.repository.AmountConfigurationReposit
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
@@ -41,6 +42,7 @@ import com.mercadopago.android.px.model.PaymentTypes;
 import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.model.internal.FromExpressMetadataToPaymentConfiguration;
 import com.mercadopago.android.px.model.internal.OneTapItem;
@@ -84,7 +86,7 @@ public class PaymentServiceTest {
 
     @Mock private UserSelectionRepository userSelectionRepository;
     @Mock private PaymentSettingRepository paymentSettingRepository;
-    @Mock private DisabledPaymentMethodService disabledPaymentMethodService;
+    @Mock private DisabledPaymentMethodRepository disabledPaymentMethodRepository;
     @Mock private DiscountRepository discountRepository;
     @Mock private AmountRepository amountRepository;
     @Mock private SplitPaymentProcessor paymentProcessor;
@@ -102,6 +104,7 @@ public class PaymentServiceTest {
     @Mock private OneTapItem node;
     @Mock private PayerCost payerCost;
     @Mock private PaymentMethod paymentMethod;
+    @Mock private Application application;
     @Mock private FileManager fileManager;
     @Mock private FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     @Mock private PaymentMethodMapper paymentMethodMapper;
@@ -116,7 +119,7 @@ public class PaymentServiceTest {
     public void setUp() {
         paymentService = new PaymentService(userSelectionRepository,
             paymentSettingRepository,
-            disabledPaymentMethodService,
+            disabledPaymentMethodRepository,
             discountRepository,
             amountRepository,
             context,
@@ -132,6 +135,11 @@ public class PaymentServiceTest {
             paymentMethodRepository
         );
 
+        application = mock(Application.class);
+        final Application.PaymentMethod applicationPaymentMethod = mock(Application.PaymentMethod.class);
+        when(applicationPaymentMethod.getId()).thenReturn(PaymentMethods.ARGENTINA.AMEX);
+        when(applicationPaymentMethod.getType()).thenReturn(PaymentTypes.CREDIT_CARD);
+        when(application.getPaymentMethod()).thenReturn(applicationPaymentMethod);
         when(paymentSettingRepository.getCheckoutPreference()).thenReturn(mock(CheckoutPreference.class));
         when(paymentSettingRepository.getPaymentConfiguration())
             .thenReturn(mock(com.mercadopago.android.px.configuration.PaymentConfiguration.class));
@@ -149,6 +157,7 @@ public class PaymentServiceTest {
         final AmountConfiguration amountConfiguration = mock(AmountConfiguration.class);
         when(amountConfigurationRepository.getConfigurationSelectedFor(anyString())).thenReturn(amountConfiguration);
         when(amountConfiguration.getCurrentPayerCost(anyBoolean(), anyInt())).thenReturn(payerCost);
+        when(applicationSelectionRepository.get(oneTapItem.getCustomOptionId())).thenReturn(application);
         return new FromExpressMetadataToPaymentConfiguration(amountConfigurationRepository, splitSelectionState,
             payerCostSelectionRepository, applicationSelectionRepository).map(oneTapItem);
     }
@@ -376,12 +385,10 @@ public class PaymentServiceTest {
 
     private Card creditCardPresetMock(final String cardId) {
         final Card card = getCardById(cardId);
-        when(node.getPaymentMethodId()).thenReturn(PaymentMethods.ARGENTINA.AMEX);
-        when(node.getPaymentTypeId()).thenReturn(PaymentTypes.CREDIT_CARD);
         when(node.isCard()).thenReturn(true);
         when(node.getCustomOptionId()).thenReturn(cardId);
         when(fromPayerPaymentMethodToCardMapper
-            .map(new PayerPaymentMethodRepository.Key(cardId, PaymentTypes.CREDIT_CARD)))
+            .map(new PayerPaymentMethodKey(cardId, PaymentTypes.CREDIT_CARD)))
             .thenReturn(card);
         return card;
     }
