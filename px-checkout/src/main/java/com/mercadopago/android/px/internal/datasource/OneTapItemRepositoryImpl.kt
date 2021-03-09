@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.datasource
 import com.mercadopago.android.px.internal.core.FileManager
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository
 import com.mercadopago.android.px.internal.repository.OneTapItemRepository
-import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
 import com.mercadopago.android.px.model.internal.OneTapItem
 import java.io.File
 
@@ -18,8 +17,8 @@ internal class OneTapItemRepositoryImpl(private val fileManager: FileManager,
     override fun readFromStorage() = fileManager.readAnyList(file, OneTapItem::class.java)
 
     override fun sortByState() {
-        val disabledPaymentMethodMap: Map<String, DisabledPaymentMethod> = disabledPaymentMethodRepository.disabledPaymentMethods
-        ExpressMetadataSorter(value, disabledPaymentMethodMap).sort()
+        val disabledPaymentMethodMap = disabledPaymentMethodRepository.value
+        OneTapItemSorter(value, disabledPaymentMethodMap).sort()
         configure(value)
     }
 }

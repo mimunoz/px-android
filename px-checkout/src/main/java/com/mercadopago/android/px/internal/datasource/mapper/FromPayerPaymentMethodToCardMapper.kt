@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.datasource.mapper
 
 import com.mercadopago.android.px.internal.mappers.NonNullMapper
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository
 import com.mercadopago.android.px.model.Card
@@ -9,12 +10,12 @@ import com.mercadopago.android.px.model.PaymentTypes.isCardPaymentType
 internal class FromPayerPaymentMethodToCardMapper(
     private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
     private val paymentMethodRepository: PaymentMethodRepository
-) : NonNullMapper<PayerPaymentMethodRepository.Key, Card>() {
+) : NonNullMapper<PayerPaymentMethodKey, Card>() {
 
-    override fun map(value: PayerPaymentMethodRepository.Key): Card? {
+    override fun map(value: PayerPaymentMethodKey): Card? {
         return payerPaymentMethodRepository[value]?.takeIf {
-            isCardPaymentType(it.type) }?.let {
-            payerPaymentMethod ->
+            isCardPaymentType(it.type)
+        }?.let { payerPaymentMethod ->
             paymentMethodRepository.value.find { it.id == payerPaymentMethod.paymentMethodId }?.let { paymentMethod ->
                 val card = Card()
                 card.id = payerPaymentMethod.id

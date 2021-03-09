@@ -4,31 +4,30 @@ import com.meli.android.carddrawer.configuration.CardDrawerStyle
 import com.mercadopago.android.px.internal.features.generic_modal.ActionType
 import com.mercadopago.android.px.internal.features.generic_modal.FromModalToGenericDialogItem
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogItem
+import com.mercadopago.android.px.internal.mappers.CardDrawerCustomViewModelMapper
 import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.internal.mappers.NonNullMapper
-import com.mercadopago.android.px.internal.repository.ChargeRepository
-import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository
-import com.mercadopago.android.px.internal.repository.ModalRepository
-import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
+import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.TextUtil
-import com.mercadopago.android.px.internal.mappers.CardDrawerCustomViewModelMapper
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem.Parameters
 import com.mercadopago.android.px.model.AccountMoneyDisplayInfo
 import com.mercadopago.android.px.model.CustomSearchItem
-import com.mercadopago.android.px.model.ExpressMetadata
+import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.one_tap.CheckoutBehaviour
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey as Key
+import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentCommons.ByApplication as CommonsByApplication
 
 internal class PaymentMethodDrawableItemMapper(
     private val chargeRepository: ChargeRepository,
     private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
+    private val applicationSelectedRepository: ApplicationSelectionRepository,
     private val cardUiMapper: CardUiMapper,
     private val cardDrawerCustomViewModelMapper: CardDrawerCustomViewModelMapper,
     private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
     private val modalRepository: ModalRepository
-) : NonNullMapper<ExpressMetadata, DrawableFragmentItem?>() {
+) : NonNullMapper<OneTapItem, DrawableFragmentItem?>() {
 
-
-    override fun map(value: ExpressMetadata): DrawableFragmentItem? {
+    override fun map(value: OneTapItem): DrawableFragmentItem? {
         val genericDialogItem = value.getBehaviour(CheckoutBehaviour.Type.TAP_CARD)?.modal?.let { modal ->
             modalRepository.value[modal]?.let {
                 FromModalToGenericDialogItem(ActionType.DISMISS, modal).map(it)
@@ -53,24 +52,34 @@ internal class PaymentMethodDrawableItemMapper(
         } ?: AccountMoneyDrawableFragmentItem(parameters, CardDrawerStyle.ACCOUNT_MONEY_DEFAULT)
 
     private fun getParameters(
-        expressMetadata: ExpressMetadata,
+        oneTapItem: OneTapItem,
         customSearchItems: List<CustomSearchItem>,
         genericDialogItem: GenericDialogItem?
     ): Parameters {
-        val displayInfo = expressMetadata.displayInfo
-        val charge = chargeRepository.getChargeRule(expressMetadata.paymentTypeId)
-        val customOptionId = expressMetadata.customOptionId
+        val displayInfo = oneTapItem.displayInfo
+
+        val customOptionId = oneTapItem.customOptionId
         val (description, issuerName) = customSearchItems.firstOrNull { c -> c.id == customOptionId }?.let {
             Pair(it.description.orEmpty(), it.issuer?.name.orEmpty())
         } ?: Pair(TextUtil.EMPTY, TextUtil.EMPTY)
 
+        val paymentMethodType = applicationSelectedRepository[customOptionId].paymentMethod.type
+        val commonsByApplication = CommonsByApplication(paymentMethodType).also {
+            oneTapItem.getApplications().forEach { application ->
+                val paymentTypeId = application.paymentMethod.type
+                it[application] = DrawableFragmentCommons(
+                    application.status,
+                    chargeRepository.getChargeRule(paymentTypeId)?.message,
+                    disabledPaymentMethodRepository[Key(customOptionId, paymentTypeId)]
+                )
+            }
+        }
+
         return Parameters(
             customOptionId,
-            expressMetadata.status,
+            commonsByApplication,
             displayInfo?.bottomDescription,
-            charge?.message,
-            expressMetadata.benefits?.reimbursement,
-            disabledPaymentMethodRepository.getDisabledPaymentMethod(customOptionId),
+            oneTapItem.benefits?.reimbursement,
             description,
             issuerName,
             genericDialogItem,

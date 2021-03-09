@@ -30,6 +30,6 @@ internal interface DiscountRepository : LocalRepository<Map<String, DiscountConf
      * @param key   The key that contains custom option ID and payment method type ID.
      * @return The discount configuration.
      */
-    fun getConfigurationFor(key: PayerPaymentMethodRepository.Key): DiscountConfigurationModel
+    fun getConfigurationFor(key: PayerPaymentMethodKey): DiscountConfigurationModel
 
 }

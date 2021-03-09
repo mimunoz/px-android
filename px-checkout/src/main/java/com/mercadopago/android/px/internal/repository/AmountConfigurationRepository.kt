@@ -21,6 +21,12 @@ internal interface AmountConfigurationRepository : LocalRepository<String> {
      */
     fun getConfigurationSelectedFor(customOptionId: String): AmountConfiguration?
 
-    fun getConfigurationFor(key: PayerPaymentMethodRepository.Key): AmountConfiguration?
+    /**
+     * Obtains the complete payer cost configuration for a specif custom option.
+     *
+     * @param key The key to look up the payer payment method.
+     * @return The payer cost configuration, returns null if don't have a configuration or ID is invalid.
+     */
+    fun getConfigurationFor(key: PayerPaymentMethodKey): AmountConfiguration?
 
 }

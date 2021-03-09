@@ -26,13 +26,15 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
     @Nullable
     private String getHighlightText() {
         final int payerCostIndex = payerCostSelectionRepository.get(item.getId());
-        final AmountConfiguration configuration = amountConfigurationRepository.getConfigurationSelectedFor(item.getId());
+        final AmountConfiguration configuration =
+            amountConfigurationRepository.getConfigurationSelectedFor(item.getId());
         final int installments = configuration == null || configuration.getPayerCosts().isEmpty() ?
             -1 : configuration.getCurrentPayerCost(false, payerCostIndex).getInstallments();
         final boolean hasReimbursement =
             item.getReimbursement() != null && item.getReimbursement().hasAppliedInstallment(installments);
         final String reimbursementMessage = hasReimbursement ? item.getReimbursement().getCard().getMessage() : null;
-        return item.getChargeMessage() != null ? item.getChargeMessage() : reimbursementMessage;
+        final String chargeMessage = item.getCommonsByApplication().getCurrent().getChargeMessage();
+        return chargeMessage != null ? chargeMessage : reimbursementMessage;
     }
 
     @Override
@@ -48,5 +50,13 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
         if (item.shouldHighlightBottomDescription()) {
             getView().animateHighlightMessageOut();
         }
+    }
+
+    @Override
+    public void onApplicationChanged(@NonNull final String paymentTypeId) {
+        item.getCommonsByApplication().update(paymentTypeId);
+        onFocusOut();
+        getView().updateView();
+        getView().updateState();
     }
 }

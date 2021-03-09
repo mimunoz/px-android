@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.internal.core.FileManager
 import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository
 import com.mercadopago.android.px.model.CustomSearchItem
 import java.io.File
@@ -17,7 +18,7 @@ internal class PayerPaymentMethodRepositoryImpl(
 
     override fun readFromStorage() = fileManager.readAnyList(file, CustomSearchItem::class.java)
 
-    override fun get(key: PayerPaymentMethodRepository.Key): CustomSearchItem? {
+    override fun get(key: PayerPaymentMethodKey): CustomSearchItem? {
         return value.firstOrNull {
             it.id == key.payerPaymentMethodId
                 && it.type == key.paymentTypeId
@@ -25,16 +26,8 @@ internal class PayerPaymentMethodRepositoryImpl(
     }
 
     override fun get(customOptionId: String): CustomSearchItem? {
-        val (paymentMethodId, paymentMethodTypeId) = applicationSelectionRepository[customOptionId]
-            ?.paymentMethod
-            ?.let { it.id to it.type }
-            ?: customOptionId to null
-
-        return value.firstOrNull {
-            it.id == customOptionId
-                && it.paymentMethodId == paymentMethodId
-                && it.type == paymentMethodTypeId
-        }
+        val paymentMethodTypeId = applicationSelectionRepository[customOptionId].paymentMethod.type
+        return get(PayerPaymentMethodKey(customOptionId, paymentMethodTypeId))
     }
 
     override fun getIdsWithSplitAllowed(): Set<String> {

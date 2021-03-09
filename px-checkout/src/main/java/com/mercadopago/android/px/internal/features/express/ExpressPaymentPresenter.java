@@ -23,13 +23,13 @@ import com.mercadopago.android.px.internal.features.generic_modal.ActionType;
 import com.mercadopago.android.px.internal.features.generic_modal.ActionTypeWrapper;
 import com.mercadopago.android.px.internal.features.generic_modal.FromModalToGenericDialogItem;
 import com.mercadopago.android.px.internal.features.pay_button.PayButton;
-import com.mercadopago.android.px.internal.mappers.SummaryViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.ConfirmButtonViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.mappers.InstallmentViewModelMapper;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.mappers.SplitHeaderMapper;
 import com.mercadopago.android.px.internal.mappers.SummaryInfoMapper;
+import com.mercadopago.android.px.internal.mappers.SummaryViewModelMapper;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository;
@@ -39,10 +39,11 @@ import com.mercadopago.android.px.internal.repository.CustomTextsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.PayerComplianceRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
@@ -51,7 +52,7 @@ import com.mercadopago.android.px.internal.util.CardFormWrapper;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.AmountDescriptorView;
 import com.mercadopago.android.px.internal.view.ElementDescriptorView;
-import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
+import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorModelByApplication;
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper;
 import com.mercadopago.android.px.internal.view.experiments.ExperimentHelper;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
@@ -186,17 +187,16 @@ import java.util.List;
                 customTextsRepository, summaryDetailDescriptorMapper, applicationSelectionRepository)
                 .map(oneTapItemList);
 
-        final List<PaymentMethodDescriptorView.Model> paymentModels =
+        final List<PaymentMethodDescriptorModelByApplication> paymentModels =
             paymentMethodDescriptorMapper.map(oneTapItemList);
 
         final List<SplitPaymentHeaderAdapter.Model> splitHeaderModels =
             new SplitHeaderMapper(
                 paymentSettingRepository.getCurrency(),
-                amountConfigurationRepository,
-                applicationSelectionRepository)
+                amountConfigurationRepository)
                 .map(oneTapItemList);
 
-        final List<ConfirmButtonViewModel> confirmButtonViewModels =
+        final List<ConfirmButtonViewModel.ByApplication> confirmButtonViewModels =
             new ConfirmButtonViewModelMapper(disabledPaymentMethodRepository).map(oneTapItemList);
 
         final HubAdapter.Model model =
@@ -241,7 +241,7 @@ import java.util.List;
                 paymentSettingRepository.getCheckoutPreference(),
                 discountRepository.getCurrentConfiguration(), escManagerBehaviour.getESCCardIds(),
                 payerPaymentMethodRepository.getIdsWithSplitAllowed(),
-                disabledPaymentMethodRepository.getDisabledPaymentMethods().size(),
+                disabledPaymentMethodRepository.getValue().size(),
                 experimentsRepository.getExperiments(Configuration.TrackingMode.NO_CONDITIONAL));
         setCurrentViewTracker(oneTapViewTracker);
     }
@@ -296,7 +296,6 @@ import java.util.List;
         final OneTapItem oneTapItem = getCurrentOneTapItem();
         final AmountConfiguration amountConfiguration =
             amountConfigurationRepository.getConfigurationSelectedFor(oneTapItem.getCustomOptionId());
-
         return amountConfiguration.getAppliedPayerCost(getState().getSplitSelectionState().userWantsToSplit());
     }
 
@@ -352,8 +351,11 @@ import java.util.List;
     }
 
     public void onDisabledDescriptorViewClick() {
+        final String payerPaymentMethodId = getCurrentOneTapItem().getCustomOptionId();
+        final String paymentTypeId =
+            applicationSelectionRepository.get(payerPaymentMethodId).getPaymentMethod().getType();
         getView().showDisabledPaymentMethodDetailDialog(
-            disabledPaymentMethodRepository.getDisabledPaymentMethod(getCurrentOneTapItem().getCustomOptionId()),
+            disabledPaymentMethodRepository.get(new PayerPaymentMethodKey(payerPaymentMethodId, paymentTypeId)),
             getCurrentOneTapItem().getStatus());
     }
 
@@ -509,9 +511,12 @@ import java.util.List;
 
     private boolean overridePayButtonStateChange(@NonNull final PayButton.State uiState) {
         final OneTapItem currentOneTapItem = getCurrentOneTapItem();
+        final String payerPaymentMethodId = getCurrentOneTapItem().getCustomOptionId();
+        final String paymentTypeId =
+            applicationSelectionRepository.get(payerPaymentMethodId).getPaymentMethod().getType();
         return uiState == PayButton.State.ENABLE && (currentOneTapItem.isNewCard() ||
-            currentOneTapItem.isOfflineMethods() || disabledPaymentMethodRepository.hasPaymentMethodId(
-            currentOneTapItem.getCustomOptionId()));
+            currentOneTapItem.isOfflineMethods() || disabledPaymentMethodRepository.hasKey(
+            new PayerPaymentMethodKey(payerPaymentMethodId, paymentTypeId)));
     }
 
     /* default */ void reload() {
@@ -570,7 +575,6 @@ import java.util.List;
     @Override
     public void onApplicationChanged(@NonNull final String paymentTypeId) {
         final OneTapItem oneTapItem = getCurrentOneTapItem();
-
         for (final Application application : oneTapItem.getApplications()) {
             if (application.getPaymentMethod().getType().equals(paymentTypeId)) {
                 applicationSelectionRepository.set(oneTapItem.getCustomOptionId(), application);

@@ -61,7 +61,7 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         topText = view.findViewById(R.id.top_text);
         bottomText = view.findViewById(R.id.bottom_text);
         final ConsumerCreditsDisplayInfo displayInfo = model.metadata.displayInfo;
-        tintBackground(view.findViewById(R.id.background), displayInfo.color);
+        tintBackground(background, displayInfo.color);
         showDisplayInfo(view, displayInfo);
         view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
     }

@@ -8,15 +8,16 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.configuration.DiscountParamsConfiguration;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
-import com.mercadopago.android.px.internal.mappers.ExpressMetadataToDisabledIdMapper;
+import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
+import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
-import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.PayerComplianceRepository;
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
@@ -26,10 +27,10 @@ import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.ExpressMetadata;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.internal.CheckoutFeatures;
-import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
-import com.mercadopago.android.px.model.internal.OneTapItem;
-import com.mercadopago.android.px.model.internal.InitRequest;
 import com.mercadopago.android.px.model.internal.CheckoutResponse;
+import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
+import com.mercadopago.android.px.model.internal.InitRequest;
+import com.mercadopago.android.px.model.internal.OneTapItem;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
@@ -108,9 +109,8 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         payerComplianceRepository.configure(checkoutResponse.getPayerCompliance());
         amountConfigurationRepository.configure(checkoutResponse.getDefaultAmountConfiguration());
         discountRepository.configure(checkoutResponse.getDiscountsConfigurations());
-
-        disabledPaymentMethodRepository.storeDisabledPaymentMethodsIds(
-            new ExpressMetadataToDisabledIdMapper().map(checkoutResponse.getOneTapItems()));
+        disabledPaymentMethodRepository.configure(
+            new OneTapItemToDisabledPaymentMethodMapper().map(checkoutResponse.getOneTapItems()));
 
         tracker.setExperiments(experimentsRepository.getExperiments());
     }
@@ -200,8 +200,8 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
 
     /* default */ Callback<CheckoutResponse> getRefreshWithNewCardCallback(@NonNull final String cardId,
         @NonNull final Callback<CheckoutResponse> callback) {
-        final Map<String, DisabledPaymentMethod> disabledPaymentMethodMap =
-            disabledPaymentMethodRepository.getDisabledPaymentMethods();
+        final Map<PayerPaymentMethodKey, DisabledPaymentMethod> disabledPaymentMethodMap =
+            disabledPaymentMethodRepository.getValue();
         return new Callback<CheckoutResponse>() {
             @Override
             public void success(final CheckoutResponse checkoutResponse) {
@@ -210,7 +210,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
                 for (final ExpressMetadata node : oneTap) {
                     if (node.isCard() && node.getCard().getId().equals(cardId)) {
                         refreshRetriesAvailable = MAX_REFRESH_RETRIES;
-                        new ExpressMetadataSorter(oneTap, disabledPaymentMethodMap)
+                        new OneTapItemSorter(oneTap, disabledPaymentMethodMap)
                             .setPrioritizedCardId(cardId).sort();
                         getPostResponse().call(checkoutResponse);
                         callback.success(checkoutResponse);

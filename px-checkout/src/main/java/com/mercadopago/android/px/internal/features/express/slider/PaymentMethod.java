@@ -1,11 +1,16 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.base.MvpView;
 
 public interface PaymentMethod {
     interface View extends MvpView {
-        void updateHighlightText(@Nullable String text);
+        void updateView();
+
+        void updateState();
+
+        void updateHighlightText(@Nullable final String text);
 
         void disable();
 
@@ -18,5 +23,7 @@ public interface PaymentMethod {
         void onFocusIn();
 
         void onFocusOut();
+
+        void onApplicationChanged(@NonNull final String paymentTypeId);
     }
 }

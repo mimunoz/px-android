@@ -1,7 +1,8 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
-import androidx.annotation.NonNull;
 import android.view.View;
+import androidx.annotation.NonNull;
+import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorModelByApplication;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.TitlePager;
 import com.mercadopago.android.px.internal.viewmodel.GoingToModel;
@@ -11,7 +12,7 @@ import java.util.List;
 
 import static com.mercadopago.android.px.internal.util.AccessibilityUtilsKt.executeIfAccessibilityTalkBackEnable;
 
-public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescriptorView.Model>, TitlePager> {
+public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescriptorModelByApplication>, TitlePager> {
 
     private static final int NO_SELECTED = -1;
 
@@ -19,27 +20,28 @@ public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescript
     private PaymentMethodDescriptorView currentView;
     private PaymentMethodDescriptorView nextView;
     private int currentIndex = NO_SELECTED;
-    private InstallmentChanged installmentChanged;
+    private final InstallmentChanged installmentChanged;
 
     public interface InstallmentChanged {
         void installmentSelectedChanged(final int installment);
     }
 
-    public TitlePagerAdapter(@NonNull final TitlePager titlePager, @NonNull final InstallmentChanged installmentChanged) {
+    public TitlePagerAdapter(@NonNull final TitlePager titlePager,
+        @NonNull final InstallmentChanged installmentChanged) {
         super(titlePager);
         this.installmentChanged = installmentChanged;
     }
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState,
-        final @NonNull Application application) {
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application) {
         if (this.currentIndex != currentIndex) {
             final GoingToModel goingTo =
                 this.currentIndex < currentIndex ? GoingToModel.BACKWARDS : GoingToModel.FORWARD;
             view.orderViews(goingTo);
             this.currentIndex = currentIndex;
         }
+        data.get(currentIndex).update(application);
         refreshData(currentIndex, payerCostSelected, splitSelectionState);
     }
 
@@ -61,11 +63,11 @@ public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescript
     private void refreshData(final int currentIndex, final int payerCostSelected,
         @NonNull final SplitSelectionState splitSelectionState) {
         if (currentIndex > 0) {
-            final PaymentMethodDescriptorView.Model previousModel = data.get(currentIndex - 1);
+            final PaymentMethodDescriptorView.Model previousModel = data.get(currentIndex - 1).getCurrent();
             previousView.update(previousModel);
         }
 
-        final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
+        final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex).getCurrent();
 
         currentModel.setCurrentPayerCost(payerCostSelected);
         currentModel.setSplit(splitSelectionState.userWantsToSplit());
@@ -80,13 +82,13 @@ public class TitlePagerAdapter extends HubableAdapter<List<PaymentMethodDescript
         }
 
         if (currentIndex + 1 < data.size()) {
-            final PaymentMethodDescriptorView.Model nextModel = data.get(currentIndex + 1);
+            final PaymentMethodDescriptorView.Model nextModel = data.get(currentIndex + 1).getCurrent();
             nextView.update(nextModel);
         }
     }
 
     @Override
-    public List<PaymentMethodDescriptorView.Model> getNewModels(final HubAdapter.Model model) {
+    public List<PaymentMethodDescriptorModelByApplication> getNewModels(final HubAdapter.Model model) {
         return model.paymentMethodDescriptorModels;
     }
 }

@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
-import androidx.annotation.NonNull;
 import android.view.View;
-import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
+import androidx.annotation.NonNull;
+import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorModelByApplication;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.internal.viewmodel.SummaryModel;
@@ -15,15 +15,15 @@ public class HubAdapter extends ViewAdapter<HubAdapter.Model, View> {
 
     public static class Model {
 
-        @NonNull public final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels;
+        @NonNull public final List<PaymentMethodDescriptorModelByApplication> paymentMethodDescriptorModels;
         @NonNull public final List<SummaryModel> summaryViewModels;
         @NonNull public final List<SplitPaymentHeaderAdapter.Model> splitModels;
-        @NonNull public final List<ConfirmButtonViewModel> confirmButtonViewModels;
+        @NonNull public final List<ConfirmButtonViewModel.ByApplication> confirmButtonViewModels;
 
-        public Model(@NonNull final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels,
+        public Model(@NonNull final List<PaymentMethodDescriptorModelByApplication> paymentMethodDescriptorModels,
             @NonNull final List<SummaryModel> summaryViewModels,
             @NonNull final List<SplitPaymentHeaderAdapter.Model> splitModels,
-            @NonNull final List<ConfirmButtonViewModel> confirmButtonViewModels) {
+            @NonNull final List<ConfirmButtonViewModel.ByApplication> confirmButtonViewModels) {
             this.paymentMethodDescriptorModels = paymentMethodDescriptorModels;
             this.summaryViewModels = summaryViewModels;
             this.splitModels = splitModels;

@@ -39,9 +39,7 @@ class DiscountServiceTest {
 
     private val validCampaignId = "VALID_CAMPAIGN_ID"
     private val invalidCustomOptionId = "INVALID_CUSTOM_OPTION_ID"
-    private val invalidPaymentMethodType = "INVALID_PAYMENT_METHOD_TYPE"
     private val validCustomOptionId = "VALID_CUSTOM_OPTION_ID"
-    private val validPaymentMethodType = "VALID_PAYMENT_METHOD_TYPE"
 
     private val discountServiceImpl: DiscountServiceImpl by lazy {
         DiscountServiceImpl(

@@ -99,6 +99,9 @@ class ExpressPaymentPresenterTest {
     private lateinit var payerComplianceRepository: PayerComplianceRepository
 
     @Mock
+    private lateinit var applicationSelectionRepository: ApplicationSelectionRepository
+
+    @Mock
     private lateinit var trackingRepository: TrackingRepository
 
     @Mock
@@ -115,16 +118,15 @@ class ExpressPaymentPresenterTest {
 
     @Mock
     private lateinit var modalRepository: ModalRepository
+
     @Mock
     private lateinit var summaryDetailDescriptorMapper: SummaryDetailDescriptorMapper
 
     @Mock
     private lateinit var summaryInfoMapper: SummaryInfoMapper
-    @Mock
-    private lateinit var elementDescriptorMapper: ElementDescriptorMapper
 
     @Mock
-    private lateinit var applicationSelectionRepository: ApplicationSelectionRepository
+    private lateinit var elementDescriptorMapper: ElementDescriptorMapper
 
     @Mock
     private lateinit var application: Application
@@ -137,6 +139,7 @@ class ExpressPaymentPresenterTest {
         val preference = mock(CheckoutPreference::class.java)
         val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
+        `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())
         `when`(paymentSettingRepository.currency).thenReturn(CurrencyStub.MLA.get())
@@ -151,8 +154,9 @@ class ExpressPaymentPresenterTest {
         `when`(discountRepository.getCurrentConfiguration()).thenReturn(discountConfigurationModel)
         `when`(discountRepository.getConfigurationFor(any())).thenReturn(discountConfigurationModel)
         `when`(amountConfigurationRepository.getConfigurationSelectedFor("123")).thenReturn(amountConfiguration)
-        `when`(amountConfigurationRepository.getConfigurationFor(any())).thenReturn(amountConfiguration)
+        `when`(applicationSelectionRepository[oneTapItem.customOptionId]).thenReturn(application)
         `when`(oneTapItemRepository.value).thenReturn(listOf(oneTapItem))
+        `when`(disabledPaymentMethodRepository.value).thenReturn(hashMapOf())
         `when`(applicationPaymentMethod.type).thenReturn("credit_card")
         `when`(application.paymentMethod).thenReturn(applicationPaymentMethod)
         `when`(applicationSelectionRepository[oneTapItem.customOptionId]).thenReturn(application)
@@ -165,7 +169,7 @@ class ExpressPaymentPresenterTest {
             mock(PaymentMethodDescriptorMapper::class.java), mock(CustomTextsRepository::class.java),
             summaryDetailDescriptorMapper,
             summaryInfoMapper,
-            elementDescriptorMapper,tracker, oneTapItemRepository, payerPaymentMethodRepository,
+            elementDescriptorMapper, tracker, oneTapItemRepository, payerPaymentMethodRepository,
             modalRepository)
         verifyAttachView()
     }
@@ -267,7 +271,7 @@ class ExpressPaymentPresenterTest {
     fun whenDisabledDescriptorViewClickThenShowDisabledDialog() {
         val disabledPaymentMethod = mock(DisabledPaymentMethod::class.java)
         val statusMetadata = mock(StatusMetadata::class.java)
-        `when`(disabledPaymentMethodRepository.getDisabledPaymentMethod(anyString())).thenReturn(disabledPaymentMethod)
+        `when`(disabledPaymentMethodRepository[any()]).thenReturn(disabledPaymentMethod)
         `when`(oneTapItem.status).thenReturn(statusMetadata)
 
         expressPaymentPresenter.onDisabledDescriptorViewClick()
@@ -313,7 +317,8 @@ class ExpressPaymentPresenterTest {
         verify(view).configurePaymentMethodHeader(anyList())
         verify(view).showToolbarElementDescriptor(any(ElementDescriptorView.Model::class.java))
         verify(view).updateAdapters(any(HubAdapter.Model::class.java))
-        verify(view).updateViewForPosition(anyInt(), anyInt(), any(SplitSelectionState::class.java), any())
+        verify(view).updateViewForPosition(
+            anyInt(), anyInt(), any(SplitSelectionState::class.java), any(Application::class.java))
         verify(view).configureRenderMode(any())
         verify(view).configureAdapters(any(Site::class.java), any(Currency::class.java))
         verify(view).updatePaymentMethods(anyListOf(DrawableFragmentItem::class.java))

@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.model.internal
 
 import android.os.Parcel
+import com.mercadopago.android.px.internal.core.extensions.orIfNullOrEmpty
 import com.mercadopago.android.px.model.ExpressMetadata
-import java.lang.UnsupportedOperationException
 
 class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
 
@@ -17,7 +17,11 @@ class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
         throw UnsupportedOperationException("Parcelable implementation not available")
     }
 
-    fun getApplications() = applications
+    fun getApplications() = applications.orIfNullOrEmpty(mutableListOf<Application>().also {
+        it.add(
+            Application(Application.PaymentMethod(paymentMethodId.orEmpty(), paymentTypeId.orEmpty()), listOf(), status)
+        )
+    })
 
     fun getDefaultPaymentMethodType(): String = displayInfo
         ?.cardDrawerSwitch

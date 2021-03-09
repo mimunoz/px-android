@@ -1,13 +1,13 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.meli.android.carddrawer.model.CardDrawerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.TextUtil;
@@ -66,5 +66,11 @@ public class SavedCardFragment extends PaymentMethodFragment<SavedCardDrawableFr
     public void disable() {
         super.disable();
         cardView.setEnabled(false);
+    }
+
+    @Override
+    public void enable() {
+        super.enable();
+        cardView.setEnabled(true);
     }
 }
