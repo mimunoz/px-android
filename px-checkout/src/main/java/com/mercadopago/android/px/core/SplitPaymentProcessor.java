@@ -21,6 +21,7 @@ public interface SplitPaymentProcessor extends Parcelable {
         @NonNull public final CheckoutPreference checkoutPreference;
         @NonNull public final List<PaymentData> paymentDataList;
         @NonNull public final String securityType;
+        @Nullable public final String validationProgramId;
 
         /**
          * @deprecated use the one with security type
@@ -32,10 +33,19 @@ public interface SplitPaymentProcessor extends Parcelable {
         }
 
         public CheckoutData(@NonNull @Size(min = 1) final List<PaymentData> paymentData,
-            @NonNull final CheckoutPreference checkoutPreference, @NonNull final String securityType) {
+            @NonNull final CheckoutPreference checkoutPreference,
+            @NonNull final String securityType) {
+            this(paymentData, checkoutPreference, securityType, null);
+        }
+
+        public CheckoutData(@NonNull @Size(min = 1) final List<PaymentData> paymentData,
+            @NonNull final CheckoutPreference checkoutPreference,
+            @NonNull final String securityType,
+            @Nullable final String validationProgramId) {
             paymentDataList = paymentData;
             this.checkoutPreference = checkoutPreference;
             this.securityType = securityType;
+            this.validationProgramId = validationProgramId;
         }
     }
 
