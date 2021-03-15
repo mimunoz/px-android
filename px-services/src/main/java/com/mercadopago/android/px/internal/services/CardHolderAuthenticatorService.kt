@@ -10,5 +10,5 @@ interface CardHolderAuthenticatorService {
     @POST("https://api.mercadopago.com/cardholder_authenticator/testpublic/app/trxAuthentication/{card_token_id}")
     suspend fun authenticate(
         @Path(value = "card_token_id", encoded = true) cardTokenId: String,
-        @Body body: CardHolderAuthenticatorBody): String
+        @Body body: CardHolderAuthenticatorBody): Any
 }

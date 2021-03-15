@@ -311,10 +311,10 @@ public class PaymentService implements PaymentRepository {
                     paymentSettingRepository.getSite(),
                     paymentSettingRepository.getCurrency()),
                 s -> {
-                    Log.v("CRIS", s);
+                    Log.v("CRIS 1", s.toString());
                     return null;
                 }, mercadoPagoError -> {
-                    Log.v("CRIS", mercadoPagoError.toString());
+                    Log.v("CRIS 2", mercadoPagoError.toString());
                     return null;
                 });
 

@@ -17,6 +17,7 @@ object ThreeDSWrapper {
         threeDSSDK.initialize(object : ThreeDSInitializationCallback {
             override fun error(e: Exception?) {
                 // do nothing
+                Log.v("CRIS 4", e.toString())
             }
 
             override fun success() {
@@ -28,7 +29,7 @@ object ThreeDSWrapper {
     fun getAuthenticationParameters(): EMVAuthenticationRequestParameters {
         val transaction = threeDS2Service.createTransaction("A000000004", "2.1.0")
         val authenticationRequestParameters = transaction.authenticationRequestParameters
-        Log.v("CRIS", authenticationRequestParameters.deviceData)
+        Log.v("CRIS 3", authenticationRequestParameters.deviceData)
         return authenticationRequestParameters
     }
 }

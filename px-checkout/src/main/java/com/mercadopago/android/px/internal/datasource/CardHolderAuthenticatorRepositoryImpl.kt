@@ -15,7 +15,7 @@ import java.util.*
 class CardHolderAuthenticatorRepositoryImpl(
     private val cardHolderAuthenticatorService: CardHolderAuthenticatorService) : CardHolderAuthenticatorRepository {
 
-    override suspend fun authenticate(paymentData: PaymentData, card: Card, site: Site, currency: Currency, threeDSParams: EMVAuthenticationRequestParameters): String {
+    override suspend fun authenticate(paymentData: PaymentData, card: Card, site: Site, currency: Currency, threeDSParams: EMVAuthenticationRequestParameters): Any {
         val body = CardHolderAuthenticatorBody(
             179096502,
             CardHolderAuthenticatorBody.Data(

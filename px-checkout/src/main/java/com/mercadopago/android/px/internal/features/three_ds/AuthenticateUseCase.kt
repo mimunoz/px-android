@@ -17,9 +17,9 @@ class AuthenticateUseCase @JvmOverloads constructor(
         private val threeDSWrapper: ThreeDSWrapper,
         private val cardHolderAuthenticatorRepository: CardHolderAuthenticatorRepository,
         override val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
-) : UseCase<AuthenticateUseCase.Params, String>(tracker) {
+) : UseCase<AuthenticateUseCase.Params, Any>(tracker) {
 
-    override suspend fun doExecute(param: Params): Response<String, MercadoPagoError> {
+    override suspend fun doExecute(param: Params): Response<Any, MercadoPagoError> {
         val response = cardHolderAuthenticatorRepository.authenticate(
                 param.paymentData,
                 param.card,

@@ -8,5 +8,5 @@ import com.nds.nudetect.EMVAuthenticationRequestParameters
 
 interface CardHolderAuthenticatorRepository {
 
-    suspend fun authenticate(paymentData: PaymentData, card: Card, site: Site, currency: Currency, threeDSParams: EMVAuthenticationRequestParameters): String
+    suspend fun authenticate(paymentData: PaymentData, card: Card, site: Site, currency: Currency, threeDSParams: EMVAuthenticationRequestParameters): Any
 }
