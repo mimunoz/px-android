@@ -3,8 +3,8 @@ package com.mercadopago.android.px.feature.custom_initialize
 import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.mercadopago.SampleApplication
 import com.mercadopago.SamplePaymentProcessor
-import com.mercadopago.android.px.addons.FakeLocaleBehaviourImpl
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
@@ -59,7 +59,7 @@ internal class CustomInitializationViewModel(private val preferences: Initializa
 
     fun onStartButtonClicked() {
         preferences.saveInitializationData(initializationData)
-        initializationData.locale.value.takeIf { it.isNotEmpty() }?.let { FakeLocaleBehaviourImpl.localeTag = it }
+        initializationData.locale.value.takeIf { it.isNotEmpty() }?.let { SampleApplication.localeTag = it }
 
         val advancedConfiguration = AdvancedConfiguration.Builder()
             .setExpressPaymentEnable(initializationData.oneTap.value)

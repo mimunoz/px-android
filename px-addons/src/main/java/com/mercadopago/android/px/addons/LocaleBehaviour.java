@@ -3,6 +3,7 @@ package com.mercadopago.android.px.addons;
 import android.content.Context;
 import androidx.annotation.NonNull;
 
+@Deprecated
 public interface LocaleBehaviour {
 
     /**
