@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/px_s_margin"
             app:srcCompat="@drawable/px_arrow_right"
-            android:tint="@color/ui_components_android_color_primary"
+            app:tint="@color/ui_components_android_color_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -1,3 +1,15 @@
+## VERSION 4.72.0
+_11_03_2021_
+* ENHANCEMENT - Added validation program id to checkout data.
+
+## VERSION 4.71.0
+_03_03_2021_
+* ENHANCEMENT - Migrated to Gradle 6.7.1 and AGP 4.0.1.
+* ENHANCEMENT - Deprecated locale behaviour.
+* ENHANCEMENT - Deprecated init cache in favor of separated repositories.
+* ENHANCEMENT - Removed deprecated validators from the testlib.
+* ENHANCEMENT - Tracker dependency injection.
+
 ## VERSION 4.70.0
 _28_01_2021_
 * FEATURE - Generate jacoco coverage report

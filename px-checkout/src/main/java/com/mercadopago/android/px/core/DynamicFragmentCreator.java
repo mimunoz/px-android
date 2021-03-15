@@ -10,6 +10,10 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @deprecated groups will no longer be available anymore
+ */
+@Deprecated
 public interface DynamicFragmentCreator extends Parcelable {
 
     /* default */ final class CheckoutData {
