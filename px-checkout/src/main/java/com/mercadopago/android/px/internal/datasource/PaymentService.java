@@ -305,11 +305,9 @@ public class PaymentService implements PaymentRepository {
         if (getPaymentProcessor().shouldShowFragmentOnPayment(checkoutPreference)) {
             handlerWrapper.onVisualPayment();
         } else {
-            authenticateUseCase.execute(new AuthenticateUseCase.Params(
-                    getPaymentDataList().get(0),
-                    userSelectionRepository.getCard(),
-                    paymentSettingRepository.getSite(),
-                    paymentSettingRepository.getCurrency()),
+            final List<PaymentData> paymentDataList = getPaymentDataList();
+            authenticateUseCase.execute(
+                paymentDataList.get(0),
                 s -> {
                     Log.v("CRIS 1", s.toString());
                     return null;
@@ -319,7 +317,7 @@ public class PaymentService implements PaymentRepository {
                 });
 
             final SplitPaymentProcessor.CheckoutData checkoutData =
-                new SplitPaymentProcessor.CheckoutData(getPaymentDataList(), checkoutPreference, securityType);
+                new SplitPaymentProcessor.CheckoutData(paymentDataList, checkoutPreference, securityType);
             getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
         }
     }

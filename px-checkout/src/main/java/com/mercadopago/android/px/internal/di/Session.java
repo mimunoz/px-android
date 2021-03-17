@@ -431,7 +431,8 @@ public final class Session extends ApplicationModule {
         if (cardHolderAuthenticatorRepository == null) {
             final CardHolderAuthenticatorService service =
                 networkModule.getRetrofitClient2().create(CardHolderAuthenticatorService.class);
-            cardHolderAuthenticatorRepository = new CardHolderAuthenticatorRepositoryImpl(service);
+            cardHolderAuthenticatorRepository =
+                new CardHolderAuthenticatorRepositoryImpl(service, configurationModule.getPaymentSettings());
         }
         return cardHolderAuthenticatorRepository;
     }
