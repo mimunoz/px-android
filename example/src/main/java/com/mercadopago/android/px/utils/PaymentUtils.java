@@ -28,9 +28,9 @@ public final class PaymentUtils {
     @NonNull
     public static IParcelablePaymentDescriptor getGenericPaymentApproved() {
         return GenericPaymentDescriptor.with(new GenericPayment.Builder(
-            Payment.StatusCodes.STATUS_IN_PROCESS,
-            Payment.StatusDetail.STATUS_DETAIL_PENDING_REVIEW_MANUAL
-        ).setPaymentId(13184699169L).createGenericPayment());
+            Payment.StatusCodes.STATUS_APPROVED,
+            Payment.StatusDetail.STATUS_DETAIL_ACCREDITED
+        ).setPaymentId(123L).createGenericPayment());
     }
 
     @NonNull

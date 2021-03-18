@@ -1,9 +1,7 @@
 package com.mercadopago.android.px.internal.features.pay_button
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -78,12 +76,6 @@ class PayButtonFragment : BaseFragment(), PayButton.View, SecurityValidationHand
         button = view.findViewById(R.id.confirm_button)
         button.setOnClickListener(object : OnSingleClickListener() {
             override fun onSingleClick(v: View?) {
-//                if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.READ_PHONE_STATE)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                    // We do not have this permission. Let's ask the user
-//                    requestPermissions(arrayOf(Manifest.permission.READ_PHONE_STATE), 999);
-//                } else {
-//                }
                 viewModel.preparePayment()
             }
         })
@@ -106,16 +98,6 @@ class PayButtonFragment : BaseFragment(), PayButton.View, SecurityValidationHand
             cvvRequiredLiveData.observe(viewLifecycleOwner,
                 Observer { params -> params?.let { showSecurityCodeScreen(it) } })
             stateUILiveData.observe(viewLifecycleOwner, Observer { state -> state?.let { onStateUIChanged(it) } })
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 999) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                viewModel.preparePayment()
-            }
-            return;
         }
     }
 

@@ -15,13 +15,6 @@ object JsonUtil {
         .create()
 
     @JvmStatic
-    val gson2: Gson = GsonBuilder()
-        .serializeNulls()
-        .registerTypeAdapterFactory(ObjectMapTypeAdapter.FACTORY)
-        .setDateFormat("yyyyMMddHHmmss")
-        .create()
-
-    @JvmStatic
     fun <T> getListFromJson(json: String?, classOfT: Class<T>): List<T> {
         val typeOfT = TypeToken.getParameterized(MutableList::class.java, classOfT).type
         return gson.fromJson(json, typeOfT) ?: mutableListOf()
