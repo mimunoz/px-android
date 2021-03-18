@@ -17,4 +17,14 @@ data class Application(
         val id: String,
         val mandatory: Boolean
     )
+
+    enum class KnownValidationProgram {
+        STP;
+
+        companion object {
+            operator fun get(validationProgramId: String?): KnownValidationProgram? {
+                return values().firstOrNull { it.name.equals(validationProgramId, true) }
+            }
+        }
+    }
 }

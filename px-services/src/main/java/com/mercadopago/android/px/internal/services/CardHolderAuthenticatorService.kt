@@ -11,7 +11,7 @@ private const val ENVIRONMENT = BuildConfig.API_ENVIRONMENT_NEW
 
 interface CardHolderAuthenticatorService {
 
-    @POST(ENVIRONMENT + "/px_mobile/" + API_VERSION + "authentication/card_holder")
+    @POST("$ENVIRONMENT/px_mobile/authentication/$API_VERSION/card_holder")
     suspend fun authenticate(
         @Query("card_token") cardTokenId: String,
         @Query("access_token") accessToken: String,

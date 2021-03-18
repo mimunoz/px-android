@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.features.three_ds
+package com.mercadopago.android.px.internal.features.validation_program
 
 import com.mercadopago.android.px.internal.base.use_case.UseCase
 import com.mercadopago.android.px.internal.callbacks.Response

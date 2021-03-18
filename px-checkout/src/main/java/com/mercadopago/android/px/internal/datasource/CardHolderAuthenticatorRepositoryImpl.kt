@@ -31,7 +31,6 @@ class CardHolderAuthenticatorRepositoryImpl(
                 ?: throw MalformedJsonException("Malformed sdkEphemeralPublicKey"),
             threeDSParams.sdkReferenceNumber,
             threeDSParams.sdkTransactionID
-
         )
         return cardHolderAuthenticatorService.authenticate(token.id, accessToken, body)
     }

@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
 import android.content.Context;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
@@ -11,7 +10,7 @@ import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
-import com.mercadopago.android.px.internal.features.three_ds.AuthenticateUseCase;
+import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.EscStatus;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -78,7 +77,7 @@ public class PaymentService implements PaymentRepository {
     @NonNull private final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     @NonNull private final PaymentMethodMapper paymentMethodMapper;
     @NonNull private final PaymentMethodRepository paymentMethodRepository;
-    @NonNull private AuthenticateUseCase authenticateUseCase;
+    @NonNull private final ValidationProgramUseCase validationProgramUseCase;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -96,7 +95,7 @@ public class PaymentService implements PaymentRepository {
         @NonNull final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper,
         @NonNull final PaymentMethodMapper paymentMethodMapper,
         @NonNull final PaymentMethodRepository paymentMethodRepository,
-        @NonNull final AuthenticateUseCase authenticateUseCase) {
+        @NonNull final ValidationProgramUseCase validationProgramUseCase) {
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.escPaymentManager = escPaymentManager;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -107,7 +106,7 @@ public class PaymentService implements PaymentRepository {
         this.context = context;
         this.tokenRepository = tokenRepository;
         this.fileManager = fileManager;
-        this.authenticateUseCase = authenticateUseCase;
+        this.validationProgramUseCase = validationProgramUseCase;
 
         paymentFile = fileManager.create(FILE_PAYMENT);
         this.fromPayerPaymentMethodToCardMapper = fromPayerPaymentMethodToCardMapper;
@@ -306,19 +305,13 @@ public class PaymentService implements PaymentRepository {
             handlerWrapper.onVisualPayment();
         } else {
             final List<PaymentData> paymentDataList = getPaymentDataList();
-            authenticateUseCase.execute(
-                paymentDataList.get(0),
-                s -> {
-                    Log.v("CRIS 1", s.toString());
-                    return null;
-                }, mercadoPagoError -> {
-                    Log.v("CRIS 2", mercadoPagoError.toString());
-                    return null;
-                });
-
-            final SplitPaymentProcessor.CheckoutData checkoutData =
-                new SplitPaymentProcessor.CheckoutData(paymentDataList, checkoutPreference, securityType);
-            getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
+            validationProgramUseCase.execute(paymentDataList, validationProgramId -> {
+                final SplitPaymentProcessor.CheckoutData checkoutData =
+                    new SplitPaymentProcessor.CheckoutData(
+                        paymentDataList, checkoutPreference, securityType, validationProgramId);
+                getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
+                return null;
+            });
         }
     }
 

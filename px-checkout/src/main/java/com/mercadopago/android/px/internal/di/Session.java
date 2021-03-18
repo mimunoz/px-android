@@ -32,7 +32,6 @@ import com.mercadopago.android.px.internal.datasource.TokenizeService;
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PXPaymentCongratsTracking;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel;
-import com.mercadopago.android.px.internal.features.three_ds.AuthenticateUseCase;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRepository;
@@ -94,6 +93,7 @@ public final class Session extends ApplicationModule {
     private ModalRepository modalRepository;
     private ConfigurationSolver configurationSolver;
     private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
+    private UseCaseModule useCaseModule;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -185,6 +185,7 @@ public final class Session extends ApplicationModule {
         getAmountConfigurationRepository().reset();
         getDiscountRepository().reset();
         networkModule.reset();
+        useCaseModule = null;
         discountRepository = null;
         amountRepository = null;
         checkoutRepository = null;
@@ -299,8 +300,7 @@ public final class Session extends ApplicationModule {
                 MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
                 getPaymentMethodRepository(),
-                new AuthenticateUseCase(getTracker(), ThreeDSWrapper.INSTANCE,
-                    getCardHolderAuthenticationRepository()));
+                getUseCaseModule().getValidationProgramUseCase());
         }
 
         return paymentRepository;
@@ -362,6 +362,13 @@ public final class Session extends ApplicationModule {
             viewModelModule = new ViewModelModule();
         }
         return viewModelModule;
+    }
+
+    public UseCaseModule getUseCaseModule() {
+        if (useCaseModule == null) {
+            useCaseModule = new UseCaseModule(configurationModule);
+        }
+        return useCaseModule;
     }
 
     public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
