@@ -33,6 +33,7 @@ public final class DefaultPaymentProcessor implements SplitPaymentProcessor {
         body.put("merchant_order_id", data.checkoutPreference.getMerchantOrderId());
         body.put("pref_id", prefId);
         body.put("payment_data", data.paymentDataList);
+        body.put("validation_program_id", data.validationProgramId);
         final Session session = Session.getInstance();
         final String transactionId = session.getConfigurationModule().getPaymentSettings().getTransactionId();
         session.getMercadoPagoServices().createPayment(transactionId, data.securityType, body,

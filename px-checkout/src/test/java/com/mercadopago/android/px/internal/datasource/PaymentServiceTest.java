@@ -12,6 +12,7 @@ import com.mercadopago.android.px.core.internal.PaymentWrapper;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
+import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -53,6 +54,7 @@ import com.mercadopago.android.px.utils.StubFailMpCall;
 import java.util.List;
 import kotlin.Pair;
 import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -109,6 +111,7 @@ public class PaymentServiceTest {
     @Mock private FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     @Mock private PaymentMethodMapper paymentMethodMapper;
     @Mock private PaymentMethodRepository paymentMethodRepository;
+    @Mock private ValidationProgramUseCase validationProgramUseCase;
 
     private PaymentService paymentService;
 
@@ -132,7 +135,8 @@ public class PaymentServiceTest {
             fileManager,
             fromPayerPaymentMethodToCardMapper,
             paymentMethodMapper,
-            paymentMethodRepository
+            paymentMethodRepository,
+            validationProgramUseCase
         );
 
         application = mock(Application.class);
@@ -319,8 +323,11 @@ public class PaymentServiceTest {
 
     @Test
     public void whenOneTapPaymentWhenHasTokenAndPaymentSuccess() {
-        final KArgumentCaptor<SplitPaymentProcessor.CheckoutData> captor =
+        final KArgumentCaptor<SplitPaymentProcessor.CheckoutData> checkoutDataCaptor =
             argumentCaptor(SplitPaymentProcessor.CheckoutData.class);
+
+        final KArgumentCaptor<Function1> validationProgramSuccessCaptor =
+            argumentCaptor(Function1.class);
 
         savedCreditCardOneTapPresent(CARD_ID_ESC_NOT_AVAILABLE);
         when(paymentSettingRepository.hasToken()).thenReturn(true);
@@ -330,10 +337,13 @@ public class PaymentServiceTest {
 
         final PaymentConfiguration configuration = mockPaymentConfiguration(node, payerCost);
         paymentService.startExpressPayment(configuration);
-        verify(paymentProcessor).startPayment(any(), captor.capture(), any());
+        verify(validationProgramUseCase).execute(any(), validationProgramSuccessCaptor.capture());
+        final Function1<String, Unit> mockExecute = validationProgramSuccessCaptor.getValue();
+        mockExecute.invoke(null);
+        verify(paymentProcessor).startPayment(any(), checkoutDataCaptor.capture(), any());
 
-        final PaymentMethod actualPm = captor.getValue().paymentDataList.get(0).getPaymentMethod();
-        final PayerCost actualPc = captor.getValue().paymentDataList.get(0).getPayerCost();
+        final PaymentMethod actualPm = checkoutDataCaptor.getValue().paymentDataList.get(0).getPaymentMethod();
+        final PayerCost actualPc = checkoutDataCaptor.getValue().paymentDataList.get(0).getPayerCost();
 
         assertEquals(actualPm.getId(), configuration.component1());
         assertEquals(actualPm.getPaymentTypeId(), configuration.component2());

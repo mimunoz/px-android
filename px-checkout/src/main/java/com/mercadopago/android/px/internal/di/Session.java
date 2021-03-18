@@ -12,17 +12,18 @@ import com.mercadopago.android.px.core.internal.TrackingRepositoryModelMapper;
 import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.AmountConfigurationRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.AmountService;
+import com.mercadopago.android.px.internal.datasource.CardHolderAuthenticatorRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.CardTokenService;
+import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolverImpl;
 import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.InstructionsService;
 import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PayerPaymentMethodRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PaymentMethodRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PaymentService;
@@ -33,20 +34,22 @@ import com.mercadopago.android.px.internal.features.payment_congrats.model.PXPay
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
+import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRepository;
 import com.mercadopago.android.px.internal.repository.CardTokenRepository;
+import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
-import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
+import com.mercadopago.android.px.internal.services.CardHolderAuthenticatorService;
 import com.mercadopago.android.px.internal.services.CheckoutService;
 import com.mercadopago.android.px.internal.services.CongratsService;
 import com.mercadopago.android.px.internal.services.GatewayService;
@@ -88,6 +91,8 @@ public final class Session extends ApplicationModule {
     private PaymentMethodRepository paymentMethodRepository;
     private ModalRepository modalRepository;
     private ConfigurationSolver configurationSolver;
+    private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
+    private UseCaseModule useCaseModule;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -178,6 +183,7 @@ public final class Session extends ApplicationModule {
         getAmountConfigurationRepository().reset();
         getDiscountRepository().reset();
         networkModule.reset();
+        useCaseModule = null;
         discountRepository = null;
         amountRepository = null;
         checkoutRepository = null;
@@ -291,8 +297,8 @@ public final class Session extends ApplicationModule {
                 getFileManager(),
                 MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
-                getPaymentMethodRepository()
-            );
+                getPaymentMethodRepository(),
+                getUseCaseModule().getValidationProgramUseCase());
         }
 
         return paymentRepository;
@@ -356,6 +362,13 @@ public final class Session extends ApplicationModule {
         return viewModelModule;
     }
 
+    public UseCaseModule getUseCaseModule() {
+        if (useCaseModule == null) {
+            useCaseModule = new UseCaseModule(configurationModule);
+        }
+        return useCaseModule;
+    }
+
     public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
         if (payerPaymentMethodRepository == null) {
             payerPaymentMethodRepository = new PayerPaymentMethodRepositoryImpl(
@@ -416,6 +429,17 @@ public final class Session extends ApplicationModule {
             paymentResultViewModelFactory = new PaymentResultViewModelFactory(getTracker());
         }
         return paymentResultViewModelFactory;
+    }
+
+    @NonNull
+    public CardHolderAuthenticatorRepository getCardHolderAuthenticationRepository() {
+        if (cardHolderAuthenticatorRepository == null) {
+            final CardHolderAuthenticatorService service =
+                networkModule.getRetrofitClient().create(CardHolderAuthenticatorService.class);
+            cardHolderAuthenticatorRepository =
+                new CardHolderAuthenticatorRepositoryImpl(service, configurationModule.getPaymentSettings());
+        }
+        return cardHolderAuthenticatorRepository;
     }
 
     private void configIds(@NonNull final MercadoPagoCheckout checkout) {

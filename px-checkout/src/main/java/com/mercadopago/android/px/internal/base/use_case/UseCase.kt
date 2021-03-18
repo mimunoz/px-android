@@ -18,6 +18,7 @@ abstract class UseCase<in P, out R>(protected val tracker: MPTracker) {
     protected abstract val contextProvider: CoroutineContextProvider
     protected abstract suspend fun doExecute(param: P): Response<R, MercadoPagoError>
 
+    @JvmOverloads
     fun execute(param: P, success: CallBack<R> = {}, failure: CallBack<MercadoPagoError> = {}) {
         CoroutineScope(contextProvider.IO).launch {
             try {
