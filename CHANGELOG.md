@@ -1,3 +1,7 @@
+## VERSION 4.72.1
+_18_03_2021_
+* FIX - Crash tracking session halted.
+
 ## VERSION 4.72.0
 _11_03_2021_
 * ENHANCEMENT - Added validation program id to checkout data.
