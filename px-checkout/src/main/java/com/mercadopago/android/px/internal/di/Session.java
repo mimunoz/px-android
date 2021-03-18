@@ -56,7 +56,6 @@ import com.mercadopago.android.px.internal.services.GatewayService;
 import com.mercadopago.android.px.internal.services.InstructionsClient;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.TextUtil;
-import com.mercadopago.android.px.internal.util.ThreeDSWrapper;
 import com.mercadopago.android.px.model.Device;
 import com.mercadopago.android.px.services.MercadoPagoServices;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
@@ -115,7 +114,6 @@ public final class Session extends ApplicationModule {
     public static Session initialize(@NonNull final Context context) {
         instance = new Session(context);
         ConfigurationModule.initialize(instance.configurationModule);
-        ThreeDSWrapper.INSTANCE.initialize();
         return instance;
     }
 

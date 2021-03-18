@@ -1,12 +1,12 @@
 package com.mercadopago.android.px.internal.di
 
+import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.internal.base.use_case.TokenizeUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.features.validation_program.AuthenticateUseCase
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase
-import com.mercadopago.android.px.internal.util.ThreeDSWrapper
 
 internal class UseCaseModule(val configurationModule: CheckoutConfigurationModule) {
 
@@ -50,7 +50,7 @@ internal class UseCaseModule(val configurationModule: CheckoutConfigurationModul
             val session = Session.getInstance()
             return AuthenticateUseCase(
                 session.tracker,
-                ThreeDSWrapper,
+                BehaviourProvider.getThreeDSBehaviour(),
                 session.cardHolderAuthenticationRepository
             )
         }

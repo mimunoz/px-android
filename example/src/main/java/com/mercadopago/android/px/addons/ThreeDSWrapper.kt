@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.util
+package com.mercadopago.android.px.addons
 
 import android.util.Log
 import com.mercadopago.android.px.internal.di.Session

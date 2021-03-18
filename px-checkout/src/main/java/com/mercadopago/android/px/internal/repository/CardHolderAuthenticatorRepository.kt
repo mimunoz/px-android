@@ -1,9 +1,9 @@
 package com.mercadopago.android.px.internal.repository
 
+import com.mercadopago.android.px.addons.model.ThreeDSDataOnlyParams
 import com.mercadopago.android.px.model.PaymentData
-import com.nds.nudetect.EMVAuthenticationRequestParameters
 
 internal interface CardHolderAuthenticatorRepository {
 
-    suspend fun authenticate(paymentData: PaymentData, threeDSParams: EMVAuthenticationRequestParameters): Any
+    suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams?): Any
 }

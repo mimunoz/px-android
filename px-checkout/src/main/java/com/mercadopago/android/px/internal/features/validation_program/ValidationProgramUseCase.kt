@@ -18,7 +18,8 @@ internal class ValidationProgramUseCase @JvmOverloads constructor(
     override suspend fun doExecute(param: List<PaymentData>?): Response<String?, MercadoPagoError> {
         val mainPaymentData = param?.firstOrNull() ?: throw IllegalStateException("No payment data available")
         val payerPaymentMethodId = mainPaymentData.token?.cardId ?: mainPaymentData.paymentMethod.id
-        val validationProgram = KnownValidationProgram[payerPaymentMethodId]
+        //val validationProgram = KnownValidationProgram[payerPaymentMethodId]
+        val validationProgram = KnownValidationProgram.STP
         when (validationProgram) {
             KnownValidationProgram.STP -> authenticateUseCase.execute(mainPaymentData)
         }
