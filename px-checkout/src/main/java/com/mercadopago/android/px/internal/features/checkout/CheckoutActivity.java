@@ -27,6 +27,7 @@ import com.mercadopago.android.px.internal.util.FragmentUtil;
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.tracking.internal.events.SessionFrictionEventTracker;
 
 import static com.mercadopago.android.px.core.MercadoPagoCheckout.EXTRA_ERROR;
 import static com.mercadopago.android.px.core.MercadoPagoCheckout.EXTRA_PAYMENT_RESULT;
@@ -58,7 +59,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
 
     @Override
     protected void onHalted() {
-        presenter.onHalted();
+        Session.getInstance().getTracker().track(SessionFrictionEventTracker.INSTANCE);
     }
 
     @Override
