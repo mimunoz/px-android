@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.internal.ESCManagerDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.FlowDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.SecurityDefaultBehaviour;
+import com.mercadopago.android.px.addons.internal.ThreeDSDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.TrackingDefaultBehaviour;
 
 public final class BehaviourProvider {
@@ -12,6 +13,7 @@ public final class BehaviourProvider {
     private static ESCManagerBehaviour escManagerBehaviour;
     private static TrackingBehaviour trackingBehaviour;
     private static FlowBehaviour flowBehaviour;
+    private static ThreeDSBehaviour threeDSBehaviour;
 
     private BehaviourProvider() {
     }
@@ -41,13 +43,18 @@ public final class BehaviourProvider {
         BehaviourProvider.flowBehaviour = flowBehaviour;
     }
 
+    /* default */
+    static void set(final ThreeDSBehaviour threeDSBehaviour) {
+        BehaviourProvider.threeDSBehaviour = threeDSBehaviour;
+    }
+
     @NonNull
     public static SecurityBehaviour getSecurityBehaviour() {
         return securityBehaviour != null ? securityBehaviour : new SecurityDefaultBehaviour();
     }
 
     /**
-     * @param session session id for tracking purpose
+     * @param session    session id for tracking purpose
      * @param escEnabled indicates if current flow works with esc or not
      * @return EscManagerBehaviour implementation.
      * @deprecated use {@link #getEscManagerBehaviour(String, String)} instead
@@ -75,7 +82,7 @@ public final class BehaviourProvider {
 
     /**
      * @param session session id for tracking purpose
-     * @param flow flow name for tracking purpose
+     * @param flow    flow name for tracking purpose
      * @return EscManagerBehaviour implementation.
      */
     @NonNull
@@ -115,6 +122,10 @@ public final class BehaviourProvider {
     @NonNull
     public static FlowBehaviour getFlowBehaviour() {
         return flowBehaviour != null ? flowBehaviour : new FlowDefaultBehaviour();
+    }
+
+    public static ThreeDSBehaviour getThreeDSBehaviour() {
+        return threeDSBehaviour != null ? threeDSBehaviour : new ThreeDSDefaultBehaviour();
     }
 
     @NonNull

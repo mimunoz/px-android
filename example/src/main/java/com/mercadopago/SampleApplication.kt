@@ -29,6 +29,7 @@ class SampleApplication : Application() {
                 val (language, country) = localeTag.split("-")
                 LocaleContextWrapper.wrap(activity, Locale(language, country))
             }
+
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
             override fun onActivityStarted(activity: Activity) {}
             override fun onActivityResumed(activity: Activity) {}
@@ -52,12 +53,15 @@ class SampleApplication : Application() {
             .build()
         HttpClientUtil.setCustomClient(customClient)
         instance.initialize(applicationContext)
+        ThreeDSWrapper.initialize()
         val escManagerBehaviour: ESCManagerBehaviour = FakeEscManagerBehaviourImpl()
+        val threeDSBehaviour: ThreeDSBehaviour = FakeThreeDSBehaviourImpl()
         val builder = PXBehaviourConfigurer()
         if (BuildConfig.DEBUG) {
             builder.with(MockSecurityBehaviour(escManagerBehaviour))
         }
         builder.with(escManagerBehaviour)
+        builder.with(threeDSBehaviour)
             .configure()
         configure()
     }

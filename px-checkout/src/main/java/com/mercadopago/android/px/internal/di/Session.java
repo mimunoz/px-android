@@ -32,7 +32,6 @@ import com.mercadopago.android.px.internal.datasource.TokenizeService;
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PXPaymentCongratsTracking;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel;
-import com.mercadopago.android.px.internal.features.three_ds.AuthenticateUseCase;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRepository;
@@ -57,7 +56,6 @@ import com.mercadopago.android.px.internal.services.GatewayService;
 import com.mercadopago.android.px.internal.services.InstructionsClient;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.TextUtil;
-import com.mercadopago.android.px.internal.util.ThreeDSWrapper;
 import com.mercadopago.android.px.model.Device;
 import com.mercadopago.android.px.services.MercadoPagoServices;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
@@ -94,6 +92,7 @@ public final class Session extends ApplicationModule {
     private ModalRepository modalRepository;
     private ConfigurationSolver configurationSolver;
     private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
+    private UseCaseModule useCaseModule;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -115,7 +114,6 @@ public final class Session extends ApplicationModule {
     public static Session initialize(@NonNull final Context context) {
         instance = new Session(context);
         ConfigurationModule.initialize(instance.configurationModule);
-        ThreeDSWrapper.INSTANCE.initialize();
         return instance;
     }
 
@@ -185,6 +183,7 @@ public final class Session extends ApplicationModule {
         getAmountConfigurationRepository().reset();
         getDiscountRepository().reset();
         networkModule.reset();
+        useCaseModule = null;
         discountRepository = null;
         amountRepository = null;
         checkoutRepository = null;
@@ -299,8 +298,7 @@ public final class Session extends ApplicationModule {
                 MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
                 getPaymentMethodRepository(),
-                new AuthenticateUseCase(getTracker(), ThreeDSWrapper.INSTANCE,
-                    getCardHolderAuthenticationRepository()));
+                getUseCaseModule().getValidationProgramUseCase());
         }
 
         return paymentRepository;
@@ -362,6 +360,13 @@ public final class Session extends ApplicationModule {
             viewModelModule = new ViewModelModule();
         }
         return viewModelModule;
+    }
+
+    public UseCaseModule getUseCaseModule() {
+        if (useCaseModule == null) {
+            useCaseModule = new UseCaseModule(configurationModule);
+        }
+        return useCaseModule;
     }
 
     public PayerPaymentMethodRepository getPayerPaymentMethodRepository() {
@@ -431,7 +436,8 @@ public final class Session extends ApplicationModule {
         if (cardHolderAuthenticatorRepository == null) {
             final CardHolderAuthenticatorService service =
                 networkModule.getRetrofitClient2().create(CardHolderAuthenticatorService.class);
-            cardHolderAuthenticatorRepository = new CardHolderAuthenticatorRepositoryImpl(service);
+            cardHolderAuthenticatorRepository =
+                new CardHolderAuthenticatorRepositoryImpl(service, configurationModule.getPaymentSettings());
         }
         return cardHolderAuthenticatorRepository;
     }
