@@ -10,6 +10,7 @@ import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
+import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.EscStatus;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import kotlin.Pair;
+import kotlin.Unit;
 
 public class PaymentService implements PaymentRepository {
 
@@ -76,6 +78,7 @@ public class PaymentService implements PaymentRepository {
     @NonNull private final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper;
     @NonNull private final PaymentMethodMapper paymentMethodMapper;
     @NonNull private final PaymentMethodRepository paymentMethodRepository;
+    @NonNull private final ValidationProgramUseCase validationProgramUseCase;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -92,7 +95,8 @@ public class PaymentService implements PaymentRepository {
         @NonNull final FileManager fileManager,
         @NonNull final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper,
         @NonNull final PaymentMethodMapper paymentMethodMapper,
-        @NonNull final PaymentMethodRepository paymentMethodRepository) {
+        @NonNull final PaymentMethodRepository paymentMethodRepository,
+        @NonNull final ValidationProgramUseCase validationProgramUseCase) {
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.escPaymentManager = escPaymentManager;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -103,6 +107,7 @@ public class PaymentService implements PaymentRepository {
         this.context = context;
         this.tokenRepository = tokenRepository;
         this.fileManager = fileManager;
+        this.validationProgramUseCase = validationProgramUseCase;
 
         paymentFile = fileManager.create(FILE_PAYMENT);
         this.fromPayerPaymentMethodToCardMapper = fromPayerPaymentMethodToCardMapper;
@@ -300,9 +305,14 @@ public class PaymentService implements PaymentRepository {
         if (getPaymentProcessor().shouldShowFragmentOnPayment(checkoutPreference)) {
             handlerWrapper.onVisualPayment();
         } else {
-            final SplitPaymentProcessor.CheckoutData checkoutData =
-                new SplitPaymentProcessor.CheckoutData(getPaymentDataList(), checkoutPreference, securityType);
-            getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
+            final List<PaymentData> paymentDataList = getPaymentDataList();
+            validationProgramUseCase.execute(paymentDataList, validationProgramId -> {
+                final SplitPaymentProcessor.CheckoutData checkoutData =
+                    new SplitPaymentProcessor.CheckoutData(
+                        paymentDataList, checkoutPreference, securityType, validationProgramId);
+                getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
+                return Unit.INSTANCE;
+            });
         }
     }
 
