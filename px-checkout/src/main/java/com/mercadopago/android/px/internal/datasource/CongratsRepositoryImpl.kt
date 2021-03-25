@@ -29,6 +29,7 @@ internal class CongratsRepositoryImpl(
     private val payerComplianceRepository: PayerComplianceRepository,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val oneTapItemRepository: OneTapItemRepository,
+    private val paymentSettingRepository: PaymentSettingRepository,
     private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
     private val alternativePayerPaymentMethodsMapper: AlternativePayerPaymentMethodsMapper) : CongratsRepository {
 
@@ -88,7 +89,8 @@ internal class CongratsRepositoryImpl(
                     it.customOptionId != usedPayerPaymentMethodId ||
                         !disabledPaymentMethodRepository.hasKey(
                             PayerPaymentMethodKey(it.customOptionId, it.paymentTypeId))
-                }
+                },
+                paymentSettingRepository
             ).map(paymentData)
             congratsService.getRemedies(
                 payment.id.toString(),

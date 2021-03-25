@@ -354,7 +354,9 @@ public final class Session extends ApplicationModule {
                 configurationModule.getUserSelectionRepository(), getAmountRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(),
                 configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getOneTapItemRepository(),
-                getPayerPaymentMethodRepository(), MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper());
+                configurationModule.getPaymentSettings(), getPayerPaymentMethodRepository(),
+                MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper()
+            );
         }
         return congratsRepository;
     }

@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_result.remedies.view
 
 import android.os.Bundle
-import android.os.Parcel
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
@@ -16,15 +15,19 @@ import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodLowResDrawer
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
+import com.mercadopago.android.px.internal.util.JsonUtil
+import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
 import com.mercadopago.android.px.model.internal.OneTapItem
+import com.mercadopago.android.px.model.internal.Text
+import kotlinx.android.parcel.Parcelize
 
 internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.DisabledDetailDialogLauncher {
 
     private lateinit var message: TextView
     private lateinit var cvvRemedy: CvvRemedy
     private lateinit var paymentMethodDescriptor: PaymentMethodDescriptorView
-    private lateinit var paymentMethodTitle: TextView
+    private lateinit var paymentMethodTitle: MPTextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies_retry_payment, container, false)
@@ -43,6 +46,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         methodData?.let {
             addCard(it)
             if (model.isAnotherMethod) {
+                model.bottomMessage?.let { message -> paymentMethodTitle.setText(message) }
                 showPaymentMethodDescriptor(it, model.payerCost)
             }
         }
@@ -75,29 +79,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         paymentMethodDescriptor.update(model)
     }
 
-    internal data class Model(val message: String, val isAnotherMethod: Boolean,
-        val cvvModel: CvvRemedy.Model?) : Parcelable {
-
-        var payerCost: RemediesPayerCost? = null
-
-        constructor(parcel: Parcel) : this(parcel.readString()!!,
-            parcel.readInt() != 0,
-            parcel.readParcelable(CvvRemedy.Model::class.java.classLoader)) {
-            payerCost = parcel.readParcelable(RemediesPayerCost::class.java.classLoader)
-        }
-
-        override fun writeToParcel(parcel: Parcel, flags: Int) {
-            parcel.writeString(message)
-            parcel.writeInt(if (isAnotherMethod) 1 else 0)
-            parcel.writeParcelable(cvvModel, flags)
-            parcel.writeParcelable(payerCost, flags)
-        }
-
-        override fun describeContents() = 0
-
-        companion object CREATOR : Parcelable.Creator<Model> {
-            override fun createFromParcel(parcel: Parcel) = Model(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<Model>(size)
-        }
-    }
+    @Parcelize
+    internal data class Model(val message: String, val isAnotherMethod: Boolean, val cvvModel: CvvRemedy.Model?,
+        val bottomMessage: Text? = null, var payerCost: RemediesPayerCost? = null) : Parcelable
 }

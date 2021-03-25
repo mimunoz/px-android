@@ -19,6 +19,7 @@ internal class AlternativePayerPaymentMethodsMapper(
                 value.id,
                 null,
                 value.issuer?.name,
+                value.firstSixDigits,
                 value.lastFourDigits,
                 value.paymentMethodId,
                 value.type,
