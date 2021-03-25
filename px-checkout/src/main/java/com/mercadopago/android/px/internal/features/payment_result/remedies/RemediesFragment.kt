@@ -43,9 +43,10 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             val session = Session.getInstance()
             viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
-                session.amountConfigurationRepository, session.tracker,
+                session.amountConfigurationRepository, session.configurationModule.applicationSelectionRepository,
                 session.oneTapItemRepository,
-                MapperProvider.getFromPayerPaymentMethodToCardMapper()
+                MapperProvider.getFromPayerPaymentMethodToCardMapper(),
+                session.tracker
             )
             retryPaymentFragment = childFragmentManager.findFragmentById(R.id.retry_payment) as RetryPaymentFragment
             retryPaymentFragment.setListener(this@RemediesFragment)

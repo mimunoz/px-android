@@ -2,7 +2,6 @@ package com.mercadopago.android.px.internal.model
 
 import com.mercadopago.android.px.model.Currency
 
-
 data class CardHolderAuthenticatorBody(
     val purchaseAmount: String,
     val card: Card,

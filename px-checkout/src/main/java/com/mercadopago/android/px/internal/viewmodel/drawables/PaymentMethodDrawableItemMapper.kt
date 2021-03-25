@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.viewmodel.drawables
 
 import com.meli.android.carddrawer.configuration.CardDrawerStyle
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.features.generic_modal.ActionType
 import com.mercadopago.android.px.internal.features.generic_modal.FromModalToGenericDialogItem
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogItem
@@ -10,8 +11,11 @@ import com.mercadopago.android.px.internal.mappers.NonNullMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem.Parameters
-import com.mercadopago.android.px.model.AccountMoneyDisplayInfo
+import com.mercadopago.android.px.model.AccountMoneyMetadata
+import com.mercadopago.android.px.model.CardMetadata
 import com.mercadopago.android.px.model.CustomSearchItem
+import com.mercadopago.android.px.model.PaymentTypes
+import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.one_tap.CheckoutBehaviour
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey as Key
@@ -36,9 +40,7 @@ internal class PaymentMethodDrawableItemMapper(
         val parameters = getParameters(value, payerPaymentMethodRepository.value, genericDialogItem)
         with(value) {
             return when {
-                isCard -> SavedCardDrawableFragmentItem(parameters, paymentMethodId,
-                    cardUiMapper.map(card.displayInfo))
-                isAccountMoney -> getAccountMoneyFragmentItem(parameters, accountMoney.displayInfo)
+                isCard || isAccountMoney -> DrawableFragmentItem(parameters)
                 isConsumerCredits -> ConsumerCreditsDrawableFragmentItem(parameters, consumerCredits)
                 isNewCard || isOfflineMethods -> OtherPaymentMethodFragmentItem(parameters, newCard, offlineMethods)
                 else -> null
@@ -46,10 +48,20 @@ internal class PaymentMethodDrawableItemMapper(
         }
     }
 
-    private fun getAccountMoneyFragmentItem(parameters: Parameters, displayInfo: AccountMoneyDisplayInfo) =
-        displayInfo.takeIf { it.type != null }?.let {
-            AccountMoneyDrawableFragmentItem(parameters, cardUiMapper.map(it))
-        } ?: AccountMoneyDrawableFragmentItem(parameters, CardDrawerStyle.ACCOUNT_MONEY_DEFAULT)
+    private fun getCardDrawable(cardMetadata: CardMetadata?, paymentMethod: Application.PaymentMethod): CardDrawable? {
+        return cardMetadata?.takeIf { PaymentTypes.isCardPaymentType(paymentMethod.type) }?.let {
+            CardDrawable(paymentMethod.id, cardUiMapper.map(it.displayInfo))
+        }
+    }
+
+    private fun getAccountMoneyCardDrawable(
+        accountMoneyMetadata: AccountMoneyMetadata?, paymentMethod: Application.PaymentMethod): CardDrawable? {
+        return accountMoneyMetadata?.takeIf { PaymentTypes.isAccountMoney(paymentMethod.type) }?.let { metadata ->
+            metadata.displayInfo.takeIf { it.type != null }?.let {
+                CardDrawable(paymentMethod.id, cardUiMapper.map(it))
+            } ?: CardDrawable(paymentMethod.id, null, CardDrawerStyle.ACCOUNT_MONEY_DEFAULT)
+        }
+    }
 
     private fun getParameters(
         oneTapItem: OneTapItem,
@@ -58,30 +70,34 @@ internal class PaymentMethodDrawableItemMapper(
     ): Parameters {
         val displayInfo = oneTapItem.displayInfo
 
-        val customOptionId = oneTapItem.customOptionId
-        val (description, issuerName) = customSearchItems.firstOrNull { c -> c.id == customOptionId }?.let {
-            Pair(it.description.orEmpty(), it.issuer?.name.orEmpty())
-        } ?: Pair(TextUtil.EMPTY, TextUtil.EMPTY)
+        val defaultCustomOptionId = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)
 
-        val paymentMethodType = applicationSelectedRepository[customOptionId].paymentMethod.type
+        val paymentMethodType = applicationSelectedRepository[defaultCustomOptionId].paymentMethod.type
         val commonsByApplication = CommonsByApplication(paymentMethodType).also {
             oneTapItem.getApplications().forEach { application ->
+                val customOptionIdByApplication = CustomOptionIdSolver.getByApplication(oneTapItem, application)
+                val (description, issuerName) = customSearchItems.firstOrNull { c -> c.id == customOptionIdByApplication }?.let {
+                    Pair(it.description.orEmpty(), it.issuer?.name.orEmpty())
+                } ?: Pair(TextUtil.EMPTY, TextUtil.EMPTY)
+
                 val paymentTypeId = application.paymentMethod.type
                 it[application] = DrawableFragmentCommons(
+                    customOptionIdByApplication,
                     application.status,
                     chargeRepository.getChargeRule(paymentTypeId)?.message,
-                    disabledPaymentMethodRepository[Key(customOptionId, paymentTypeId)]
+                    disabledPaymentMethodRepository[Key(customOptionIdByApplication, paymentTypeId)],
+                    description,
+                    issuerName,
+                    getCardDrawable(oneTapItem.card, application.paymentMethod)
+                        ?: getAccountMoneyCardDrawable(oneTapItem.accountMoney, application.paymentMethod)
                 )
             }
         }
 
         return Parameters(
-            customOptionId,
             commonsByApplication,
             displayInfo?.bottomDescription,
             oneTapItem.benefits?.reimbursement,
-            description,
-            issuerName,
             genericDialogItem,
             cardDrawerCustomViewModelMapper.mapToSwitchModel(displayInfo?.cardDrawerSwitch)
         )

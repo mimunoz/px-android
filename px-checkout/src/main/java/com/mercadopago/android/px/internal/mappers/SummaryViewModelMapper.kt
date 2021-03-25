@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.mappers
 
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.ChargeRuleHelper
 import com.mercadopago.android.px.internal.view.AmountDescriptorView
@@ -44,12 +45,11 @@ internal class SummaryViewModelMapper(
 
     private fun mapToSummaryViewModel(value: OneTapItem): Map<String, SummaryView.Model> {
         val map = mutableMapOf<String, SummaryView.Model>()
-        val customOptionId = value.customOptionId
-        val currentPmTypeSelection = getCurrentPmTypeSelection(value)
-        value.getApplications()?.takeIf { it.isNotEmpty() }?.forEach { application ->
+        value.getApplications().forEach { application ->
+            val customOptionId = CustomOptionIdSolver.getByApplication(value, application)
             val paymentMethodTypeId = application.paymentMethod.type
             map[paymentMethodTypeId] = mapWithCache(customOptionId, paymentMethodTypeId)
-        } ?: let { map[currentPmTypeSelection] = mapWithCache(customOptionId, currentPmTypeSelection) }
+        }
 
         return map
     }
@@ -66,8 +66,10 @@ internal class SummaryViewModelMapper(
         }
     }
 
-    private fun getCurrentPmTypeSelection(oneTapItem: OneTapItem) =
-        applicationSelectionRepository[oneTapItem.customOptionId].paymentMethod.type
+    private fun getCurrentPmTypeSelection(oneTapItem: OneTapItem): String {
+        val defaultCustomOptionId = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)
+        return applicationSelectionRepository[defaultCustomOptionId].paymentMethod.type
+    }
 
     private fun createModel(
         paymentTypeId: String,

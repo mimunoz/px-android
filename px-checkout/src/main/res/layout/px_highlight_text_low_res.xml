@@ -7,7 +7,7 @@
     android:layout_height="0dp"
     app:layout_constraintHeight_percent="0.25"
     app:layout_constraintBottom_toBottomOf="parent"
-    tools:showIn="@layout/px_fragment_saved_card_low_res"
+    tools:showIn="@layout/px_fragment_card_low_res"
     tools:layout_height="21dp"
     android:orientation="vertical">
 

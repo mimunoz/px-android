@@ -33,6 +33,7 @@ import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.mocks.CheckoutResponseStub;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.model.Card;
+import com.mercadopago.android.px.model.CardMetadata;
 import com.mercadopago.android.px.model.CustomSearchItem;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.IPaymentDescriptor;
@@ -112,6 +113,7 @@ public class PaymentServiceTest {
     @Mock private PaymentMethodMapper paymentMethodMapper;
     @Mock private PaymentMethodRepository paymentMethodRepository;
     @Mock private ValidationProgramUseCase validationProgramUseCase;
+    @Mock private CustomOptionIdSolver customOptionIdSolver;
 
     private PaymentService paymentService;
 
@@ -161,9 +163,10 @@ public class PaymentServiceTest {
         final AmountConfiguration amountConfiguration = mock(AmountConfiguration.class);
         when(amountConfigurationRepository.getConfigurationSelectedFor(anyString())).thenReturn(amountConfiguration);
         when(amountConfiguration.getCurrentPayerCost(anyBoolean(), anyInt())).thenReturn(payerCost);
-        when(applicationSelectionRepository.get(oneTapItem.getCustomOptionId())).thenReturn(application);
+        final String defaultOneTapItem = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem);
+        when(applicationSelectionRepository.get(defaultOneTapItem)).thenReturn(application);
         return new FromExpressMetadataToPaymentConfiguration(amountConfigurationRepository, splitSelectionState,
-            payerCostSelectionRepository, applicationSelectionRepository).map(oneTapItem);
+            payerCostSelectionRepository, applicationSelectionRepository, customOptionIdSolver).map(oneTapItem);
     }
 
     @Test
@@ -395,8 +398,11 @@ public class PaymentServiceTest {
 
     private Card creditCardPresetMock(final String cardId) {
         final Card card = getCardById(cardId);
+        final CardMetadata cardMetadata = mock(CardMetadata.class);
+        when(cardMetadata.getId()).thenReturn(cardId);
         when(node.isCard()).thenReturn(true);
-        when(node.getCustomOptionId()).thenReturn(cardId);
+        when(node.getCard()).thenReturn(cardMetadata);
+        when(customOptionIdSolver.get(node)).thenReturn(cardId);
         when(fromPayerPaymentMethodToCardMapper
             .map(new PayerPaymentMethodKey(cardId, PaymentTypes.CREDIT_CARD)))
             .thenReturn(card);

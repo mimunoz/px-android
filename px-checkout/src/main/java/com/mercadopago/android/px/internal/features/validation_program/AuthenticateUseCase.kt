@@ -18,7 +18,7 @@ internal class AuthenticateUseCase @JvmOverloads constructor(
     override suspend fun doExecute(param: PaymentData): Response<Any, MercadoPagoError> {
         val response = cardHolderAuthenticatorRepository.authenticate(
             param,
-            threeDSBehaviour.getAuthenticationParameters()
+            threeDSBehaviour.getAuthenticationParameters() ?: error("Missing authentication params")
         )
 
         return Response.Success(response)

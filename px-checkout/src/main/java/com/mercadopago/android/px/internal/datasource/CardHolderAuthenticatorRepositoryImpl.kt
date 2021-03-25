@@ -7,31 +7,30 @@ import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRep
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
 import com.mercadopago.android.px.internal.services.CardHolderAuthenticatorService
 import com.mercadopago.android.px.internal.util.JsonUtil
-import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.model.PaymentData
 
-class CardHolderAuthenticatorRepositoryImpl(
+internal class CardHolderAuthenticatorRepositoryImpl(
     private val cardHolderAuthenticatorService: CardHolderAuthenticatorService,
     private val paymentSettingRepository: PaymentSettingRepository) : CardHolderAuthenticatorRepository {
 
-    override suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams?): Any {
+    override suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams): Any {
         val token = paymentData.token ?: throw IllegalStateException("Missing token during authentication")
-        val accessToken = paymentSettingRepository.privateKey ?: return TextUtil.EMPTY
-        val threeDSParams = threeDSDataOnlyParams ?: throw IllegalStateException("Missing ThreeDS SDK Data")
+        val sdkEphemPubKey = (JsonUtil.fromJson(threeDSDataOnlyParams.sdkEphemeralPublicKey, CardHolderAuthenticatorBody.SdkEphemPubKey::class.java)
+            ?: throw MalformedJsonException("Malformed sdkEphemeralPublicKey"))
+        val accessToken = paymentSettingRepository.privateKey.orEmpty()
         val body = CardHolderAuthenticatorBody(
             paymentData.rawAmount.toString(),
             CardHolderAuthenticatorBody.Card(
-                "JohnDoe Anytown",
+                token.cardHolder?.name.orEmpty(),
                 paymentData.paymentMethod.id
             ),
             paymentSettingRepository.currency,
             paymentSettingRepository.site.id,
-            threeDSParams.sdkAppId,
-            threeDSParams.deviceData,
-            JsonUtil.fromJson(threeDSParams.sdkEphemeralPublicKey, CardHolderAuthenticatorBody.SdkEphemPubKey::class.java)
-                ?: throw MalformedJsonException("Malformed sdkEphemeralPublicKey"),
-            threeDSParams.sdkReferenceNumber,
-            threeDSParams.sdkTransactionId
+            threeDSDataOnlyParams.sdkAppId,
+            threeDSDataOnlyParams.deviceData,
+            sdkEphemPubKey,
+            threeDSDataOnlyParams.sdkReferenceNumber,
+            threeDSDataOnlyParams.sdkTransactionId
         )
         return cardHolderAuthenticatorService.authenticate(token.id, accessToken, body)
     }

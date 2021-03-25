@@ -1,12 +1,14 @@
 package com.mercadopago.android.px.internal.mappers
 
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey as Key
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel.ByApplication as ModelByApplication
 
-internal class ConfirmButtonViewModelMapper(private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository)
+internal class ConfirmButtonViewModelMapper(
+    private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository)
     : Mapper<OneTapItem, ModelByApplication>() {
 
     override fun map(value: OneTapItem): ModelByApplication {
@@ -15,7 +17,7 @@ internal class ConfirmButtonViewModelMapper(private val disabledPaymentMethodRep
                 model[application] = ConfirmButtonViewModel(
                     value.isNewCard || value.isOfflineMethods ||
                         disabledPaymentMethodRepository.hasKey(
-                            Key(value.customOptionId, application.paymentMethod.type)))
+                            Key(CustomOptionIdSolver.getByApplication(value, application), application.paymentMethod.type)))
             }
         }
     }

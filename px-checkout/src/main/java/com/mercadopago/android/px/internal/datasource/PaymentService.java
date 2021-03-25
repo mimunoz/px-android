@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import kotlin.Pair;
+import kotlin.Unit;
 
 public class PaymentService implements PaymentRepository {
 
@@ -310,7 +311,7 @@ public class PaymentService implements PaymentRepository {
                     new SplitPaymentProcessor.CheckoutData(
                         paymentDataList, checkoutPreference, securityType, validationProgramId);
                 getPaymentProcessor().startPayment(context, checkoutData, handlerWrapper);
-                return null;
+                return Unit.INSTANCE;
             });
         }
     }

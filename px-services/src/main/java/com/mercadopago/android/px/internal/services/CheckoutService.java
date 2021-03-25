@@ -16,7 +16,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface CheckoutService {
-
     String CHECKOUT_VERSION = "v2";
     String ENVIRONMENT = BuildConfig.API_ENVIRONMENT_NEW;
 

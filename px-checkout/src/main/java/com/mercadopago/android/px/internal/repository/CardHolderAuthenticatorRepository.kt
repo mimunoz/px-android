@@ -5,5 +5,5 @@ import com.mercadopago.android.px.model.PaymentData
 
 internal interface CardHolderAuthenticatorRepository {
 
-    suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams?): Any
+    suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams): Any
 }

@@ -8,7 +8,6 @@ import com.mercadopago.android.px.model.internal.Application.KnownValidationProg
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import java.util.*
 
-
 internal class ValidationProgramUseCase @JvmOverloads constructor(
     tracker: MPTracker,
     private val authenticateUseCase: AuthenticateUseCase,
@@ -18,8 +17,7 @@ internal class ValidationProgramUseCase @JvmOverloads constructor(
     override suspend fun doExecute(param: List<PaymentData>?): Response<String?, MercadoPagoError> {
         val mainPaymentData = param?.firstOrNull() ?: throw IllegalStateException("No payment data available")
         val payerPaymentMethodId = mainPaymentData.token?.cardId ?: mainPaymentData.paymentMethod.id
-        //val validationProgram = KnownValidationProgram[payerPaymentMethodId]
-        val validationProgram = KnownValidationProgram.STP
+        val validationProgram = KnownValidationProgram[payerPaymentMethodId]
         when (validationProgram) {
             KnownValidationProgram.STP -> authenticateUseCase.execute(mainPaymentData)
         }
