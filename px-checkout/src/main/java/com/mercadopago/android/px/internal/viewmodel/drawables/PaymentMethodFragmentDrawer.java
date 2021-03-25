@@ -9,9 +9,5 @@ public interface PaymentMethodFragmentDrawer {
 
     Fragment draw(@NonNull final OtherPaymentMethodFragmentItem drawableItem);
 
-    Fragment draw(@NonNull final SavedCardDrawableFragmentItem drawableItem);
-
-    Fragment draw(@NonNull final AccountMoneyDrawableFragmentItem drawableItem);
-
     Fragment draw(@NonNull final ConsumerCreditsDrawableFragmentItem drawableItem);
 }

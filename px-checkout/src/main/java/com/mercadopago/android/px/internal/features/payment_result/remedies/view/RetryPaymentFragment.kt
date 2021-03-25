@@ -56,6 +56,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     private fun addCard(methodData: OneTapItem) {
         childFragmentManager.beginTransaction().apply {
             val drawableFragmentItem = MapperProvider.getPaymentMethodDrawableItemMapper().map(methodData)!!
+            drawableFragmentItem.switchModel = null
             val paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
             paymentMethodFragment.onFocusIn()
             replace(R.id.card_container, paymentMethodFragment)

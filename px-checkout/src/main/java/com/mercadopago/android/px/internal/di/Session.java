@@ -18,6 +18,8 @@ import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolverImpl;
 import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver;
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolverImpl;
 import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
@@ -93,6 +95,7 @@ public final class Session extends ApplicationModule {
     private ConfigurationSolver configurationSolver;
     private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
     private UseCaseModule useCaseModule;
+    private CustomOptionIdSolver customOptionIdSolver;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -200,6 +203,7 @@ public final class Session extends ApplicationModule {
         modalRepository = null;
         configurationSolver = null;
         cardHolderAuthenticatorRepository = null;
+        customOptionIdSolver = null;
     }
 
     @NonNull
@@ -350,7 +354,7 @@ public final class Session extends ApplicationModule {
                 configurationModule.getUserSelectionRepository(), getAmountRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(),
                 configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getOneTapItemRepository(),
-                MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper());
+                getPayerPaymentMethodRepository(), MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper());
         }
         return congratsRepository;
     }
@@ -406,6 +410,14 @@ public final class Session extends ApplicationModule {
             configurationSolver = new ConfigurationSolverImpl(getPayerPaymentMethodRepository());
         }
         return configurationSolver;
+    }
+
+    public CustomOptionIdSolver getCustomOptionIdSolver() {
+        if (customOptionIdSolver == null) {
+            customOptionIdSolver =
+                new CustomOptionIdSolverImpl(getConfigurationModule().getApplicationSelectionRepository());
+        }
+        return customOptionIdSolver;
     }
 
     @NonNull

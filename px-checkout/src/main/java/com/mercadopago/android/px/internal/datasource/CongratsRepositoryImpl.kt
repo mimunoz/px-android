@@ -29,6 +29,7 @@ internal class CongratsRepositoryImpl(
     private val payerComplianceRepository: PayerComplianceRepository,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val oneTapItemRepository: OneTapItemRepository,
+    private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
     private val alternativePayerPaymentMethodsMapper: AlternativePayerPaymentMethodsMapper) : CongratsRepository {
 
     private val paymentRewardCache = HashMap<String, CongratsResponse>()
@@ -83,7 +84,7 @@ internal class CongratsRepositoryImpl(
                 amountRepository,
                 usedPayerPaymentMethodId,
                 escCardIds.contains(usedPayerPaymentMethodId),
-                alternativePayerPaymentMethodsMapper.map(oneTapItemRepository.value).filter {
+                alternativePayerPaymentMethodsMapper.map(payerPaymentMethodRepository.value).filter {
                     it.customOptionId != usedPayerPaymentMethodId ||
                         !disabledPaymentMethodRepository.hasKey(
                             PayerPaymentMethodKey(it.customOptionId, it.paymentTypeId))

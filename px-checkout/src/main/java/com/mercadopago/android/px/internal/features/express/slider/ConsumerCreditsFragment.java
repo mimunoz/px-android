@@ -119,6 +119,6 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
 
     @Override
     protected String getAccessibilityContentDescription() {
-        return model.getDescription();
+        return model.getCommonsByApplication().getCurrent().getDescription();
     }
 }

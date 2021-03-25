@@ -6,6 +6,7 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
 import com.mercadopago.android.px.internal.callbacks.MPCall
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
@@ -131,6 +132,9 @@ class ExpressPaymentPresenterTest {
     @Mock
     private lateinit var application: Application
 
+    @Mock
+    private lateinit var customOptionIdSolver: CustomOptionIdSolver
+
     private lateinit var expressPaymentPresenter: ExpressPaymentPresenter
 
     @Before
@@ -149,17 +153,16 @@ class ExpressPaymentPresenterTest {
         `when`(oneTapItem.isCard).thenReturn(true)
         `when`(oneTapItem.card).thenReturn(cardMetadata)
         `when`(cardMetadata.displayInfo).thenReturn(mock(CardDisplayInfo::class.java))
-        `when`(oneTapItem.customOptionId).thenReturn("123")
+        `when`(cardMetadata.id).thenReturn("123")
+        `when`(customOptionIdSolver[oneTapItem]).thenReturn("123")
         `when`(oneTapItem.status).thenReturn(mock(StatusMetadata::class.java))
         `when`(discountRepository.getCurrentConfiguration()).thenReturn(discountConfigurationModel)
-        `when`(discountRepository.getConfigurationFor(any())).thenReturn(discountConfigurationModel)
         `when`(amountConfigurationRepository.getConfigurationSelectedFor("123")).thenReturn(amountConfiguration)
-        `when`(applicationSelectionRepository[oneTapItem.customOptionId]).thenReturn(application)
         `when`(oneTapItemRepository.value).thenReturn(listOf(oneTapItem))
         `when`(disabledPaymentMethodRepository.value).thenReturn(hashMapOf())
         `when`(applicationPaymentMethod.type).thenReturn("credit_card")
         `when`(application.paymentMethod).thenReturn(applicationPaymentMethod)
-        `when`(applicationSelectionRepository[oneTapItem.customOptionId]).thenReturn(application)
+        `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
         `when`(summaryInfoMapper.map(any(CheckoutPreference::class.java))).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
@@ -170,7 +173,7 @@ class ExpressPaymentPresenterTest {
             summaryDetailDescriptorMapper,
             summaryInfoMapper,
             elementDescriptorMapper, tracker, oneTapItemRepository, payerPaymentMethodRepository,
-            modalRepository)
+            modalRepository, customOptionIdSolver)
         verifyAttachView()
     }
 
@@ -225,7 +228,7 @@ class ExpressPaymentPresenterTest {
         `when`(state.paymentMethodIndex).thenReturn(paymentMethodIndex)
         `when`(state.splitSelectionState).thenReturn(splitSelectionState)
         val payerCostIndex = 2
-        `when`(payerCostSelectionRepository.get(oneTapItem.customOptionId)).thenReturn(payerCostIndex)
+        `when`(payerCostSelectionRepository.get(customOptionIdSolver[oneTapItem])).thenReturn(payerCostIndex)
 
         expressPaymentPresenter.restoreState(state)
         expressPaymentPresenter.onInstallmentSelectionCanceled()

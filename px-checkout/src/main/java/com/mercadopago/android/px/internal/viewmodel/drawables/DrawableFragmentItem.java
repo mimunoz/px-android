@@ -11,55 +11,50 @@ import com.mercadopago.android.px.model.Reimbursement;
 import com.mercadopago.android.px.model.internal.Text;
 import java.io.Serializable;
 
-public abstract class DrawableFragmentItem implements KParcelable, Serializable {
+public class DrawableFragmentItem implements KParcelable, Serializable {
 
-    private final String id;
     private final DrawableFragmentCommons.ByApplication commonsByApplication;
     private final Text bottomDescription;
     private final Reimbursement reimbursement;
-    private final String description;
-    private final String issuerName;
     private final GenericDialogItem genericDialogItem;
-    private final SwitchModel switchModel;
+    private SwitchModel switchModel;
 
     protected DrawableFragmentItem(@NonNull final Parameters parameters) {
-        id = parameters.id;
         commonsByApplication = parameters.commonsByApplication;
         bottomDescription = parameters.bottomDescription;
         reimbursement = parameters.reimbursement;
-        description = parameters.description;
-        issuerName = parameters.issuerName;
         genericDialogItem = parameters.genericDialogItem;
         switchModel = parameters.switchModel;
     }
 
     protected DrawableFragmentItem(final Parcel in) {
-        id = in.readString();
         commonsByApplication = in.readParcelable(DrawableFragmentCommons.ByApplication.class.getClassLoader());
         bottomDescription = in.readParcelable(Text.class.getClassLoader());
         reimbursement = in.readParcelable(Reimbursement.class.getClassLoader());
-        description = in.readString();
-        issuerName = in.readString();
         genericDialogItem = in.readParcelable(GenericDialogItem.class.getClassLoader());
         switchModel = in.readParcelable(SwitchModel.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-        dest.writeString(id);
         dest.writeParcelable(commonsByApplication, flags);
         dest.writeParcelable(bottomDescription, flags);
         dest.writeParcelable(reimbursement, flags);
-        dest.writeString(description);
-        dest.writeString(issuerName);
         dest.writeParcelable(genericDialogItem, flags);
         dest.writeParcelable(switchModel, flags);
     }
 
-    public abstract Fragment draw(@NonNull final PaymentMethodFragmentDrawer drawer);
+    public void setSwitchModel(final SwitchModel switchModel) {
+        this.switchModel = switchModel;
+    }
 
-    public String getId() {
-        return id;
+    public Fragment draw(@NonNull final PaymentMethodFragmentDrawer drawer) {
+        return drawer.draw(this);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public DrawableFragmentCommons.ByApplication getCommonsByApplication() {
@@ -74,16 +69,6 @@ public abstract class DrawableFragmentItem implements KParcelable, Serializable 
     @Nullable
     public Reimbursement getReimbursement() {
         return reimbursement;
-    }
-
-    @NonNull
-    public String getDescription() {
-        return description;
-    }
-
-    @NonNull
-    public String getIssuerName() {
-        return issuerName;
     }
 
     public boolean shouldHighlightBottomDescription() {
@@ -101,28 +86,32 @@ public abstract class DrawableFragmentItem implements KParcelable, Serializable 
     }
 
     public static final class Parameters {
-        /* default */ @NonNull final String id;
         /* default */ @NonNull final DrawableFragmentCommons.ByApplication commonsByApplication;
         /* default */ @Nullable final Text bottomDescription;
         /* default */ @Nullable final Reimbursement reimbursement;
-        /* default */ @NonNull final String description;
-        /* default */ @NonNull final String issuerName;
         /* default */ @NonNull final GenericDialogItem genericDialogItem;
         /* default */ @Nullable final SwitchModel switchModel;
 
-        /* default */ Parameters(@NonNull final String id,
-            @NonNull final DrawableFragmentCommons.ByApplication commonsByApplication,
+        /* default */ Parameters(@NonNull final DrawableFragmentCommons.ByApplication commonsByApplication,
             @Nullable final Text bottomDescription, @Nullable final Reimbursement reimbursement,
-            @NonNull final String description, @NonNull final String issuerName,
             @Nullable final GenericDialogItem genericDialogItem, @Nullable final SwitchModel switchModel) {
-            this.id = id;
             this.commonsByApplication = commonsByApplication;
             this.bottomDescription = bottomDescription;
             this.reimbursement = reimbursement;
-            this.description = description;
-            this.issuerName = issuerName;
             this.genericDialogItem = genericDialogItem;
             this.switchModel = switchModel;
         }
     }
+
+    public static final Creator<DrawableFragmentItem> CREATOR = new Creator<DrawableFragmentItem>() {
+        @Override
+        public DrawableFragmentItem createFromParcel(final Parcel in) {
+            return new DrawableFragmentItem(in);
+        }
+
+        @Override
+        public DrawableFragmentItem[] newArray(final int size) {
+            return new DrawableFragmentItem[size];
+        }
+    };
 }

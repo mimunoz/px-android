@@ -43,7 +43,7 @@ import java.util.Map;
                 boolean allApplicationsDisabled = true;
                 for (final Application application : oneTapItem.getApplications()) {
                     if (!disabledPaymentMethods.containsKey(
-                        new PayerPaymentMethodKey(oneTapItem.getCustomOptionId(),
+                        new PayerPaymentMethodKey(CustomOptionIdSolver.getByApplication(oneTapItem, application),
                             application.getPaymentMethod().getType()))) {
                         allApplicationsDisabled = false;
                     }

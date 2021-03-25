@@ -8,9 +8,13 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 internal data class DrawableFragmentCommons(
+    val customOptionId: String,
     val status: StatusMetadata,
     val chargeMessage: String?,
-    val disabledPaymentMethod: DisabledPaymentMethod?
+    val disabledPaymentMethod: DisabledPaymentMethod?,
+    val description: String,
+    val issuerName: String,
+    val cardDrawable: CardDrawable? = null
 ) : Parcelable {
 
     @Parcelize

@@ -86,10 +86,6 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         card = view.findViewById(R.id.payment_method);
         bottomDescription = view.findViewById(R.id.bottom_description);
         updateView();
-        final CardDrawerView cardDrawerView = view.findViewById(R.id.card);
-        if (cardDrawerView != null) {
-            setUpCardDrawerView(cardDrawerView);
-        }
     }
 
     @Override
@@ -108,6 +104,10 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
         if (hasFocus()) {
             onFocusIn();
+        }
+        final CardDrawerView cardDrawerView = view.findViewById(R.id.card);
+        if (cardDrawerView != null) {
+            setUpCardDrawerView(cardDrawerView);
         }
     }
 

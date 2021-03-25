@@ -22,12 +22,11 @@ internal class ApplicationSelectionRepositoryImpl(private val fileManager: FileM
     }
 
     private fun resolveDefault(payerPaymentMethodId: PayerPaymentTypeId): Application {
-        return oneTapItemRepository.value.first { it.customOptionId == payerPaymentMethodId }
-            .let { oneTapItem ->
-                getApplication(oneTapItem, oneTapItem.getApplications()).also {
-                    set(payerPaymentMethodId, it)
-                }
+        return oneTapItemRepository.findBy(payerPaymentMethodId).let { oneTapItem ->
+            getApplication(oneTapItem, oneTapItem.getApplications()).also {
+                set(payerPaymentMethodId, it)
             }
+        }
     }
 
     private fun getApplication(oneTapItem: OneTapItem, applications: List<Application>): Application {
