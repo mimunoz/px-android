@@ -19,8 +19,7 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
         return inflater.inflate(R.layout.px_fragment_card, container, false)
     }
 
-    override fun setUpCardDrawerView(cardDrawerView: CardDrawerView) {
-        super.setUpCardDrawerView(cardDrawerView)
+    override fun updateCardDrawerView(cardDrawerView: CardDrawerView) {
         model.commonsByApplication.getCurrent().cardDrawable?.let { byApplication ->
             byApplication.cardConfiguration?.takeIf { it.isNotNull() }?.let { card ->
                 cardView = cardDrawerView

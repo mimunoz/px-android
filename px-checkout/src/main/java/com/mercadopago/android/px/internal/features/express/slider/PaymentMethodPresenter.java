@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import androidx.annotation.NonNull;
-import com.meli.android.carddrawer.model.SwitchModel;
+import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
@@ -59,8 +59,17 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
         item.getCommonsByApplication().update(paymentTypeId);
         onFocusOut();
         final SwitchModel old = item.getSwitchModel();
-        item.setSwitchModel(
-            new SwitchModel(old.getStates(), old.getOptions(), old.getBackgroundColor(), paymentTypeId));
+        if (old != null) {
+            item.setSwitchModel(
+                new SwitchModel(
+                    old.getDescription(),
+                    old.getStates(),
+                    old.getOptions(),
+                    old.getSwitchBackgroundColor(),
+                    old.getPillBackgroundColor(),
+                    old.getSafeZoneBackgroundColor(),
+                    paymentTypeId));
+        }
         getView().updateView();
         getView().updateState();
     }

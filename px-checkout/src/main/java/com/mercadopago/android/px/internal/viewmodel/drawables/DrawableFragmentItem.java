@@ -4,7 +4,7 @@ import android.os.Parcel;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.meli.android.carddrawer.model.SwitchModel;
+import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogItem;
 import com.mercadopago.android.px.internal.util.KParcelable;
 import com.mercadopago.android.px.model.Reimbursement;
