@@ -40,8 +40,9 @@ internal class UseCaseModule(val configurationModule: CheckoutConfigurationModul
         get() {
             val session = Session.getInstance()
             return ValidationProgramUseCase(
-                session.tracker,
-                authenticateUseCase
+                configurationModule.applicationSelectionRepository,
+                authenticateUseCase,
+                session.tracker
             )
         }
 

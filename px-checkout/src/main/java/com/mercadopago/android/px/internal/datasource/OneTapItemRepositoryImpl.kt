@@ -22,7 +22,7 @@ internal class OneTapItemRepositoryImpl(private val fileManager: FileManager,
         configure(value)
     }
 
-    override fun findBy(customOptionId: String): OneTapItem {
+    override fun get(customOptionId: String): OneTapItem {
         return value.first { CustomOptionIdSolver.compare(it, customOptionId) }
     }
 }

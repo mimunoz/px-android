@@ -4,7 +4,7 @@ import com.mercadopago.android.px.model.StatusMetadata
 
 data class Application(
     val paymentMethod: PaymentMethod,
-    val validationPrograms: List<ValidationProgram>,
+    val validationPrograms: List<ValidationProgram>?,
     val status: StatusMetadata
 ) {
 

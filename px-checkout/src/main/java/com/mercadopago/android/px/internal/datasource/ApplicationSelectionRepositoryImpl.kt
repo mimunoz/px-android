@@ -22,7 +22,7 @@ internal class ApplicationSelectionRepositoryImpl(private val fileManager: FileM
     }
 
     private fun resolveDefault(payerPaymentMethodId: PayerPaymentTypeId): Application {
-        return oneTapItemRepository.findBy(payerPaymentMethodId).let { oneTapItem ->
+        return oneTapItemRepository[payerPaymentMethodId].let { oneTapItem ->
             getApplication(oneTapItem, oneTapItem.getApplications()).also {
                 set(payerPaymentMethodId, it)
             }
