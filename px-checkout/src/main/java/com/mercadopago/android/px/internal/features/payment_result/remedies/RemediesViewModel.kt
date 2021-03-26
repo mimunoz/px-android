@@ -49,7 +49,7 @@ internal class RemediesViewModel(
     init {
         val methodIds = getMethodIds()
         val customOptionId = methodIds.customOptionId
-        val methodData = oneTapItemRepository.findBy(customOptionId)
+        val methodData = oneTapItemRepository[customOptionId]
         card = fromPayerPaymentMethodToCardMapper.map(
             PayerPaymentMethodKey(customOptionId, methodIds.typeId))
         remediesModel.retryPayment?.let {

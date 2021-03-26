@@ -4,5 +4,5 @@ import com.mercadopago.android.px.model.internal.OneTapItem
 
 internal interface OneTapItemRepository : LocalRepository<List<@JvmSuppressWildcards OneTapItem>> {
     fun sortByState()
-    fun findBy(customOptionId: String): OneTapItem
+    operator fun get(customOptionId: String): OneTapItem
 }
