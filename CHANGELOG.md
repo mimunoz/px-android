@@ -1,3 +1,7 @@
+## VERSION 4.72.2
+_30_03_2021_
+* FIX - Retry build to address card form signature problem.
+
 ## VERSION 4.72.1
 _18_03_2021_
 * FIX - Crash tracking session halted.
