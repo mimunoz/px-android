@@ -29,7 +29,7 @@ internal class PaymentMethodDescriptorMapper(
 
                 model[application] = when {
                     disabledPaymentMethodRepository.hasKey(payerPaymentMethodKey) ->
-                        DisabledPaymentMethodDescriptorModel.createFrom(value.status.mainMessage)
+                        DisabledPaymentMethodDescriptorModel.createFrom(application.status.mainMessage)
                     isCreditCardPaymentType(paymentTypeId) || value.isConsumerCredits ->
                         amountConfigurationRepository.getConfigurationFor(payerPaymentMethodKey)?.let {
                             mapCredit(value, it)

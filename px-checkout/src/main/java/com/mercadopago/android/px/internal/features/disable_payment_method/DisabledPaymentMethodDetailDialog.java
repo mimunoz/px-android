@@ -3,12 +3,12 @@ package com.mercadopago.android.px.internal.features.disable_payment_method;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import android.view.View;
-import android.widget.TextView;
+import androidx.fragment.app.FragmentActivity;
 import com.mercadolibre.android.ui.widgets.MeliDialog;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.di.Session;
@@ -26,24 +26,19 @@ public class DisabledPaymentMethodDetailDialog extends MeliDialog {
     @Nullable private StatusMetadata status;
     private String statusDetail;
 
+    @SuppressWarnings("TypeMayBeWeakened")
     public static void showDialog(@NonNull final Fragment targetFragment, final int requestCode,
         @Nullable final String statusDetail, @Nullable final StatusMetadata status) {
-        //noinspection ConstantConditions
-        final DisabledPaymentMethodDetailDialog disabledPaymentMethodDetailDialog =
-            showDialog(targetFragment.getActivity().getSupportFragmentManager(), statusDetail, status);
-        disabledPaymentMethodDetailDialog.setTargetFragment(targetFragment, requestCode);
-    }
-
-    @SuppressWarnings("TypeMayBeWeakened")
-    public static DisabledPaymentMethodDetailDialog showDialog(@NonNull final FragmentManager supportFragmentManager,
-        @Nullable final String statusDetail, @Nullable final StatusMetadata status) {
-        final DisabledPaymentMethodDetailDialog instance = new DisabledPaymentMethodDetailDialog();
-        final Bundle arguments = new Bundle();
-        arguments.putString(ARG_DISABLED_PAYMENT_METHOD, statusDetail);
-        arguments.putParcelable(ARG_STATUS_METADATA, status);
-        instance.setArguments(arguments);
-        instance.show(supportFragmentManager, TAG);
-        return instance;
+        final FragmentActivity activity = targetFragment.getActivity();
+        if (activity != null) {
+            final DisabledPaymentMethodDetailDialog instance = new DisabledPaymentMethodDetailDialog();
+            final Bundle arguments = new Bundle();
+            arguments.putString(ARG_DISABLED_PAYMENT_METHOD, statusDetail);
+            arguments.putParcelable(ARG_STATUS_METADATA, status);
+            instance.setArguments(arguments);
+            instance.show(activity.getSupportFragmentManager(), TAG);
+            instance.setTargetFragment(targetFragment, requestCode);
+        }
     }
 
     @Override
