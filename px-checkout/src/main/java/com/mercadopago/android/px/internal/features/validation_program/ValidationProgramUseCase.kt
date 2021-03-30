@@ -7,6 +7,7 @@ import com.mercadopago.android.px.model.PaymentData
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.model.internal.Application.KnownValidationProgram
 import com.mercadopago.android.px.tracking.internal.MPTracker
+import com.mercadopago.android.px.tracking.internal.events.ProgramValidationEvent
 import java.util.*
 
 internal class ValidationProgramUseCase @JvmOverloads constructor(
@@ -20,10 +21,12 @@ internal class ValidationProgramUseCase @JvmOverloads constructor(
         val mainPaymentData = param?.firstOrNull() ?: throw IllegalStateException("No payment data available")
         val payerPaymentMethodId = mainPaymentData.token?.cardId ?: mainPaymentData.paymentMethod.id
         val application = applicationSelectionRepository[payerPaymentMethodId].validationPrograms?.firstOrNull()
-        val validationProgram = KnownValidationProgram[application?.id]
-        when (validationProgram) {
+        val knownValidationProgram = KnownValidationProgram[application?.id]
+        when (knownValidationProgram) {
             KnownValidationProgram.STP -> authenticateUseCase.execute(mainPaymentData)
         }
-        return Response.Success(validationProgram?.toString()?.toLowerCase(Locale.ROOT))
+        val validationProgramId = knownValidationProgram?.toString()
+        tracker.track(ProgramValidationEvent(validationProgramId))
+        return Response.Success(validationProgramId?.toLowerCase(Locale.ROOT))
     }
 }

@@ -378,20 +378,18 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             session.getAmountConfigurationRepository(),
             session.getConfigurationModule().getChargeRepository(),
             session.getMercadoPagoESC(),
+            session.getExperimentsRepository(), configurationModule.getPayerComplianceRepository(),
+            configurationModule.getTrackingRepository(), configurationModule.getCustomTextsRepository(),
+            session.getOneTapItemRepository(), session.getPayerPaymentMethodRepository(), session.getModalRepository(),
+            session.getCustomOptionIdSolver(),
             MapperProvider.INSTANCE.getPaymentMethodDrawableItemMapper(),
-            session.getExperimentsRepository(),
-            configurationModule.getPayerComplianceRepository(),
-            configurationModule.getTrackingRepository(),
             MapperProvider.INSTANCE.getPaymentMethodDescriptorMapper(),
-            configurationModule.getCustomTextsRepository(),
             MapperProvider.INSTANCE.getSummaryDetailDescriptorMapper(),
             MapperProvider.INSTANCE.getSummaryInfoMapper(),
             MapperProvider.INSTANCE.getElementDescriptorMapper(),
-            session.getTracker(),
-            session.getOneTapItemRepository(),
-            session.getPayerPaymentMethodRepository(),
-            session.getModalRepository(),
-            session.getCustomOptionIdSolver());
+            MapperProvider.INSTANCE.getFromApplicationToApplicationInfo(),
+            session.getTracker()
+        );
     }
 
     @Override

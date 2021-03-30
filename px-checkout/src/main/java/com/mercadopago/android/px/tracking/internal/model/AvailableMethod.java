@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.PaymentMethod;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,17 +89,20 @@ public class AvailableMethod extends TrackingMapModel implements Parcelable {
     public static class Builder {
         private static final String HAS_INTEREST_FREE = "has_interest_free";
         private static final String HAS_REIMBURSEMENT = "has_reimbursement";
+        private static final String APPLICATIONS = "applications";
         String paymentMethodId;
         String paymentMethodType;
         Map<String, Object> extraInfo = new HashMap<>();
 
         public Builder(@NonNull final String paymentMethodId, @NonNull final String paymentMethodType,
-            final boolean hasInterestFree, final boolean hasReimbursement) {
+            final boolean hasInterestFree, final boolean hasReimbursement,
+            @NonNull final List<ApplicationInfo> applicationsInfo) {
 
             this.paymentMethodId = paymentMethodId;
             this.paymentMethodType = paymentMethodType;
             extraInfo.put(HAS_INTEREST_FREE, hasInterestFree);
             extraInfo.put(HAS_REIMBURSEMENT, hasReimbursement);
+            extraInfo.put(APPLICATIONS, applicationsInfo);
         }
 
         public Builder setExtraInfo(@NonNull final Map<String, Object> extraInfo) {
