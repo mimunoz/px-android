@@ -28,11 +28,9 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
                 cardView.card.number = card.number
                 cardView.show(card)
             }
-            byApplication.cardStyle.takeIf { it.isNotNull() }?.let { style ->
-                cardView.setStyle(style)
-            }
+            byApplication.cardStyle.takeIf { it.isNotNull() }?.let (cardView::setStyle)
+            cardView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         }
-        cardView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
     }
 
     override fun getAccessibilityContentDescription(): String {
