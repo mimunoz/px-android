@@ -1,3 +1,8 @@
+## VERSION 4.73.1
+_30_03_2021_
+* FIX - Retry build to address card form signature problem.
+* ENHANCEMENT - Adds some pay button tests.
+
 ## VERSION 4.72.2
 _30_03_2021_
 * FIX - Retry build to address card form signature problem.
