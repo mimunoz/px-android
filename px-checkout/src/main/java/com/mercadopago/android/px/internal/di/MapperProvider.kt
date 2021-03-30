@@ -51,7 +51,6 @@ internal object MapperProvider {
     fun getAlternativePayerPaymentMethodsMapper(): AlternativePayerPaymentMethodsMapper {
         return AlternativePayerPaymentMethodsMapper(
             Session.getInstance().mercadoPagoESC,
-            Session.getInstance().payerPaymentMethodRepository,
             Session.getInstance().paymentMethodRepository
         )
     }

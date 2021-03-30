@@ -120,7 +120,7 @@ public final class OneTapSamples {
     // It should suggest one tap with account money
     private static MercadoPagoCheckout.Builder startOneTapWithAccountMoneyNoCards() {
         final CheckoutPreference preference =
-            getCheckoutPreferenceWithPayerEmail(new ArrayList<>(), 12000);
+            getCheckoutPreferenceWithPayerEmailInBrazil(new ArrayList<>(), 12000);
         final PaymentConfiguration paymentConfiguration =
             new PaymentConfiguration.Builder(new SamplePaymentProcessor(
                 PaymentUtils.getGenericPaymentRejected(),

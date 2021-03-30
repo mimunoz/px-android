@@ -13,9 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import com.meli.android.carddrawer.model.CardDrawerSwitchView;
 import com.meli.android.carddrawer.model.CardDrawerView;
-import com.meli.android.carddrawer.model.SwitchModel;
+import com.meli.android.carddrawer.model.customview.CardDrawerSwitch;
+import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BasePagerFragment;
 import com.mercadopago.android.px.internal.di.Session;
@@ -43,6 +43,7 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     private boolean focused;
     private MPTextView bottomDescription;
     private Handler handler;
+    private CardDrawerView cardDrawerView;
     private PaymentMethodPagerListener listener = paymentTypeId -> {
     };
 
@@ -85,11 +86,9 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     public void initializeViews(@NonNull final View view) {
         card = view.findViewById(R.id.payment_method);
         bottomDescription = view.findViewById(R.id.bottom_description);
+        cardDrawerView = view.findViewById(R.id.card);
         updateView();
-        final CardDrawerView cardDrawerView = view.findViewById(R.id.card);
-        if (cardDrawerView != null) {
-            setUpCardDrawerView(cardDrawerView);
-        }
+        setUpCardDrawerCustomView();
     }
 
     @Override
@@ -109,6 +108,9 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         if (hasFocus()) {
             onFocusIn();
         }
+        if (cardDrawerView != null) {
+            updateCardDrawerView(cardDrawerView);
+        }
     }
 
     @Override
@@ -120,16 +122,14 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
     }
 
-    @CallSuper
-    protected void setUpCardDrawerView(@NonNull final CardDrawerView cardDrawerView) {
-        setUpCardDrawerCustomView(cardDrawerView);
-    }
+    protected abstract void updateCardDrawerView(@NonNull final CardDrawerView cardDrawerView);
 
-    private void setUpCardDrawerCustomView(@NonNull final CardDrawerView cardDrawerView) {
+    private void setUpCardDrawerCustomView() {
         final SwitchModel switchModel = model.getSwitchModel();
-        if (switchModel != null) {
-            final CardDrawerSwitchView cardDrawerSwitch = new CardDrawerSwitchView(getContext());
+        if (cardDrawerView != null && switchModel != null) {
+            final CardDrawerSwitch cardDrawerSwitch = new CardDrawerSwitch(getContext());
             cardDrawerSwitch.setSwitchModel(switchModel);
+            cardDrawerSwitch.setConfiguration(cardDrawerView.buildCustomViewConfiguration());
             cardDrawerView.setCustomView(cardDrawerSwitch);
             cardDrawerSwitch.setSwitchListener(this::onApplicationChanged);
         }

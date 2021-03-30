@@ -15,29 +15,29 @@ class CardHolderAuthenticatorRepositoryImpl(
     private val cardHolderAuthenticatorService: CardHolderAuthenticatorService,
     private val paymentSettingRepository: PaymentSettingRepository) : CardHolderAuthenticatorRepository {
 
-    override suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams?): Any {
+    override suspend fun authenticate(paymentData: PaymentData, threeDSDataOnlyParams: ThreeDSDataOnlyParams): Any {
         val token = paymentData.token ?: throw IllegalStateException("Missing token during authentication")
+        val sdkEphemPubKey = (JsonUtil.fromJson(threeDSDataOnlyParams.sdkEphemeralPublicKey, CardHolderAuthenticatorBody.SdkEphemPubKey::class.java)
+            ?: throw MalformedJsonException("Malformed sdkEphemeralPublicKey"))
         val accessToken = paymentSettingRepository.privateKey ?: return TextUtil.EMPTY
         val currency = paymentSettingRepository.currency
-        val threeDSParams = threeDSDataOnlyParams ?: throw IllegalStateException("Missing ThreeDS SDK Data")
         val body = CardHolderAuthenticatorBody(
-            179096502,
+            accessToken.split("-").last().toLong(),
             CardHolderAuthenticatorBody.Data(
                 paymentData.rawAmount.toString(),
                 paymentSettingRepository.site.id,
                 Date(),
                 CardHolderAuthenticatorBody.Card(
-                    "JohnDoe Anytown",
+                    token.cardHolder?.name.orEmpty(),
                     paymentData.paymentMethod.id
                 ),
                 currency.id,
                 currency.decimalPlaces,
-                threeDSParams.sdkAppId,
-                threeDSParams.deviceData,
-                JsonUtil.fromJson(threeDSParams.sdkEphemeralPublicKey, CardHolderAuthenticatorBody.SdkEphemPubKey::class.java)
-                    ?: throw MalformedJsonException("Malformed sdkEphemeralPublicKey"),
-                threeDSParams.sdkReferenceNumber,
-                threeDSParams.sdkTransactionId
+                threeDSDataOnlyParams.sdkAppId,
+                threeDSDataOnlyParams.deviceData,
+                sdkEphemPubKey,
+                threeDSDataOnlyParams.sdkReferenceNumber,
+                threeDSDataOnlyParams.sdkTransactionId
             )
         )
         return cardHolderAuthenticatorService.authenticate(token.id, body)

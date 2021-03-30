@@ -390,7 +390,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             session.getTracker(),
             session.getOneTapItemRepository(),
             session.getPayerPaymentMethodRepository(),
-            session.getModalRepository());
+            session.getModalRepository(),
+            session.getCustomOptionIdSolver());
     }
 
     @Override

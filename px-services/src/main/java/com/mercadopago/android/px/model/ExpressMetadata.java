@@ -109,6 +109,7 @@ public class ExpressMetadata implements Parcelable, Serializable, ExpressPayment
         return offlineMethods != null;
     }
 
+    @Deprecated
     @Override
     public String getCustomOptionId() {
         return isCard() ? getCard().getId() : getPaymentMethodId();

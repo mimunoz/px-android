@@ -21,4 +21,8 @@ internal class OneTapItemRepositoryImpl(private val fileManager: FileManager,
         OneTapItemSorter(value, disabledPaymentMethodMap).sort()
         configure(value)
     }
+
+    override fun get(customOptionId: String): OneTapItem {
+        return value.first { CustomOptionIdSolver.compare(it, customOptionId) }
+    }
 }

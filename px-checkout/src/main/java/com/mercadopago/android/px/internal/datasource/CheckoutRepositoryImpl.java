@@ -26,6 +26,7 @@ import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.ExpressMetadata;
 import com.mercadopago.android.px.model.exceptions.ApiException;
+import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.CheckoutFeatures;
 import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
@@ -35,6 +36,7 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -172,6 +174,9 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
             .setSplit(paymentConfiguration.getPaymentProcessor().supportsSplitPayment(checkoutPreference))
             .setExpress(advancedConfiguration.isExpressPaymentEnabled())
             .setOdrFlag(true)
+            .setComboCard(true)
+            .setHybridCard(true)
+            .addValidationPrograms(Collections.singletonList(Application.KnownValidationProgram.STP.name()))
             .build();
 
         final Map<String, Object> body = JsonUtil.getMapFromObject(

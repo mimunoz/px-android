@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import androidx.annotation.NonNull;
+import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
@@ -25,9 +26,10 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
 
     @Nullable
     private String getHighlightText() {
-        final int payerCostIndex = payerCostSelectionRepository.get(item.getId());
+        final String customOptionId = item.getCommonsByApplication().getCurrent().getCustomOptionId();
+        final int payerCostIndex = payerCostSelectionRepository.get(customOptionId);
         final AmountConfiguration configuration =
-            amountConfigurationRepository.getConfigurationSelectedFor(item.getId());
+            amountConfigurationRepository.getConfigurationSelectedFor(customOptionId);
         final int installments = configuration == null || configuration.getPayerCosts().isEmpty() ?
             -1 : configuration.getCurrentPayerCost(false, payerCostIndex).getInstallments();
         final boolean hasReimbursement =
@@ -56,6 +58,18 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
     public void onApplicationChanged(@NonNull final String paymentTypeId) {
         item.getCommonsByApplication().update(paymentTypeId);
         onFocusOut();
+        final SwitchModel old = item.getSwitchModel();
+        if (old != null) {
+            item.setSwitchModel(
+                new SwitchModel(
+                    old.getDescription(),
+                    old.getStates(),
+                    old.getOptions(),
+                    old.getSwitchBackgroundColor(),
+                    old.getPillBackgroundColor(),
+                    old.getSafeZoneBackgroundColor(),
+                    paymentTypeId));
+        }
         getView().updateView();
         getView().updateState();
     }

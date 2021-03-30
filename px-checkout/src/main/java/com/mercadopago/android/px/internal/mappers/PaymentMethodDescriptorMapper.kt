@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.mappers
 
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
 import com.mercadopago.android.px.internal.viewmodel.*
@@ -18,12 +19,13 @@ internal class PaymentMethodDescriptorMapper(
 
     override fun map(value: OneTapItem): Model {
         val currency = paymentSettings.currency
-        val customOptionId = value.customOptionId
+        val customOptionId = CustomOptionIdSolver.defaultCustomOptionId(value)
 
         return Model(applicationSelectionRepository[customOptionId].paymentMethod.type).also { model ->
             value.getApplications().forEach { application ->
+                val customOptionIdByApplication = CustomOptionIdSolver.getByApplication(value, application)
                 val paymentTypeId = application.paymentMethod.type
-                val payerPaymentMethodKey = PayerPaymentMethodKey(customOptionId, paymentTypeId)
+                val payerPaymentMethodKey = PayerPaymentMethodKey(customOptionIdByApplication, paymentTypeId)
 
                 model[application] = when {
                     disabledPaymentMethodRepository.hasKey(payerPaymentMethodKey) ->
