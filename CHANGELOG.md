@@ -1,3 +1,7 @@
+## VERSION 4.73.1
+_30_03_2021_
+* ENHANCEMENT - Adds some pay button tests.
+
 ## VERSION 4.73.0
 _25_03_2021_
 * FEATURE - Sonic branding.
