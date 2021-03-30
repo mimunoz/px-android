@@ -5,20 +5,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Observer;
-import com.mercadopago.android.px.KArgumentCaptor;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.core.internal.PaymentWrapper;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodIdToCardMapper;
+import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
-import com.mercadopago.android.px.internal.repository.InitRepository;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
@@ -26,7 +25,6 @@ import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
-import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.mocks.InitResponseStub;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.model.Card;
@@ -52,11 +50,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static com.mercadopago.android.px.ArgumentCaptorKt.argumentCaptor;
 import static com.mercadopago.android.px.utils.ReflectionArgumentMatchers.reflectionEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -90,7 +88,6 @@ public class PaymentServiceTest {
     @Mock private ESCManagerBehaviour escManagerBehaviour;
     @Mock private TokenRepository tokenRepository;
     @Mock private InstructionsRepository instructionsRepository;
-    @Mock private InitRepository initRepository;
     @Mock private AmountConfigurationRepository amountConfigurationRepository;
     @Mock private CongratsRepository congratsRepository;
     @Mock private SplitSelectionState splitSelectionState;
@@ -306,8 +303,8 @@ public class PaymentServiceTest {
 
     @Test
     public void whenOneTapPaymentWhenHasTokenAndPaymentSuccess() {
-        final KArgumentCaptor<SplitPaymentProcessor.CheckoutData> captor =
-            argumentCaptor(SplitPaymentProcessor.CheckoutData.class);
+        final ArgumentCaptor<SplitPaymentProcessor.CheckoutData> captor =
+            ArgumentCaptor.forClass(SplitPaymentProcessor.CheckoutData.class);
 
         savedCreditCardOneTapPresent(CARD_ID_ESC_NOT_AVAILABLE);
         when(paymentSettingRepository.hasToken()).thenReturn(true);

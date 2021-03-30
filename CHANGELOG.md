@@ -2,6 +2,10 @@
 _30_03_2021_
 * FIX - Retry build to address card form signature problem.
 
+## VERSION 4.73.0
+_25_03_2021_
+* FEATURE - Sonic branding.
+
 ## VERSION 4.72.1
 _18_03_2021_
 * FIX - Crash tracking session halted.

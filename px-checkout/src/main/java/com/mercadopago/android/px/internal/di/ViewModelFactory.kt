@@ -34,6 +34,7 @@ internal class ViewModelFactory : ViewModelProvider.Factory {
                     MapperProvider.getPaymentCongratsMapper(),
                     MapperProvider.getPostPaymentUrlsMapper(),
                     session.paymentResultViewModelFactory,
+                    session.audioPlayer,
                     session.tracker
                 )
             }

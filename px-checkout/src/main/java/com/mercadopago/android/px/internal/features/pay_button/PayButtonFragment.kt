@@ -120,6 +120,9 @@ class PayButtonFragment : BaseFragment(), PayButton.View, SecurityValidationHand
             is UIResult.PaymentResult -> PaymentResultActivity.start(this, REQ_CODE_CONGRATS, stateUI.model)
             is UIResult.NoCongratsResult -> DummyResultActivity.start(this, REQ_CODE_CONGRATS, stateUI.model)
             is UIResult.CongratsPaymentModel -> PaymentCongrats.show(stateUI.model, this, REQ_CODE_CONGRATS)
+            is UIProgress.PlayResultAudio -> with(stateUI) {
+                context?.let { audioPlayer.play(it, sound) }
+            }
         }
     }
 
@@ -179,6 +182,10 @@ class PayButtonFragment : BaseFragment(), PayButton.View, SecurityValidationHand
                 view.showSnackBar(getString(R.string.px_error_title), andesSnackbarAction = action)
             }
         }
+    }
+
+    override fun onResultIconAnimation() {
+        viewModel.onResultIconAnimation()
     }
 
     override fun onAnimationFinished() {
