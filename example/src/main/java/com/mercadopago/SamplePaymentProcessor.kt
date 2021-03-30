@@ -37,7 +37,7 @@ open class SamplePaymentProcessor @JvmOverloads constructor(private val visualPr
 
     override fun shouldShowFragmentOnPayment(checkoutPreference: CheckoutPreference) = visualProcessor
 
-    override fun supportsSplitPayment(checkoutPreference: CheckoutPreference?) = true
+    override fun supportsSplitPayment(checkoutPreference: CheckoutPreference?) = false
 
     override fun getFragment(data: SplitPaymentProcessor.CheckoutData, context: Context): Fragment? {
         return SamplePaymentProcessorFragment.with(getCurrentPayment())

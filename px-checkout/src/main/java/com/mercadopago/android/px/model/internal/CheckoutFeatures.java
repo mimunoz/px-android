@@ -17,6 +17,7 @@ public final class CheckoutFeatures {
     private final boolean odrFlag;
     private final boolean comboCard;
     private final boolean hybridCard;
+    @SerializedName("validations_programs")
     private final List<String> validationPrograms;
 
     /* default */ CheckoutFeatures(@NonNull final Builder builder) {

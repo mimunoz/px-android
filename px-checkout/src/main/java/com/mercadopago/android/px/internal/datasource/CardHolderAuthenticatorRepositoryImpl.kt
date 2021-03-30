@@ -24,7 +24,7 @@ class CardHolderAuthenticatorRepositoryImpl(
         val body = CardHolderAuthenticatorBody(
             accessToken.split("-").last().toLong(),
             CardHolderAuthenticatorBody.Data(
-                paymentData.rawAmount.toString(),
+                paymentData.rawAmount.setScale(2).toPlainString().replace(".", "").replace(",", ""),
                 paymentSettingRepository.site.id,
                 Date(),
                 CardHolderAuthenticatorBody.Card(

@@ -153,9 +153,9 @@ public final class OneTapSamples {
             .setExpressPaymentEnable(true)
             .build();
 
-        return new MercadoPagoCheckout.Builder(Credentials.ONE_TAP_DIRECT_DISCOUNT_MERCHANT_PUBLIC_KEY, preference,
+        return new MercadoPagoCheckout.Builder("TEST-d1a694aa-b0ee-4dd2-8326-79b1d53a676c", "99997433-f2a40235-2cd9-4d78-9b74-7e0f5693ba7a",
             paymentConfiguration)
-            .setPrivateKey("TEST-3774255615657160-020616-9ef3ce48d70f2f538c865b4bd2068634-62044014")
+            .setPrivateKey("TEST-8362886470442472-090913-6d80a6f8f2bf0bc7b5741de5d952a2b0-7758811")
             .setAdvancedConfiguration(advancedConfiguration)
             .setTrackingConfiguration(trackingConfiguration);
     }
@@ -463,7 +463,7 @@ public final class OneTapSamples {
 
         return new MercadoPagoCheckout.Builder(Credentials.ONE_TAP_MERCHANT_PUBLIC_KEY, preference,
             paymentConfiguration)
-            .setPrivateKey(Credentials.ONE_TAP_PAYER_1_ACCESS_TOKEN)
+            .setPrivateKey("TEST-8362886470442472-090913-6d80a6f8f2bf0bc7b5741de5d952a2b0-7758811")
             .setAdvancedConfiguration(
                 new AdvancedConfiguration.Builder().setProductId(PRODUCT_ID).setExpressPaymentEnable(true)
                     .build());
