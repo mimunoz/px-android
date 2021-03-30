@@ -362,11 +362,11 @@ import java.util.List;
 
     public void onDisabledDescriptorViewClick() {
         final String payerPaymentMethodId = customOptionIdSolver.get(getCurrentOneTapItem());
-        final String paymentTypeId =
-            applicationSelectionRepository.get(payerPaymentMethodId).getPaymentMethod().getType();
+        final Application selectedApplication = applicationSelectionRepository.get(payerPaymentMethodId);
+        final String paymentTypeId = selectedApplication.getPaymentMethod().getType();
         getView().showDisabledPaymentMethodDetailDialog(
             disabledPaymentMethodRepository.get(new PayerPaymentMethodKey(payerPaymentMethodId, paymentTypeId)),
-            getCurrentOneTapItem().getStatus());
+            selectedApplication.getStatus());
     }
 
     @Override

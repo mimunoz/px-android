@@ -282,7 +282,8 @@ class ExpressPaymentPresenterTest {
         val disabledPaymentMethod = mock(DisabledPaymentMethod::class.java)
         val statusMetadata = mock(StatusMetadata::class.java)
         `when`(disabledPaymentMethodRepository[any()]).thenReturn(disabledPaymentMethod)
-        `when`(oneTapItem.status).thenReturn(statusMetadata)
+        `when`(applicationSelectionRepository[any()]).thenReturn(application)
+        `when`(application.status).thenReturn(statusMetadata)
 
         expressPaymentPresenter.onDisabledDescriptorViewClick()
 

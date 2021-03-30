@@ -30,7 +30,7 @@ internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
             .setOdrFlag(true)
             .setComboCard(true)
             .setHybridCard(true)
-            .addValidationPrograms(listOf(Application.KnownValidationProgram.STP.name))
+            .addValidationPrograms(listOf(Application.KnownValidationProgram.STP.name.toLowerCase(Locale.ROOT)))
             .build()
 
         val body = JsonUtil.getMapFromObject(InitRequest.Builder(checkout.publicKey)
