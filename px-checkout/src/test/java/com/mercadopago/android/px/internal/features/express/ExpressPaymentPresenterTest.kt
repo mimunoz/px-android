@@ -29,6 +29,7 @@ import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.AbortEvent
 import com.mercadopago.android.px.tracking.internal.events.BackEvent
 import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrack
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker
 import com.mercadopago.android.px.utils.StubFailMpCall
 import org.junit.Before
@@ -167,13 +168,19 @@ class ExpressPaymentPresenterTest {
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
             payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository, checkoutRepository,
-            amountConfigurationRepository, chargeRepository, escManagerBehaviour, paymentMethodDrawableItemMapper,
+            amountConfigurationRepository, chargeRepository, escManagerBehaviour,
             experimentsRepository, payerComplianceRepository, trackingRepository,
-            mock(PaymentMethodDescriptorMapper::class.java), mock(CustomTextsRepository::class.java),
+            mock(CustomTextsRepository::class.java),
+            oneTapItemRepository, payerPaymentMethodRepository,
+            modalRepository,
+            customOptionIdSolver,
+            paymentMethodDrawableItemMapper,
+            mock(PaymentMethodDescriptorMapper::class.java),
             summaryDetailDescriptorMapper,
             summaryInfoMapper,
-            elementDescriptorMapper, tracker, oneTapItemRepository, payerPaymentMethodRepository,
-            modalRepository, customOptionIdSolver)
+            elementDescriptorMapper,
+            mock(FromApplicationToApplicationInfo::class.java),
+            tracker)
         verifyAttachView()
     }
 

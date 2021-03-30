@@ -22,6 +22,7 @@ import java.util.Set;
 
 public class FromSelectedExpressMetadataToAvailableMethods extends Mapper<OneTapItem, AvailableMethod> {
 
+    @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
     @NonNull private final ApplicationSelectionRepository applicationSelectionRepository;
     @NonNull private final Set<String> cardsWithEsc;
     @Nullable private final PayerCost selectedPayerCost;
@@ -29,9 +30,11 @@ public class FromSelectedExpressMetadataToAvailableMethods extends Mapper<OneTap
 
     public FromSelectedExpressMetadataToAvailableMethods(
         @NonNull final ApplicationSelectionRepository applicationSelectionRepository,
+        @NonNull final FromApplicationToApplicationInfo fromApplicationToApplicationInfo,
         @NonNull final Set<String> cardsWithEsc,
         @Nullable final PayerCost selectedPayerCost, final boolean isSplit) {
         this.applicationSelectionRepository = applicationSelectionRepository;
+        this.fromApplicationToApplicationInfo = fromApplicationToApplicationInfo;
         this.cardsWithEsc = cardsWithEsc;
         this.selectedPayerCost = selectedPayerCost;
         this.isSplit = isSplit;
@@ -55,7 +58,7 @@ public class FromSelectedExpressMetadataToAvailableMethods extends Mapper<OneTap
         final AvailableMethod.Builder builder = new AvailableMethod.Builder(
             paymentMethod.getId(),
             paymentMethod.getType(),
-            hasInterestFree, hasReimbursement);
+            hasInterestFree, hasReimbursement, fromApplicationToApplicationInfo.map(oneTapItem.getApplications()));
 
         if (PaymentTypes.isCardPaymentType(paymentMethod.getType())) {
             final CardMetadata card = oneTapItem.getCard();

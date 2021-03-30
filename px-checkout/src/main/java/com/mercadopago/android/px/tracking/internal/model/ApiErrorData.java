@@ -10,6 +10,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Keep
 public class ApiErrorData extends TrackingMapModel {
+    private final String message;
     private final int status;
     private final List<Cause> causes;
     private final String url;
@@ -26,6 +27,7 @@ public class ApiErrorData extends TrackingMapModel {
             causes = null;
             url = null;
         }
+        message = mercadoPagoError.getMessage();
         retryAvailable = mercadoPagoError.isRecoverable();
     }
 }
