@@ -9,6 +9,9 @@ import com.mercadopago.android.px.addons.model.SecurityValidationData;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.core.internal.TrackingRepositoryModelMapper;
+import com.mercadopago.android.px.internal.audio.AudioPlayer;
+import com.mercadopago.android.px.internal.audio.AudioPlayerDefault;
+import com.mercadopago.android.px.internal.audio.AudioPlayerMuted;
 import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.AmountConfigurationRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.AmountService;
@@ -96,6 +99,7 @@ public final class Session extends ApplicationModule {
     private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
     private UseCaseModule useCaseModule;
     private CustomOptionIdSolver customOptionIdSolver;
+    private AudioPlayer audioPlayer;
     private final NetworkModule networkModule;
 
     private Session(@NonNull final Context context) {
@@ -204,6 +208,7 @@ public final class Session extends ApplicationModule {
         configurationSolver = null;
         cardHolderAuthenticatorRepository = null;
         customOptionIdSolver = null;
+        audioPlayer = null;
     }
 
     @NonNull
@@ -436,6 +441,18 @@ public final class Session extends ApplicationModule {
             tracker = new MPTracker(configurationModule.getTrackingRepository());
         }
         return tracker;
+    }
+
+    @NonNull
+    public AudioPlayer getAudioPlayer() {
+        if (audioPlayer == null) {
+            if (configurationModule.getPaymentSettings().getConfiguration().sonicBrandingEnabled()) {
+                audioPlayer = new AudioPlayerDefault();
+            } else {
+                audioPlayer = new AudioPlayerMuted();
+            }
+        }
+        return audioPlayer;
     }
 
     @NonNull

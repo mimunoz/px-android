@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import com.mercadopago.android.px.addons.model.SecurityValidationData
+import com.mercadopago.android.px.internal.audio.AudioPlayer
 import com.mercadopago.android.px.internal.base.BaseState
 import com.mercadopago.android.px.internal.base.BaseViewModelWithState
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler
@@ -52,6 +53,7 @@ internal class PayButtonViewModel(
     private val paymentCongratsMapper: PaymentCongratsModelMapper,
     private val postPaymentUrlsMapper: PostPaymentUrlsMapper,
     private val factory: PaymentResultViewModelFactory,
+    private val audioPlayer: AudioPlayer,
     tracker: MPTracker) : BaseViewModelWithState<PayButtonViewModel.State>(tracker), PayButton.ViewModel {
 
     val buttonTextLiveData = MutableLiveData<ButtonConfig>()
@@ -268,6 +270,15 @@ internal class PayButtonViewModel(
                     }
                 }
             })
+        }
+    }
+
+    override fun onResultIconAnimation() {
+        state.paymentModel?.paymentResult?.let { it ->
+            when {
+                it.isApproved -> stateUILiveData.postValue(PlayResultAudio(audioPlayer, AudioPlayer.Sound.SUCCESS))
+                it.isRejected -> stateUILiveData.postValue(PlayResultAudio(audioPlayer, AudioPlayer.Sound.FAILURE))
+            }
         }
     }
 
