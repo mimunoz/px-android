@@ -7,6 +7,7 @@ import com.mercadopago.android.px.internal.repository.PayerCostSelectionReposito
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
+import com.mercadopago.android.px.tracking.internal.events.ComboSwitchEvent;
 import org.jetbrains.annotations.Nullable;
 
 class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implements PaymentMethod.Action {
@@ -55,6 +56,7 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
 
     @Override
     public void onApplicationChanged(@NonNull final String paymentTypeId) {
+        getTracker().track(new ComboSwitchEvent(paymentTypeId));
         item.getCommonsByApplication().update(paymentTypeId);
         onFocusOut();
         getView().updateView();
