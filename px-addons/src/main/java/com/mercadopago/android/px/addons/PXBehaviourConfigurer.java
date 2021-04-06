@@ -8,6 +8,7 @@ public final class PXBehaviourConfigurer {
     private ESCManagerBehaviour escManagerBehaviour;
     private TrackingBehaviour trackingBehaviour;
     private FlowBehaviour flowBehaviour;
+    private ThreeDSBehaviour threeDSBehaviour;
 
     public PXBehaviourConfigurer with(@NonNull final ESCManagerBehaviour escManagerBehaviour) {
         this.escManagerBehaviour = escManagerBehaviour;
@@ -34,10 +35,16 @@ public final class PXBehaviourConfigurer {
         return this;
     }
 
+    public PXBehaviourConfigurer with(@NonNull final ThreeDSBehaviour threeDSBehaviour) {
+        this.threeDSBehaviour = threeDSBehaviour;
+        return this;
+    }
+
     public void configure() {
         BehaviourProvider.set(securityBehaviour);
         BehaviourProvider.set(escManagerBehaviour);
         BehaviourProvider.set(trackingBehaviour);
         BehaviourProvider.set(flowBehaviour);
+        BehaviourProvider.set(threeDSBehaviour);
     }
 }
