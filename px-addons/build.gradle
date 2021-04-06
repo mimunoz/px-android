@@ -11,4 +11,5 @@ dependencies {
 
     implementation "androidx.appcompat:appcompat:$appcompat"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlin"
 }
