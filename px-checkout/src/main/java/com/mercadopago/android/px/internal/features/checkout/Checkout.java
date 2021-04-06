@@ -33,8 +33,6 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
         void onErrorCancel(@Nullable final MercadoPagoError mercadoPagoError);
 
-        void onHalted();
-
         void recoverFromFailure();
 
         void onPaymentResultResponse(@Nullable final Integer customResultCode, @Nullable final String backUrl,

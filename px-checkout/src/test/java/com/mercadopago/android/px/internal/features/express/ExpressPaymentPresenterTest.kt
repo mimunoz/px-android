@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.features.express
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
-import com.mercadopago.android.px.any
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
@@ -38,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.mockito.kotlin.any
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -164,7 +164,7 @@ class ExpressPaymentPresenterTest {
         `when`(applicationPaymentMethod.type).thenReturn("credit_card")
         `when`(application.paymentMethod).thenReturn(applicationPaymentMethod)
         `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
-        `when`(summaryInfoMapper.map(any(CheckoutPreference::class.java))).thenReturn(mock(SummaryInfo::class.java))
+        `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
             payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository, checkoutRepository,

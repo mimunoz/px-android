@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Observer;
-import com.mercadopago.android.px.KArgumentCaptor;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.core.internal.PaymentWrapper;
@@ -13,6 +12,7 @@ import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
+import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
@@ -60,11 +60,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static com.mercadopago.android.px.ArgumentCaptorKt.argumentCaptor;
 import static com.mercadopago.android.px.utils.ReflectionArgumentMatchers.reflectionEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -326,11 +326,11 @@ public class PaymentServiceTest {
 
     @Test
     public void whenOneTapPaymentWhenHasTokenAndPaymentSuccess() {
-        final KArgumentCaptor<SplitPaymentProcessor.CheckoutData> checkoutDataCaptor =
-            argumentCaptor(SplitPaymentProcessor.CheckoutData.class);
+        final ArgumentCaptor<SplitPaymentProcessor.CheckoutData> checkoutDataCaptor =
+            ArgumentCaptor.forClass(SplitPaymentProcessor.CheckoutData.class);
 
-        final KArgumentCaptor<Function1> validationProgramSuccessCaptor =
-            argumentCaptor(Function1.class);
+        final ArgumentCaptor<Function1> validationProgramSuccessCaptor =
+            ArgumentCaptor.forClass(Function1.class);
 
         savedCreditCardOneTapPresent(CARD_ID_ESC_NOT_AVAILABLE);
         when(paymentSettingRepository.hasToken()).thenReturn(true);
