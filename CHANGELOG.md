@@ -1,3 +1,7 @@
+## VERSION 4.74.0
+_06_04_2021_
+* FEATURE - ThreeDSBehaviour added
+
 ## VERSION 4.73.1
 _30_03_2021_
 * FIX - Retry build to address card form signature problem.
