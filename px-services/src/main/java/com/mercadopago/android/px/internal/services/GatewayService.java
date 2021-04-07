@@ -18,9 +18,6 @@ import retrofit2.http.Query;
 public interface GatewayService {
 
     @POST("/v1/card_tokens")
-    MPCall<Token> createToken(@Query("public_key") String publicKey, @Body RequestBody body);
-
-    @POST("/v1/card_tokens")
     MPCall<Token> createToken(@Query("public_key") String publicKey, @Nullable @Query("access_token") String privateKey,
         @Body CardToken cardToken);
 

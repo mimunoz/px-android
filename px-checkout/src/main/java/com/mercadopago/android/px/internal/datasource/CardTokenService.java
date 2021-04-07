@@ -14,8 +14,6 @@ import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.requests.SecurityCodeIntent;
 import com.mercadopago.android.px.services.Callback;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 import static com.mercadopago.android.px.services.BuildConfig.API_ENVIRONMENT_NEW;
 
@@ -47,20 +45,9 @@ public class CardTokenService implements CardTokenRepository {
     @Override
     public MPCall<Token> createToken(final SavedESCCardToken savedESCCardToken) {
         savedESCCardToken.setDevice(device);
-        final RequestBody body = RequestBody.create(MediaType.parse("application/json"), "{\n" +
-            "   \"cardholder\": {\n" +
-            "       \"name\": \"JohnDoe Anytown\",\n" +
-            "       \"identification\": {\n" +
-            "           \"number\": \"339.592.238-38\",\n" +
-            "           \"type\": \"CPF\"\n" +
-            "       }\n" +
-            "   },\n" +
-            "   \"card_number\": \"2303770003400004\",\n" +
-            "   \"security_code\": \"832\",\n" +
-            "   \"expiration_year\": 2026,\n" +
-            "   \"expiration_month\": 5\n" +
-            "}");
-        return gatewayService.createToken("APP_USR-5a2b9e27-690d-4f2b-a1a4-8d08b37ee5f3", body);
+        return gatewayService
+            .createToken(paymentSettingRepository.getPublicKey(), paymentSettingRepository.getPrivateKey(),
+                savedESCCardToken);
     }
 
     @Override
