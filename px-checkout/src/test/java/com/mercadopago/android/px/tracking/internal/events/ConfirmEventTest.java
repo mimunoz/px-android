@@ -9,6 +9,7 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.Application.PaymentMethod;
 import com.mercadopago.android.px.model.internal.OneTapItem;
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo;
 import com.mercadopago.android.px.tracking.internal.mapper.FromSelectedExpressMetadataToAvailableMethods;
 import com.mercadopago.android.px.tracking.internal.model.ConfirmData;
 import java.math.BigDecimal;
@@ -27,9 +28,9 @@ public class ConfirmEventTest {
 
     private static final String EXPECTED_PATH = "/px_checkout/review/confirm";
     private static final String EXPECTED_JUST_CARD =
-        "{review_type=one_tap, payment_method_selected_index=2, payment_method_id=visa, payment_method_type=credit_card, extra_info={has_interest_free=false, issuer_id=0, has_split=false, has_reimbursement=false, card_id=123, selected_installment={quantity=1, installment_amount=10, visible_total_price=10, interest_rate=10}, has_esc=false}}";
+        "{review_type=one_tap, payment_method_selected_index=2, payment_method_id=visa, payment_method_type=credit_card, extra_info={has_interest_free=false, issuer_id=0, has_split=false, has_reimbursement=false, card_id=123, selected_installment={quantity=1, installment_amount=10, visible_total_price=10, interest_rate=10}, applications=[], has_esc=false}}";
     private static final String EXPECTED_JUST_AM =
-        "{review_type=one_tap, payment_method_selected_index=2, payment_method_id=account_money, payment_method_type=account_money, extra_info={has_interest_free=false, balance=10, has_reimbursement=false, invested=true}}";
+        "{review_type=one_tap, payment_method_selected_index=2, payment_method_id=account_money, payment_method_type=account_money, extra_info={has_interest_free=false, balance=10, has_reimbursement=false, invested=true, applications=[]}}";
     private static final int PAYMENT_METHOD_SELECTED_INDEX = 2;
 
     @Mock private OneTapItem oneTapItem;
@@ -41,7 +42,10 @@ public class ConfirmEventTest {
     private ConfirmEvent getConfirmEvent(final PayerCost payerCost) {
         final ConfirmData
             confirmTrackerData = new ConfirmData(ConfirmData.ReviewType.ONE_TAP, PAYMENT_METHOD_SELECTED_INDEX,
-            new FromSelectedExpressMetadataToAvailableMethods(applicationSelectionRepository, cardIdsWithEsc,
+            new FromSelectedExpressMetadataToAvailableMethods(
+                applicationSelectionRepository,
+                mock(FromApplicationToApplicationInfo.class),
+                cardIdsWithEsc,
                 payerCost, false)
                 .map(oneTapItem));
         return new ConfirmEvent(confirmTrackerData);

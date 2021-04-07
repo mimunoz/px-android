@@ -99,7 +99,7 @@ internal class PaymentMethodDrawableItemMapper(
             displayInfo?.bottomDescription,
             oneTapItem.benefits?.reimbursement,
             genericDialogItem,
-            cardDrawerCustomViewModelMapper.mapToSwitchModel(displayInfo?.cardDrawerSwitch)
+            cardDrawerCustomViewModelMapper.mapToSwitchModel(displayInfo?.cardDrawerSwitch, paymentMethodType)
         )
     }
 }

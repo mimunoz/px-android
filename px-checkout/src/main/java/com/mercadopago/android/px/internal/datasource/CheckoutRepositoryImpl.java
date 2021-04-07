@@ -176,7 +176,8 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
             .setOdrFlag(true)
             .setComboCard(true)
             .setHybridCard(true)
-            .addValidationPrograms(Collections.singletonList(Application.KnownValidationProgram.STP.name()))
+            .addValidationPrograms(
+                Collections.singletonList(Application.KnownValidationProgram.STP.name().toLowerCase()))
             .build();
 
         final Map<String, Object> body = JsonUtil.getMapFromObject(

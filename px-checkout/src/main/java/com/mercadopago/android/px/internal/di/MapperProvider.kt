@@ -7,6 +7,7 @@ import com.mercadopago.android.px.internal.features.payment_result.remedies.Alte
 import com.mercadopago.android.px.internal.mappers.*
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 
 internal object MapperProvider {
     fun getPaymentMethodDrawableItemMapper(): PaymentMethodDrawableItemMapper {
@@ -84,4 +85,7 @@ internal object MapperProvider {
             getAmountDescriptorMapper()
         )
     }
+
+    val fromApplicationToApplicationInfo: FromApplicationToApplicationInfo
+        get() = FromApplicationToApplicationInfo()
 }

@@ -82,6 +82,7 @@ import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrac
 import com.mercadopago.android.px.tracking.internal.events.SuspendedFrictionTracker;
 import com.mercadopago.android.px.tracking.internal.events.SwipeOneTapEventTracker;
 import com.mercadopago.android.px.tracking.internal.events.TargetBehaviourEvent;
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo;
 import com.mercadopago.android.px.tracking.internal.mapper.FromSelectedExpressMetadataToAvailableMethods;
 import com.mercadopago.android.px.tracking.internal.model.ConfirmData;
 import com.mercadopago.android.px.tracking.internal.model.TargetBehaviourTrackData;
@@ -114,8 +115,9 @@ import java.util.List;
     @NonNull private final ModalRepository modalRepository;
     @NonNull private final CustomOptionIdSolver customOptionIdSolver;
     @NonNull /* default */ final CheckoutRepository checkoutRepository;
-    private final PayerCostSelectionRepository payerCostSelectionRepository;
-    private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
+    @NonNull private final PayerCostSelectionRepository payerCostSelectionRepository;
+    @NonNull private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
+    @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
     /* default */ TriggerableQueue triggerableQueue;
 
     /* default */ ExpressPaymentPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -128,20 +130,21 @@ import java.util.List;
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final ChargeRepository chargeRepository,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
-        @NonNull final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper,
         @NonNull final ExperimentsRepository experimentsRepository,
         @NonNull final PayerComplianceRepository payerComplianceRepository,
         @NonNull final TrackingRepository trackingRepository,
-        @NonNull final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper,
         @NonNull final CustomTextsRepository customTextsRepository,
-        @NonNull final SummaryDetailDescriptorMapper summaryDetailDescriptorMapper,
-        @NonNull final SummaryInfoMapper summaryInfoMapper,
-        @NonNull final ElementDescriptorMapper elementDescriptorMapper,
-        @NonNull final MPTracker tracker,
         @NonNull final OneTapItemRepository oneTapItemRepository,
         @NonNull final PayerPaymentMethodRepository payerPaymentMethodRepository,
         @NonNull final ModalRepository modalRepository,
-        @NonNull final CustomOptionIdSolver customOptionIdSolver) {
+        @NonNull final CustomOptionIdSolver customOptionIdSolver,
+        @NonNull final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper,
+        @NonNull final PaymentMethodDescriptorMapper paymentMethodDescriptorMapper,
+        @NonNull final SummaryDetailDescriptorMapper summaryDetailDescriptorMapper,
+        @NonNull final SummaryInfoMapper summaryInfoMapper,
+        @NonNull final ElementDescriptorMapper elementDescriptorMapper,
+        @NonNull final FromApplicationToApplicationInfo fromApplicationToApplicationInfo,
+        @NonNull final MPTracker tracker) {
         super(tracker);
         this.paymentSettingRepository = paymentSettingRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
@@ -161,6 +164,7 @@ import java.util.List;
         this.customTextsRepository = customTextsRepository;
         this.summaryInfoMapper = summaryInfoMapper;
         this.elementDescriptorMapper = elementDescriptorMapper;
+        this.fromApplicationToApplicationInfo = fromApplicationToApplicationInfo;
         this.summaryDetailDescriptorMapper = summaryDetailDescriptorMapper;
         this.oneTapItemRepository = oneTapItemRepository;
         this.payerPaymentMethodRepository = payerPaymentMethodRepository;
@@ -241,7 +245,9 @@ import java.util.List;
 
     private void trackOneTapView() {
         final OneTapViewTracker oneTapViewTracker =
-            new OneTapViewTracker(oneTapItemRepository.getValue(),
+            new OneTapViewTracker(
+                fromApplicationToApplicationInfo,
+                oneTapItemRepository.getValue(),
                 paymentSettingRepository.getCheckoutPreference(),
                 discountRepository.getCurrentConfiguration(), escManagerBehaviour.getESCCardIds(),
                 payerPaymentMethodRepository.getIdsWithSplitAllowed(),
@@ -356,11 +362,11 @@ import java.util.List;
 
     public void onDisabledDescriptorViewClick() {
         final String payerPaymentMethodId = customOptionIdSolver.get(getCurrentOneTapItem());
-        final String paymentTypeId =
-            applicationSelectionRepository.get(payerPaymentMethodId).getPaymentMethod().getType();
+        final Application selectedApplication = applicationSelectionRepository.get(payerPaymentMethodId);
+        final String paymentTypeId = selectedApplication.getPaymentMethod().getType();
         getView().showDisabledPaymentMethodDetailDialog(
             disabledPaymentMethodRepository.get(new PayerPaymentMethodKey(payerPaymentMethodId, paymentTypeId)),
-            getCurrentOneTapItem().getStatus());
+            selectedApplication.getStatus());
     }
 
     @Override
@@ -504,7 +510,8 @@ import java.util.List;
         final List<Experiment> experiments = new ArrayList<>();
         final ConfirmData confirmData =
             new ConfirmData(ConfirmData.ReviewType.ONE_TAP, getState().getPaymentMethodIndex(),
-                new FromSelectedExpressMetadataToAvailableMethods(applicationSelectionRepository,
+                new FromSelectedExpressMetadataToAvailableMethods(
+                    applicationSelectionRepository, fromApplicationToApplicationInfo,
                     escManagerBehaviour.getESCCardIds(), configuration.getPayerCost(), configuration.getSplitPayment())
                     .map(getCurrentOneTapItem()));
         final Experiment experiment = experimentsRepository.getExperiment(KnownExperiment.INSTALLMENTS_HIGHLIGHT);

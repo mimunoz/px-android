@@ -1,13 +1,13 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import androidx.annotation.NonNull;
-import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
+import com.mercadopago.android.px.tracking.internal.events.ComboSwitchEvent;
 import org.jetbrains.annotations.Nullable;
 
 class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implements PaymentMethod.Action {
@@ -56,20 +56,9 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
 
     @Override
     public void onApplicationChanged(@NonNull final String paymentTypeId) {
+        getTracker().track(new ComboSwitchEvent(paymentTypeId));
         item.getCommonsByApplication().update(paymentTypeId);
         onFocusOut();
-        final SwitchModel old = item.getSwitchModel();
-        if (old != null) {
-            item.setSwitchModel(
-                new SwitchModel(
-                    old.getDescription(),
-                    old.getStates(),
-                    old.getOptions(),
-                    old.getSwitchBackgroundColor(),
-                    old.getPillBackgroundColor(),
-                    old.getSafeZoneBackgroundColor(),
-                    paymentTypeId));
-        }
         getView().updateView();
         getView().updateState();
     }
