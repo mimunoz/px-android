@@ -20,8 +20,6 @@ android {
 }
 
 dependencies {
-    androidTestImplementation project(':testlib')
-
     testImplementation "junit:junit:$junit"
     testImplementation "org.mockito:mockito-core:$mockito"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlin"

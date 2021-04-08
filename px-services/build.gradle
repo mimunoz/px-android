@@ -44,8 +44,6 @@ android {
 }
 
 dependencies {
-    androidTestImplementation project(":testlib")
-
     implementation project(':px-addons')
     implementation "androidx.appcompat:appcompat:$appcompat"
     implementation "com.google.code.gson:gson:$gson"

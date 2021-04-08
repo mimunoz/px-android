@@ -71,8 +71,6 @@ dependencies {
 
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
-    androidTestImplementation project(':px-testlib')
-    androidTestImplementation project(':testlib')
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle"
     implementation "androidx.lifecycle:lifecycle-livedata-core:$lifecycle"
