@@ -15,6 +15,7 @@ import com.mercadopago.android.px.internal.view.LabeledSwitch;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.model.Currency;
 import com.mercadopago.android.px.model.Split;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
 public class SplitPaymentHeaderAdapter extends HubableAdapter<List<SplitPaymentHeaderAdapter.Model>, LabeledSwitch>
@@ -104,7 +105,7 @@ public class SplitPaymentHeaderAdapter extends HubableAdapter<List<SplitPaymentH
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
+        @NonNull final SplitSelectionState splitSelectionState, final @NonNull Application application) {
         // Empty data case
         if (currentIndex >= data.size()) {
             new Empty().visit(view);

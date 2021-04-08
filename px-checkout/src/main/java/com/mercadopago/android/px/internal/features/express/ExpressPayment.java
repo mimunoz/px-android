@@ -21,6 +21,7 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.model.StatusMetadata;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import java.util.List;
@@ -45,7 +46,8 @@ public interface ExpressPayment {
 
         void updateViewForPosition(final int paymentMethodIndex,
             final int payerCostSelected,
-            @NonNull final SplitSelectionState splitSelectionState);
+            @NonNull final SplitSelectionState splitSelectionState,
+            @NonNull final Application application);
 
         void updateInstallmentsList(final int selectedIndex, @NonNull List<InstallmentRowHolder.Model> models);
 
@@ -127,6 +129,8 @@ public interface ExpressPayment {
         void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback);
 
         void onCardFormResult();
+
+        void onApplicationChanged(@NonNull final String paymentTypeId);
     }
 
     enum NavigationState {

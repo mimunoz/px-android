@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.view.SummaryView;
 import com.mercadopago.android.px.internal.viewmodel.GoingToModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.internal.viewmodel.SummaryModel;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
-public class SummaryViewAdapter extends HubableAdapter<List<SummaryView.Model>, SummaryView> {
+public class SummaryViewAdapter extends HubableAdapter<List<SummaryModel>, SummaryView> {
 
     private static final int NO_SELECTED = -1;
 
@@ -19,11 +21,15 @@ public class SummaryViewAdapter extends HubableAdapter<List<SummaryView.Model>, 
 
     @Override
     public void updateData(final int index, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
-        final SummaryView.Model nextModel = data.get(index);
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application) {
+        final SummaryModel model = data.get(index);
+        model.update(application);
+
+        final SummaryView.Model nextModel = model.getCurrent();
         if (!nextModel.equals(currentModel)) {
             view.update(nextModel);
         }
+
         currentIndex = index;
         currentModel = nextModel;
     }
@@ -40,7 +46,7 @@ public class SummaryViewAdapter extends HubableAdapter<List<SummaryView.Model>, 
             return;
         }
         //We only animate if the models are different
-        if (!currentModel.equals(data.get(nextIndex))) {
+        if (!currentModel.equals(data.get(nextIndex).getCurrent())) {
             if (goingTo == GoingToModel.BACKWARDS) {
                 positionOffset = 1.0f - positionOffset;
             }
@@ -49,21 +55,23 @@ public class SummaryViewAdapter extends HubableAdapter<List<SummaryView.Model>, 
     }
 
     @Override
-    public void update(@NonNull final List<SummaryView.Model> newData) {
+    public void update(@NonNull final List<SummaryModel> newData) {
         super.update(newData);
         view.setMaxElementsToShow(getMaxItemsInSummaryAvailable());
     }
 
     private int getMaxItemsInSummaryAvailable() {
         int maxItems = 0;
-        for (final SummaryView.Model model : data) {
-            maxItems = Math.max(maxItems, model.getElementsSize());
+        for (final SummaryModel summaryModel : data) {
+            for (final SummaryView.Model model : summaryModel.getSummaryViewModelMap().values()) {
+                maxItems = Math.max(maxItems, model.getElementsSize());
+            }
         }
         return maxItems;
     }
 
     @Override
-    public List<SummaryView.Model> getNewModels(final HubAdapter.Model model) {
+    public List<SummaryModel> getNewModels(final HubAdapter.Model model) {
         return model.summaryViewModels;
     }
 }

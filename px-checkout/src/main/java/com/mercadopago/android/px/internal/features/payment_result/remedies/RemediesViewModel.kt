@@ -4,7 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.internal.base.BaseState
 import com.mercadopago.android.px.internal.base.BaseViewModelWithState
-import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodIdToCardMapper
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
+import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
 import com.mercadopago.android.px.internal.repository.*
@@ -34,9 +35,10 @@ internal class RemediesViewModel(
     private val cardTokenRepository: CardTokenRepository,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val amountConfigurationRepository: AmountConfigurationRepository,
-    tracker: MPTracker,
-    private val expressMetadataRepository: ExpressMetadataRepository,
-    private val fromPayerPaymentMethodIdToCardMapper: FromPayerPaymentMethodIdToCardMapper
+    private val applicationSelectionRepository: ApplicationSelectionRepository,
+    oneTapItemRepository: OneTapItemRepository,
+    fromPayerPaymentMethodToCardMapper: FromPayerPaymentMethodToCardMapper,
+    tracker: MPTracker
 ) : BaseViewModelWithState<RemediesViewModel.State>(tracker), Remedies.ViewModel {
 
     val remedyState: MutableLiveData<RemedyState> = MutableLiveData()
@@ -47,20 +49,24 @@ internal class RemediesViewModel(
     init {
         val methodIds = getMethodIds()
         val customOptionId = methodIds.customOptionId
-        CoroutineScope(Dispatchers.IO).launch {
-            val methodData = expressMetadataRepository.value.find { it.customOptionId == customOptionId }
-            card = fromPayerPaymentMethodIdToCardMapper.map(methodData?.customOptionId)
-            paymentConfiguration = PaymentConfiguration(methodIds.methodId, methodIds.typeId, customOptionId,
-                card != null, false, getPayerCost(customOptionId))
-            withContext(Dispatchers.Main) {
-                remediesModel.retryPayment?.let {
-                    remedyState.value = RemedyState.ShowRetryPaymentRemedy(Pair(it, methodData))
-                }
-                remediesModel.highRisk?.let {
-                    remedyState.value = RemedyState.ShowKyCRemedy(it)
-                }
+        val methodData = oneTapItemRepository[customOptionId]
+        card = fromPayerPaymentMethodToCardMapper.map(
+            PayerPaymentMethodKey(customOptionId, methodIds.typeId))
+        remediesModel.retryPayment?.let {
+            if (isSilverBullet) {
+                val paymentTypeId = previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
+                applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(methodData)] =
+                    methodData.getApplications().first { application ->
+                        application.paymentMethod.type == paymentTypeId
+                    }
             }
+            remedyState.value = RemedyState.ShowRetryPaymentRemedy(Pair(it, methodData))
         }
+        remediesModel.highRisk?.let {
+            remedyState.value = RemedyState.ShowKyCRemedy(it)
+        }
+        paymentConfiguration = PaymentConfiguration(methodIds.methodId, methodIds.typeId, customOptionId,
+            card?.isSecurityCodeRequired() == true, false, getPayerCost(customOptionId))
     }
 
     override fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback) {
@@ -93,7 +99,7 @@ internal class RemediesViewModel(
                 remedies.suggestedPaymentMethod?.alternativePaymentMethod?.installmentsList?.run {
                     if (isNotEmpty()) {
                         get(0).let {
-                            amountConfigurationRepository.getConfigurationFor(customOptionId)?.run {
+                            amountConfigurationRepository.getConfigurationSelectedFor(customOptionId)?.run {
                                 for (i in 0 until payerCosts.size) {
                                     val payerCost = payerCosts[i]
                                     if (payerCost.installments == it.installments) {

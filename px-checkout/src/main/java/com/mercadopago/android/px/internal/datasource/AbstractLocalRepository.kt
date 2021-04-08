@@ -5,7 +5,7 @@ import com.mercadopago.android.px.internal.core.FileManager
 import com.mercadopago.android.px.internal.repository.LocalRepository
 import java.io.File
 
-abstract class AbstractLocalRepository<T>(private val fileManager: FileManager) : LocalRepository<T> {
+internal abstract class AbstractLocalRepository<T>(private val fileManager: FileManager) : LocalRepository<T> {
     abstract val file: File
     private var internalValue: T? = null
     override val value: T

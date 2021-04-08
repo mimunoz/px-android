@@ -1,17 +1,21 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.CallSuper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import com.meli.android.carddrawer.model.CardDrawerView;
+import com.meli.android.carddrawer.model.customview.CardDrawerSwitch;
+import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BasePagerFragment;
 import com.mercadopago.android.px.internal.di.Session;
@@ -31,13 +35,30 @@ import java.util.Arrays;
 import static com.mercadopago.android.px.internal.util.AccessibilityUtilsKt.executeIfAccessibilityTalkBackEnable;
 
 public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
-    extends BasePagerFragment<PaymentMethodPresenter, T> implements PaymentMethod.View, Focusable, GenericDialog.Listener {
+    extends BasePagerFragment<PaymentMethodPresenter, T>
+    implements PaymentMethod.View, Focusable, GenericDialog.Listener {
+
+    private static final String SWITCH_MODEL_EXTRA = "switch_model";
+    private static final int CONTENT_DESCRIPTION_DELAY = 800;
 
     private CardView card;
     private BottomSlideAnimationSet animation;
     private boolean focused;
     private MPTextView bottomDescription;
     private Handler handler;
+    private CardDrawerView cardDrawerView;
+    @Nullable
+    private SwitchModel switchModel;
+    private PaymentMethodPagerListener listener = paymentTypeId -> {
+    };
+
+    @Override
+    public void onAttach(@NonNull final Context context) {
+        super.onAttach(context);
+        if (getParentFragment() instanceof PaymentMethodPagerListener) {
+            listener = (PaymentMethodPagerListener) getParentFragment();
+        }
+    }
 
     @Override
     protected PaymentMethodPresenter createPresenter() {
@@ -58,23 +79,31 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initializeViews(view);
-        final GenericDialogItem genericDialogItem = model.getGenericDialogItem();
-        if (isDisableMethod()) {
-            disable();
-        } else if (genericDialogItem != null) {
-            card.setOnClickListener(v -> GenericDialog.showDialog(getChildFragmentManager(), genericDialogItem));
+
+        if (savedInstanceState != null) {
+            switchModel = savedInstanceState.getParcelable(SWITCH_MODEL_EXTRA);
         }
+
+        initializeViews(view);
+        updateState();
     }
 
     protected boolean isDisableMethod() {
-        return model.getDisabledPaymentMethod() != null;
+        return model.getCommonsByApplication().getCurrent().getDisabledPaymentMethod() != null;
     }
 
     @CallSuper
     public void initializeViews(@NonNull final View view) {
         card = view.findViewById(R.id.payment_method);
         bottomDescription = view.findViewById(R.id.bottom_description);
+        cardDrawerView = view.findViewById(R.id.card);
+        updateView();
+        setUpCardDrawerCustomView();
+    }
+
+    @Override
+    public void updateView() {
+        final View view = getView();
         if (model.shouldHighlightBottomDescription()) {
             final View highlightContainer = view.findViewById(R.id.bottom_description_container);
             highlightContainer.setVisibility(View.INVISIBLE);
@@ -89,6 +118,57 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         if (hasFocus()) {
             onFocusIn();
         }
+        if (cardDrawerView != null) {
+            updateCardDrawerView(cardDrawerView);
+        }
+    }
+
+    @Override
+    public void updateState() {
+        if (isDisableMethod()) {
+            disable();
+        } else {
+            enable();
+        }
+    }
+
+    protected abstract void updateCardDrawerView(@NonNull final CardDrawerView cardDrawerView);
+
+    private void setUpCardDrawerCustomView() {
+        switchModel = switchModel != null ? switchModel : model.getSwitchModel();
+        if (cardDrawerView != null && switchModel != null) {
+            final CardDrawerSwitch cardDrawerSwitch = new CardDrawerSwitch(getContext());
+            cardDrawerSwitch.setSwitchModel(switchModel);
+            cardDrawerSwitch.setConfiguration(cardDrawerView.buildCustomViewConfiguration());
+            cardDrawerView.setCustomView(cardDrawerSwitch);
+            cardDrawerSwitch.setSwitchListener(this::onApplicationChanged);
+        }
+    }
+
+    private void onApplicationChanged(@NonNull final String paymentTypeId) {
+        updateSwitchModel(paymentTypeId);
+        listener.onApplicationChanged(paymentTypeId);
+        presenter.onApplicationChanged(paymentTypeId);
+    }
+
+    private void updateSwitchModel(@NonNull final String paymentTypeId) {
+        final SwitchModel old = model.getSwitchModel();
+        if (old != null) {
+            switchModel = new SwitchModel(
+                old.getDescription(),
+                old.getStates(),
+                old.getOptions(),
+                old.getSwitchBackgroundColor(),
+                old.getPillBackgroundColor(),
+                old.getSafeZoneBackgroundColor(),
+                paymentTypeId);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(SWITCH_MODEL_EXTRA, switchModel);
     }
 
     protected String getAccessibilityContentDescription() {
@@ -142,7 +222,8 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
 
         if (isDisableMethod()) {
-            String statusMessage = model.getStatus().getMainMessage().getMessage();
+            String statusMessage =
+                model.getCommonsByApplication().getCurrent().getStatus().getMainMessage().getMessage();
             statusMessage = TextUtil.isNotEmpty(statusMessage) ? statusMessage : TextUtil.EMPTY;
             if (TextUtil.isNotEmpty(statusMessage)) {
                 setDescriptionForAccessibility(statusMessage);
@@ -150,7 +231,7 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         }
     }
 
-    private void setDescriptionForAccessibility(@NonNull final String description) {
+    private void setDescriptionForAccessibility(@NonNull final CharSequence description) {
         final View rootView = getView();
         final DynamicHeightViewPager parent;
         if (rootView != null && rootView.getParent() instanceof DynamicHeightViewPager &&
@@ -158,7 +239,7 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
             parent.announceForAccessibility(description);
         }
         if (handler != null) {
-            handler.postDelayed(() -> card.setContentDescription(description), 800);
+            handler.postDelayed(() -> card.setContentDescription(description), CONTENT_DESCRIPTION_DELAY);
         }
     }
 
@@ -196,7 +277,8 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @Override
     public void disable() {
         final Fragment parentFragment = getParentFragment();
-        final DisabledPaymentMethod disabledPaymentMethod = model.getDisabledPaymentMethod();
+        final DisabledPaymentMethod disabledPaymentMethod =
+            model.getCommonsByApplication().getCurrent().getDisabledPaymentMethod();
 
         if (!(parentFragment instanceof DisabledDetailDialogLauncher)) {
             throw new IllegalStateException(
@@ -210,7 +292,15 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         card.setOnClickListener(
             v -> DisabledPaymentMethodDetailDialog
                 .showDialog(parentFragment, ((DisabledDetailDialogLauncher) parentFragment).getRequestCode(),
-                    disabledPaymentMethod.getPaymentStatusDetail(), model.getStatus()));
+                    disabledPaymentMethod.getPaymentStatusDetail(),
+                    model.getCommonsByApplication().getCurrent().getStatus()));
+    }
+
+    public void enable() {
+        final GenericDialogItem genericDialogItem = model.getGenericDialogItem();
+        if (genericDialogItem != null) {
+            card.setOnClickListener(v -> GenericDialog.showDialog(getChildFragmentManager(), genericDialogItem));
+        }
     }
 
     @Override
@@ -245,5 +335,9 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         default int getRequestCode() {
             return 0;
         }
+    }
+
+    public interface PaymentMethodPagerListener {
+        void onApplicationChanged(@NonNull final String paymentTypeId);
     }
 }

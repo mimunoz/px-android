@@ -5,24 +5,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    app:layout_constraintHeight_percent="0.1835"
+    app:layout_constraintHeight_percent="0.1"
     app:layout_constraintBottom_toBottomOf="parent"
-    tools:showIn="@layout/px_fragment_saved_card"
-    tools:layout_height="29dp"
+    tools:showIn="@layout/px_fragment_card"
     android:orientation="vertical">
 
     <View
         android:id="@+id/bottom_description_shadow"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="1"
         android:background="@drawable/shadow_top" />
 
     <FrameLayout
         android:id="@+id/bottom_description_background"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="24"
+        android:layout_weight="4"
         android:background="@color/px_color_highlight">
 
         <com.mercadopago.android.px.internal.view.MPTextView
@@ -33,7 +32,7 @@
             android:layout_marginEnd="@dimen/px_s_alternative_1_margin"
             android:gravity="center"
             android:textColor="@color/ui_meli_white"
-            android:textSize="@dimen/px_xs_text"
+            android:textSize="@dimen/px_xxxs_text"
             android:ellipsize="end"
             android:maxLines="1"
             app:customStyle="semi_bold"

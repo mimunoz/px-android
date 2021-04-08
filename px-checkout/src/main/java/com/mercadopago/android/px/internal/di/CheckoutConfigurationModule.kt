@@ -9,10 +9,7 @@ internal class CheckoutConfigurationModule(context: Context) : ConfigurationModu
     val userSelectionRepository: UserSelectionRepository by lazy { UserSelectionService(sharedPreferences, fileManager) }
     val paymentSettings: PaymentSettingRepository by lazy { PaymentSettingService(sharedPreferences, fileManager) }
     val disabledPaymentMethodRepository: DisabledPaymentMethodRepository by lazy {
-        DisabledPaymentMethodService(sharedPreferences)
-    }
-    val payerCostSelectionRepository: PayerCostSelectionRepository by lazy {
-        PayerCostSelectionRepositoryImpl(sharedPreferences)
+        DisabledPaymentMethodRepositoryImpl(fileManager)
     }
     val payerComplianceRepository: PayerComplianceRepository by lazy { PayerComplianceRepositoryImpl(sharedPreferences, fileManager) }
     private var internalChargeRepository: ChargeRepository? = null
@@ -33,14 +30,35 @@ internal class CheckoutConfigurationModule(context: Context) : ConfigurationModu
             return internalCustomTextsRepository!!
         }
 
+    private var internalApplicationSelectionRepository: ApplicationSelectionRepository? = null
+    val applicationSelectionRepository: ApplicationSelectionRepository
+        get() {
+            return internalApplicationSelectionRepository ?: ApplicationSelectionRepositoryImpl(
+                fileManager, Session.getInstance().oneTapItemRepository).also {
+                internalApplicationSelectionRepository = it
+            }
+        }
+
+    private var internalPayerCostSelectionRepository: PayerCostSelectionRepository? = null
+    val payerCostSelectionRepository: PayerCostSelectionRepository
+        get() {
+            return internalPayerCostSelectionRepository
+                ?: PayerCostSelectionRepositoryImpl(sharedPreferences, applicationSelectionRepository).also {
+                    internalPayerCostSelectionRepository = it
+                }
+        }
+
     override fun reset() {
         super.reset()
         userSelectionRepository.reset()
         paymentSettings.reset()
         disabledPaymentMethodRepository.reset()
-        payerCostSelectionRepository.reset()
         payerComplianceRepository.reset()
+        applicationSelectionRepository.reset()
+        payerCostSelectionRepository.reset()
         internalChargeRepository = null
         internalCustomTextsRepository = null
+        internalApplicationSelectionRepository = null
+        internalPayerCostSelectionRepository = null
     }
 }

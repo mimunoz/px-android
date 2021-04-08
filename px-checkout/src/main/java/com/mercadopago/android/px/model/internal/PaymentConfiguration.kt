@@ -8,7 +8,7 @@ data class PaymentConfiguration(
     val paymentMethodId: String,
     val paymentTypeId: String,
     val customOptionId: String,
-    val isCard: Boolean,
+    val securityCodeRequired: Boolean,
     val splitPayment: Boolean,
     val payerCost: PayerCost?
 ) : Parcelable {
@@ -24,7 +24,7 @@ data class PaymentConfiguration(
         parcel.writeString(paymentMethodId)
         parcel.writeString(paymentTypeId)
         parcel.writeString(customOptionId)
-        parcel.writeByte(if (isCard) 1 else 0)
+        parcel.writeByte(if (securityCodeRequired) 1 else 0)
         parcel.writeByte(if (splitPayment) 1 else 0)
         parcel.writeParcelable(payerCost, flags)
     }

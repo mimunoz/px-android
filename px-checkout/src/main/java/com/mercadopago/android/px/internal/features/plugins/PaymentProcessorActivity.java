@@ -5,12 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.PaymentProcessor;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
@@ -19,6 +18,7 @@ import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.Session;
+import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel;
@@ -96,7 +96,7 @@ public final class PaymentProcessorActivity extends PXActivity
             session.getCongratsRepository(), session.getConfigurationModule().getUserSelectionRepository());
 
         if (getFragmentByTag() == null) { // if fragment is not added, then create it.
-            addPaymentProcessorFragment(getSupportFragmentManager(), session);
+            addPaymentProcessorFragment(session);
         }
     }
 
@@ -105,11 +105,12 @@ public final class PaymentProcessorActivity extends PXActivity
         return getSupportFragmentManager().findFragmentByTag(TAG_PROCESSOR_FRAGMENT);
     }
 
-    private void addPaymentProcessorFragment(@NonNull final FragmentManager supportFragmentManager,
-        @NonNull final Session session) {
+    private void addPaymentProcessorFragment(@NonNull final Session session) {
 
         final CheckoutConfigurationModule configurationModule = session.getConfigurationModule();
         final PaymentSettingRepository paymentSettings = configurationModule.getPaymentSettings();
+        final ValidationProgramUseCase validationProgramUseCase =
+            session.getUseCaseModule().getValidationProgramUseCase();
 
         final SplitPaymentProcessor paymentProcessor = paymentSettings
             .getPaymentConfiguration()
@@ -121,13 +122,22 @@ public final class PaymentProcessorActivity extends PXActivity
 
         final CheckoutPreference checkoutPreference = paymentSettings.getCheckoutPreference();
         final String securityType = paymentSettings.getSecurityType().getValue();
-        final SplitPaymentProcessor.CheckoutData checkoutData =
-            new SplitPaymentProcessor.CheckoutData(paymentData, checkoutPreference, securityType);
 
+        validationProgramUseCase.execute(paymentData, validationProgramId -> {
+            final SplitPaymentProcessor.CheckoutData checkoutData =
+                new SplitPaymentProcessor.CheckoutData(
+                    paymentData, checkoutPreference, securityType, validationProgramId);
+            startPayment(paymentProcessor, checkoutData);
+            return null;
+        });
+    }
+
+    private void startPayment(final SplitPaymentProcessor paymentProcessor,
+        final SplitPaymentProcessor.CheckoutData checkoutData) {
         final Fragment fragment = paymentProcessor.getFragment(checkoutData, this);
 
         if (fragment != null) {
-            supportFragmentManager.beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                 .replace(R.id.px_main_container, fragment, TAG_PROCESSOR_FRAGMENT)
                 .commit();
         }

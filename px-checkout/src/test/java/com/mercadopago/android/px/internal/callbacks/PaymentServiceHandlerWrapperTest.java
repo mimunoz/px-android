@@ -1,13 +1,12 @@
 package com.mercadopago.android.px.internal.callbacks;
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.annotation.NonNull;
-
-import com.mercadopago.android.px.internal.datasource.DisabledPaymentMethodService;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import com.mercadopago.android.px.internal.repository.CongratsRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
-import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel;
 import com.mercadopago.android.px.mocks.PaymentMethodStub;
@@ -45,7 +44,7 @@ public class PaymentServiceHandlerWrapperTest {
 
     @Mock private PaymentServiceHandler wrapped;
     @Mock private PaymentRepository paymentRepository;
-    @Mock private DisabledPaymentMethodService disabledPaymentMethodService;
+    @Mock private DisabledPaymentMethodRepository disabledPaymentMethodRepository;
     @Mock private PaymentRecovery paymentRecovery;
     @Mock private InstructionsRepository instructionsRepository;
     @Mock private CongratsRepository congratsRepository;
@@ -57,7 +56,7 @@ public class PaymentServiceHandlerWrapperTest {
     @Before
     public void setUp() {
         paymentServiceHandlerWrapper =
-            new PaymentServiceHandlerWrapper(paymentRepository, disabledPaymentMethodService, escPaymentManager,
+            new PaymentServiceHandlerWrapper(paymentRepository, disabledPaymentMethodRepository, escPaymentManager,
                 instructionsRepository, congratsRepository, userSelectionRepository);
         paymentServiceHandlerWrapper.setHandler(wrapped);
         when(paymentRepository.createRecoveryForInvalidESC()).thenReturn(paymentRecovery);
@@ -138,9 +137,10 @@ public class PaymentServiceHandlerWrapperTest {
         noMoreInteractions();
     }
 
-    private void verifyOnPaymentFinished(@NonNull final IPaymentDescriptor payment, @NonNull final PaymentResult paymentResult) {
+    private void verifyOnPaymentFinished(@NonNull final IPaymentDescriptor payment,
+        @NonNull final PaymentResult paymentResult) {
         final ArgumentCaptor<CongratsRepository.PostPaymentCallback> callbackArgumentCaptor = ArgumentCaptor.forClass(
-                CongratsRepository.PostPaymentCallback.class);
+            CongratsRepository.PostPaymentCallback.class);
         verify(congratsRepository).getPostPaymentData(eq(payment), eq(paymentResult), callbackArgumentCaptor.capture());
         final CongratsRepository.PostPaymentCallback value = callbackArgumentCaptor.getValue();
         PaymentModel paymentModel = mock(PaymentModel.class);

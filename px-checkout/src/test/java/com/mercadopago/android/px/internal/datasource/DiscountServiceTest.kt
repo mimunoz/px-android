@@ -62,32 +62,34 @@ class DiscountServiceTest {
 
     @Test
     fun testGetConfigurationFor_whenCustomOptionIdIsNotValidAndHasNoDefault_thenReturnDiscountModelNone() {
-        `when`(configurationSolver.getConfigurationHashFor(invalidCustomOptionId)).thenReturn(TextUtil.EMPTY)
-        val discountConfigurationModel = discountServiceImpl.getConfigurationFor(invalidCustomOptionId)
+        `when`(configurationSolver.getConfigurationHashSelectedFor(invalidCustomOptionId)).thenReturn(TextUtil.EMPTY)
+        val discountConfigurationModel = discountServiceImpl.getConfigurationSelectedFor(invalidCustomOptionId)
         Assert.assertEquals(DiscountConfigurationModel.NONE, discountConfigurationModel)
     }
 
     @Test
     fun testGetConfigurationFor_whenCustomOptionIdIsNotValidAndHasDefault_thenReturnDefaultDiscountModel() {
-        `when`(configurationSolver.getConfigurationHashFor(invalidCustomOptionId)).thenReturn(TextUtil.EMPTY)
+        `when`(configurationSolver.getConfigurationHashSelectedFor(invalidCustomOptionId)).thenReturn(TextUtil.EMPTY)
         `when`(amountConfigurationRepository.value).thenReturn(validCampaignId)
-        val actualDiscountModel = discountServiceImpl.getConfigurationFor(invalidCustomOptionId)
+        val actualDiscountModel = discountServiceImpl.getConfigurationSelectedFor(invalidCustomOptionId)
         Assert.assertEquals(this.expectedDiscountModel, actualDiscountModel)
     }
 
     @Test
     fun testGetConfigurationFor_whenCustomOptionIdIsValid_thenReturnCustomOptionDiscountModel() {
-        `when`(configurationSolver.getConfigurationHashFor(validCustomOptionId)).thenReturn(validCampaignId)
-        val actualDiscountModel = discountServiceImpl.getConfigurationFor(validCustomOptionId)
+        `when`(configurationSolver.getConfigurationHashSelectedFor(validCustomOptionId)).thenReturn(validCampaignId)
+        val actualDiscountModel = discountServiceImpl.getConfigurationSelectedFor(validCustomOptionId)
         Assert.assertEquals(this.expectedDiscountModel, actualDiscountModel)
     }
 
     @Test
     fun testGetCurrentConfiguration_whenMethodSelectedIsCard_thenReturnCardDiscountModel() {
         val card = mock(Card::class.java)
-        `when`(configurationSolver.getConfigurationHashFor(validCustomOptionId)).thenReturn(validCampaignId)
+        val pm = mock(PaymentMethod::class.java)
+        `when`(configurationSolver.getConfigurationHashSelectedFor(validCustomOptionId)).thenReturn(validCampaignId)
         `when`(card.id).thenReturn(validCustomOptionId)
         `when`(userSelectionService.card).thenReturn(card)
+        `when`(userSelectionService.paymentMethod).thenReturn(pm)
         val actualDiscountModel = discountServiceImpl.getCurrentConfiguration()
         Assert.assertEquals(this.expectedDiscountModel, actualDiscountModel)
     }
@@ -95,7 +97,7 @@ class DiscountServiceTest {
     @Test
     fun testGetCurrentConfiguration_whenMethodSelectedIsNotCard_thenReturnPaymentMethodDiscountModel() {
         val paymentMethod = mock(PaymentMethod::class.java)
-        `when`(configurationSolver.getConfigurationHashFor(validCustomOptionId)).thenReturn(validCampaignId)
+        `when`(configurationSolver.getConfigurationHashSelectedFor(validCustomOptionId)).thenReturn(validCampaignId)
         `when`(paymentMethod.id).thenReturn(validCustomOptionId)
         `when`(userSelectionService.paymentMethod).thenReturn(paymentMethod)
         val actualDiscountModel = discountServiceImpl.getCurrentConfiguration()

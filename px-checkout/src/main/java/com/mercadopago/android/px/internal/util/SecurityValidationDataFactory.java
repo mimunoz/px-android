@@ -16,8 +16,9 @@ public final class SecurityValidationDataFactory {
         @NonNull final BigDecimal totalAmount, @NonNull final PaymentConfiguration paymentConfiguration) {
         final String productId = productIdProvider.getProductId();
         final String customOptionId = paymentConfiguration.getCustomOptionId();
-        final boolean isCard = paymentConfiguration.isCard();
-        final EscValidationData escValidationData = new EscValidationData.Builder(customOptionId, isCard).build();
+        final boolean securityCodeRequired = paymentConfiguration.getSecurityCodeRequired();
+        final EscValidationData escValidationData = new EscValidationData.Builder(customOptionId, securityCodeRequired)
+            .build();
         return new SecurityValidationData.Builder(productId).putParam("amount", totalAmount)
             .setEscValidationData(escValidationData).build();
     }

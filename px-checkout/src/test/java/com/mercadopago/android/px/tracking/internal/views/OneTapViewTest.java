@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo;
 import com.mercadopago.android.px.tracking.internal.model.DiscountInfo;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OneTapViewTest {
@@ -29,14 +31,16 @@ public class OneTapViewTest {
     @Test
     public void verifyPath() {
         assertEquals(EXPECTED_PATH,
-            new OneTapViewTracker(Collections.EMPTY_LIST, checkoutPreference, discountModel, Collections.emptySet(),
+            new OneTapViewTracker(mock(FromApplicationToApplicationInfo.class),
+                Collections.EMPTY_LIST, checkoutPreference, discountModel, Collections.emptySet(),
                 Collections.emptySet(), DISABLED_METHODS_QUANTITY, Collections.emptyList()).getTrack().getPath());
     }
 
     @Test
     public void verifyTrackData() {
         final OneTapViewTracker track =
-            new OneTapViewTracker(Collections.EMPTY_LIST, checkoutPreference, discountModel, Collections.emptySet(),
+            new OneTapViewTracker(mock(FromApplicationToApplicationInfo.class),
+                Collections.EMPTY_LIST, checkoutPreference, discountModel, Collections.emptySet(),
                 Collections.emptySet(), DISABLED_METHODS_QUANTITY, Collections.emptyList());
         assertEquals(expectedOneTapData(), track.getTrack().getData());
     }

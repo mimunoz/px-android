@@ -83,6 +83,7 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.model.StatusMetadata;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import java.util.Arrays;
@@ -97,7 +98,7 @@ import static android.view.View.VISIBLE;
 public class ExpressPaymentFragment extends BaseFragment implements ExpressPayment.View, ViewPager.OnPageChangeListener,
     SplitPaymentHeaderAdapter.SplitListener, PaymentMethodFragment.DisabledDetailDialogLauncher,
     OtherPaymentMethodFragment.OnOtherPaymentMethodClickListener, TitlePagerAdapter.InstallmentChanged,
-    PayButton.Handler, GenericDialog.Listener, BackHandler {
+    PayButton.Handler, GenericDialog.Listener, BackHandler, PaymentMethodFragment.PaymentMethodPagerListener {
 
     private static final String TAG = ExpressPaymentFragment.class.getSimpleName();
     private static final String TAG_HEADER_DYNAMIC_DIALOG = "TAG_HEADER_DYNAMIC_DIALOG";
@@ -183,6 +184,11 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             presenter.onBack();
         }
         return isExploding || offlineMethodsFragment.handleBack();
+    }
+
+    @Override
+    public void onApplicationChanged(@NonNull final String paymentTypeId) {
+        presenter.onApplicationChanged(paymentTypeId);
     }
 
     public interface CallBack {
@@ -365,23 +371,25 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         return new ExpressPaymentPresenter(configurationModule.getPaymentSettings(),
             configurationModule.getDisabledPaymentMethodRepository(),
             configurationModule.getPayerCostSelectionRepository(),
+            configurationModule.getApplicationSelectionRepository(),
             session.getDiscountRepository(),
             session.getAmountRepository(),
-            session.getInitRepository(),
+            session.getCheckoutRepository(),
             session.getAmountConfigurationRepository(),
             session.getConfigurationModule().getChargeRepository(),
             session.getMercadoPagoESC(),
+            session.getExperimentsRepository(), configurationModule.getPayerComplianceRepository(),
+            configurationModule.getTrackingRepository(), configurationModule.getCustomTextsRepository(),
+            session.getOneTapItemRepository(), session.getPayerPaymentMethodRepository(), session.getModalRepository(),
+            session.getCustomOptionIdSolver(),
             MapperProvider.INSTANCE.getPaymentMethodDrawableItemMapper(),
-            session.getExperimentsRepository(),
-            configurationModule.getPayerComplianceRepository(),
-            configurationModule.getTrackingRepository(),
             MapperProvider.INSTANCE.getPaymentMethodDescriptorMapper(),
-            configurationModule.getCustomTextsRepository(),
-            MapperProvider.INSTANCE.getAmountDescriptorMapper(),
-            session.getTracker(),
-            session.getExpressMetadataRepository(),
-            session.getPayerPaymentMethodRepository(),
-            session.getModalRepository());
+            MapperProvider.INSTANCE.getSummaryDetailDescriptorMapper(),
+            MapperProvider.INSTANCE.getSummaryInfoMapper(),
+            MapperProvider.INSTANCE.getElementDescriptorMapper(),
+            MapperProvider.INSTANCE.getFromApplicationToApplicationInfo(),
+            session.getTracker()
+        );
     }
 
     @Override
@@ -567,9 +575,9 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     @Override
     public void updateViewForPosition(final int paymentMethodIndex,
-        final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
-        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, splitSelectionState);
+        final int payerCostSelected, @NonNull final SplitSelectionState splitSelectionState,
+        @NonNull final Application application) {
+        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, splitSelectionState, application);
     }
 
     /* default */ void onInstallmentSelected(final PayerCost payerCostSelected) {

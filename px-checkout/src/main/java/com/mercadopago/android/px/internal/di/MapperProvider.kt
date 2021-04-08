@@ -1,14 +1,13 @@
 package com.mercadopago.android.px.internal.di
 
-import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodIdToCardMapper
+import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
-import com.mercadopago.android.px.internal.mappers.AmountDescriptorMapper
-import com.mercadopago.android.px.internal.mappers.CardUiMapper
-import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
+import com.mercadopago.android.px.internal.mappers.*
+import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper
-import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 
 internal object MapperProvider {
     fun getPaymentMethodDrawableItemMapper(): PaymentMethodDrawableItemMapper {
@@ -16,18 +15,22 @@ internal object MapperProvider {
         return PaymentMethodDrawableItemMapper(
             session.configurationModule.chargeRepository,
             session.configurationModule.disabledPaymentMethodRepository,
+            session.configurationModule.applicationSelectionRepository,
             CardUiMapper,
+            CardDrawerCustomViewModelMapper,
             session.payerPaymentMethodRepository,
             session.modalRepository
         )
     }
 
     fun getPaymentMethodDescriptorMapper(): PaymentMethodDescriptorMapper {
+        val session = Session.getInstance()
         return PaymentMethodDescriptorMapper(
-            Session.getInstance().configurationModule.paymentSettings,
-            Session.getInstance().amountConfigurationRepository,
-            Session.getInstance().configurationModule.disabledPaymentMethodRepository,
-            Session.getInstance().amountRepository
+            session.configurationModule.paymentSettings,
+            session.amountConfigurationRepository,
+            session.configurationModule.disabledPaymentMethodRepository,
+            session.configurationModule.applicationSelectionRepository,
+            session.amountRepository
         )
     }
 
@@ -49,13 +52,13 @@ internal object MapperProvider {
     fun getAlternativePayerPaymentMethodsMapper(): AlternativePayerPaymentMethodsMapper {
         return AlternativePayerPaymentMethodsMapper(
             Session.getInstance().mercadoPagoESC,
-            Session.getInstance().payerPaymentMethodRepository,
             Session.getInstance().paymentMethodRepository
         )
     }
 
-    fun getFromPayerPaymentMethodIdToCardMapper(): FromPayerPaymentMethodIdToCardMapper {
-        return FromPayerPaymentMethodIdToCardMapper(
+    fun getFromPayerPaymentMethodToCardMapper(): FromPayerPaymentMethodToCardMapper {
+        return FromPayerPaymentMethodToCardMapper(
+            Session.getInstance().oneTapItemRepository,
             Session.getInstance().payerPaymentMethodRepository,
             Session.getInstance().paymentMethodRepository
         )
@@ -64,4 +67,26 @@ internal object MapperProvider {
     fun getPaymentMethodMapper(): PaymentMethodMapper {
         return PaymentMethodMapper(Session.getInstance().paymentMethodRepository)
     }
+
+    fun getSummaryInfoMapper(): SummaryInfoMapper {
+        return SummaryInfoMapper()
+    }
+
+    fun getElementDescriptorMapper(): ElementDescriptorMapper {
+        return ElementDescriptorMapper()
+    }
+
+    fun getSummaryDetailDescriptorMapper(): SummaryDetailDescriptorMapper {
+        val session = Session.getInstance()
+        val paymentSettings = session.configurationModule.paymentSettings
+        return SummaryDetailDescriptorMapper(
+            session.amountRepository,
+            getSummaryInfoMapper().map(paymentSettings.checkoutPreference!!),
+            paymentSettings.currency,
+            getAmountDescriptorMapper()
+        )
+    }
+
+    val fromApplicationToApplicationInfo: FromApplicationToApplicationInfo
+        get() = FromApplicationToApplicationInfo()
 }

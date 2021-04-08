@@ -13,7 +13,8 @@ internal object PaymentResultRemediesModelMapper : Mapper<RemediesResponse, Reme
         var title = ""
         val retryPaymentModel = response.suggestedPaymentMethod?.let {
             title = it.title
-            RetryPaymentFragment.Model(response.cvv?.run { message } ?: it.message, true, getCvvModel(response.cvv))
+            RetryPaymentFragment.Model(response.cvv?.run { message } ?: it.message,
+                true, getCvvModel(response.cvv), it.bottomMessage)
         } ?: response.cvv?.let {
             title = it.title
             RetryPaymentFragment.Model(it.message, false, getCvvModel(it))

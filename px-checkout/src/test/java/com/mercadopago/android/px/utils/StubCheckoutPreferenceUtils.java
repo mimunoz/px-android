@@ -115,9 +115,18 @@ public final class StubCheckoutPreferenceUtils {
         return stubBuilderOneItem();
     }
 
+    public static CheckoutPreference.Builder stubBuilderOneItemAndPayerWithAdditionalInfo() {
+        return stubBuilderOneItemWithAdditionalInfo();
+    }
+
     public static CheckoutPreference stubPreferenceOneItem() {
         return stubBuilderOneItem()
             .build();
+    }
+
+    private static CheckoutPreference.Builder stubBuilderOneItemWithAdditionalInfo() {
+        return new CheckoutPreference.Builder(Sites.ARGENTINA, "unemail@gmail.com", stubOneItemList())
+            .setAdditionalInfo("{\"px_summary\":{\"title\":\"Test test\",\"subtitle\":\"Test\"}}");
     }
 
     private static CheckoutPreference.Builder stubBuilderOneItem() {

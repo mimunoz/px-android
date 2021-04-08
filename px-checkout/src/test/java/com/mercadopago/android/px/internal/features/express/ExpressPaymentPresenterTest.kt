@@ -5,12 +5,15 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
 import com.mercadopago.android.px.internal.callbacks.MPCall
+import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter
-import com.mercadopago.android.px.internal.mappers.AmountDescriptorMapper
+import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
+import com.mercadopago.android.px.internal.mappers.SummaryInfoMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
 import com.mercadopago.android.px.internal.view.ElementDescriptorView
+import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper
@@ -19,21 +22,22 @@ import com.mercadopago.android.px.mocks.SiteStub
 import com.mercadopago.android.px.model.*
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
-import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
-import com.mercadopago.android.px.model.internal.InitResponse
+import com.mercadopago.android.px.model.internal.*
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.AbortEvent
 import com.mercadopago.android.px.tracking.internal.events.BackEvent
 import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrack
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker
 import com.mercadopago.android.px.utils.StubFailMpCall
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.eq
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.mockito.kotlin.any
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
@@ -55,7 +59,7 @@ class ExpressPaymentPresenterTest {
     private lateinit var payerCostSelectionRepository: PayerCostSelectionRepository
 
     @Mock
-    private lateinit var initRepository: InitRepository
+    private lateinit var checkoutRepository: CheckoutRepository
 
     @Mock
     private lateinit var discountRepository: DiscountRepository
@@ -67,7 +71,7 @@ class ExpressPaymentPresenterTest {
     private lateinit var amountRepository: AmountRepository
 
     @Mock
-    private lateinit var expressMetadata: ExpressMetadata
+    private lateinit var oneTapItem: OneTapItem
 
     @Mock
     private lateinit var amountConfiguration: AmountConfiguration
@@ -97,6 +101,9 @@ class ExpressPaymentPresenterTest {
     private lateinit var payerComplianceRepository: PayerComplianceRepository
 
     @Mock
+    private lateinit var applicationSelectionRepository: ApplicationSelectionRepository
+
+    @Mock
     private lateinit var trackingRepository: TrackingRepository
 
     @Mock
@@ -106,7 +113,7 @@ class ExpressPaymentPresenterTest {
     private lateinit var tracker: MPTracker
 
     @Mock
-    private lateinit var expressMetadataRepository: ExpressMetadataRepository
+    private lateinit var oneTapItemRepository: OneTapItemRepository
 
     @Mock
     private lateinit var payerPaymentMethodRepository: PayerPaymentMethodRepository
@@ -114,42 +121,72 @@ class ExpressPaymentPresenterTest {
     @Mock
     private lateinit var modalRepository: ModalRepository
 
+    @Mock
+    private lateinit var summaryDetailDescriptorMapper: SummaryDetailDescriptorMapper
+
+    @Mock
+    private lateinit var summaryInfoMapper: SummaryInfoMapper
+
+    @Mock
+    private lateinit var elementDescriptorMapper: ElementDescriptorMapper
+
+    @Mock
+    private lateinit var application: Application
+
+    @Mock
+    private lateinit var customOptionIdSolver: CustomOptionIdSolver
+
     private lateinit var expressPaymentPresenter: ExpressPaymentPresenter
 
     @Before
     fun setUp() {
         //This is needed for the presenter constructor
         val preference = mock(CheckoutPreference::class.java)
+        val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
-        `when`(item.title).thenReturn("Item title")
+        `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())
         `when`(paymentSettingRepository.currency).thenReturn(CurrencyStub.MLA.get())
         `when`(paymentSettingRepository.checkoutPreference).thenReturn(preference)
         `when`(paymentSettingRepository.advancedConfiguration).thenReturn(advancedConfiguration)
         `when`(advancedConfiguration.dynamicDialogConfiguration).thenReturn(dynamicDialogConfiguration)
-        `when`(expressMetadata.isCard).thenReturn(true)
-        `when`(expressMetadata.card).thenReturn(cardMetadata)
+        `when`(oneTapItem.isCard).thenReturn(true)
+        `when`(oneTapItem.card).thenReturn(cardMetadata)
         `when`(cardMetadata.displayInfo).thenReturn(mock(CardDisplayInfo::class.java))
-        `when`(expressMetadata.customOptionId).thenReturn("123")
-        `when`(expressMetadata.status).thenReturn(mock(StatusMetadata::class.java))
+        `when`(cardMetadata.id).thenReturn("123")
+        `when`(customOptionIdSolver[oneTapItem]).thenReturn("123")
+        `when`(oneTapItem.status).thenReturn(mock(StatusMetadata::class.java))
         `when`(discountRepository.getCurrentConfiguration()).thenReturn(discountConfigurationModel)
-        `when`(discountRepository.getConfigurationFor("123")).thenReturn(discountConfigurationModel)
-        `when`(amountConfigurationRepository.getConfigurationFor("123")).thenReturn(amountConfiguration)
-        `when`(expressMetadataRepository.value).thenReturn(listOf(expressMetadata))
+        `when`(amountConfigurationRepository.getConfigurationSelectedFor("123")).thenReturn(amountConfiguration)
+        `when`(oneTapItemRepository.value).thenReturn(listOf(oneTapItem))
+        `when`(disabledPaymentMethodRepository.value).thenReturn(hashMapOf())
+        `when`(applicationPaymentMethod.type).thenReturn("credit_card")
+        `when`(application.paymentMethod).thenReturn(applicationPaymentMethod)
+        `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
+        `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
+        `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
-            payerCostSelectionRepository, discountRepository, amountRepository, initRepository,
-            amountConfigurationRepository, chargeRepository, escManagerBehaviour, paymentMethodDrawableItemMapper,
+            payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository, checkoutRepository,
+            amountConfigurationRepository, chargeRepository, escManagerBehaviour,
             experimentsRepository, payerComplianceRepository, trackingRepository,
-            mock(PaymentMethodDescriptorMapper::class.java), mock(CustomTextsRepository::class.java),
-            mock(AmountDescriptorMapper::class.java), tracker, expressMetadataRepository, payerPaymentMethodRepository,
-            modalRepository)
+            mock(CustomTextsRepository::class.java),
+            oneTapItemRepository, payerPaymentMethodRepository,
+            modalRepository,
+            customOptionIdSolver,
+            paymentMethodDrawableItemMapper,
+            mock(PaymentMethodDescriptorMapper::class.java),
+            summaryDetailDescriptorMapper,
+            summaryInfoMapper,
+            elementDescriptorMapper,
+            mock(FromApplicationToApplicationInfo::class.java),
+            tracker)
         verifyAttachView()
     }
 
     @Test
     fun whenFailToRetrieveCheckoutThenShowError() {
-        `when`<MPCall<InitResponse>>(initRepository.init()).thenReturn(StubFailMpCall(mock(ApiException::class.java)))
+        `when`<MPCall<CheckoutResponse>>(checkoutRepository.checkout()).thenReturn(StubFailMpCall(mock(ApiException::class.java)))
         expressPaymentPresenter.handleDeepLink()
         verify(view).showError(any(MercadoPagoError::class.java))
     }
@@ -198,12 +235,12 @@ class ExpressPaymentPresenterTest {
         `when`(state.paymentMethodIndex).thenReturn(paymentMethodIndex)
         `when`(state.splitSelectionState).thenReturn(splitSelectionState)
         val payerCostIndex = 2
-        `when`(payerCostSelectionRepository.get(expressMetadata.customOptionId)).thenReturn(payerCostIndex)
+        `when`(payerCostSelectionRepository.get(customOptionIdSolver[oneTapItem])).thenReturn(payerCostIndex)
 
         expressPaymentPresenter.restoreState(state)
         expressPaymentPresenter.onInstallmentSelectionCanceled()
 
-        verify(view).updateViewForPosition(paymentMethodIndex, payerCostIndex, splitSelectionState)
+        verify(view).updateViewForPosition(paymentMethodIndex, payerCostIndex, splitSelectionState, application)
         verify(view).collapseInstallmentsSelection()
     }
 
@@ -244,8 +281,9 @@ class ExpressPaymentPresenterTest {
     fun whenDisabledDescriptorViewClickThenShowDisabledDialog() {
         val disabledPaymentMethod = mock(DisabledPaymentMethod::class.java)
         val statusMetadata = mock(StatusMetadata::class.java)
-        `when`(disabledPaymentMethodRepository.getDisabledPaymentMethod(anyString())).thenReturn(disabledPaymentMethod)
-        `when`(expressMetadata.status).thenReturn(statusMetadata)
+        `when`(disabledPaymentMethodRepository[any()]).thenReturn(disabledPaymentMethod)
+        `when`(applicationSelectionRepository[any()]).thenReturn(application)
+        `when`(application.status).thenReturn(statusMetadata)
 
         expressPaymentPresenter.onDisabledDescriptorViewClick()
 
@@ -259,7 +297,7 @@ class ExpressPaymentPresenterTest {
 
         expressPaymentPresenter.onSliderOptionSelected(currentElementPosition)
 
-        verify(view).updateViewForPosition(eq(currentElementPosition), eq(PayerCost.NO_SELECTED), any())
+        verify(view).updateViewForPosition(eq(currentElementPosition), eq(PayerCost.NO_SELECTED), any(), any())
         verifyNoMoreInteractions(view)
     }
 
@@ -271,7 +309,7 @@ class ExpressPaymentPresenterTest {
 
         expressPaymentPresenter.onPayerCostSelected(payerCostList[selectedPayerCostIndex])
 
-        verify(view).updateViewForPosition(eq(paymentMethodIndex), eq(selectedPayerCostIndex), any())
+        verify(view).updateViewForPosition(eq(paymentMethodIndex), eq(selectedPayerCostIndex), any(), any())
         verify(view).collapseInstallmentsSelection()
         verifyNoMoreInteractions(view)
     }
@@ -290,7 +328,8 @@ class ExpressPaymentPresenterTest {
         verify(view).configurePaymentMethodHeader(anyList())
         verify(view).showToolbarElementDescriptor(any(ElementDescriptorView.Model::class.java))
         verify(view).updateAdapters(any(HubAdapter.Model::class.java))
-        verify(view).updateViewForPosition(anyInt(), anyInt(), any(SplitSelectionState::class.java))
+        verify(view).updateViewForPosition(
+            anyInt(), anyInt(), any(SplitSelectionState::class.java), any(Application::class.java))
         verify(view).configureRenderMode(any())
         verify(view).configureAdapters(any(Site::class.java), any(Currency::class.java))
         verify(view).updatePaymentMethods(anyListOf(DrawableFragmentItem::class.java))

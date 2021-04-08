@@ -1,11 +1,12 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
-import androidx.annotation.NonNull;
 import android.view.View;
-import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
-import com.mercadopago.android.px.internal.view.SummaryView;
+import androidx.annotation.NonNull;
+import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorModelByApplication;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.internal.viewmodel.SummaryModel;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
 public class HubAdapter extends ViewAdapter<HubAdapter.Model, View> {
@@ -14,15 +15,15 @@ public class HubAdapter extends ViewAdapter<HubAdapter.Model, View> {
 
     public static class Model {
 
-        @NonNull public final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels;
-        @NonNull public final List<SummaryView.Model> summaryViewModels;
+        @NonNull public final List<PaymentMethodDescriptorModelByApplication> paymentMethodDescriptorModels;
+        @NonNull public final List<SummaryModel> summaryViewModels;
         @NonNull public final List<SplitPaymentHeaderAdapter.Model> splitModels;
-        @NonNull public final List<ConfirmButtonViewModel> confirmButtonViewModels;
+        @NonNull public final List<ConfirmButtonViewModel.ByApplication> confirmButtonViewModels;
 
-        public Model(@NonNull final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels,
-            @NonNull final List<SummaryView.Model> summaryViewModels,
+        public Model(@NonNull final List<PaymentMethodDescriptorModelByApplication> paymentMethodDescriptorModels,
+            @NonNull final List<SummaryModel> summaryViewModels,
             @NonNull final List<SplitPaymentHeaderAdapter.Model> splitModels,
-            @NonNull final List<ConfirmButtonViewModel> confirmButtonViewModels) {
+            @NonNull final List<ConfirmButtonViewModel.ByApplication> confirmButtonViewModels) {
             this.paymentMethodDescriptorModels = paymentMethodDescriptorModels;
             this.summaryViewModels = summaryViewModels;
             this.splitModels = splitModels;
@@ -44,9 +45,10 @@ public class HubAdapter extends ViewAdapter<HubAdapter.Model, View> {
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
+        @NonNull final SplitSelectionState splitSelectionState,
+        @NonNull final Application application) {
         for (final HubableAdapter adapter : adapters) {
-            adapter.updateData(currentIndex, payerCostSelected, splitSelectionState);
+            adapter.updateData(currentIndex, payerCostSelected, splitSelectionState, application);
         }
     }
 

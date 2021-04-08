@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import com.meli.android.carddrawer.model.CardDrawerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.view.LinkableTextView;
@@ -61,10 +62,13 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         topText = view.findViewById(R.id.top_text);
         bottomText = view.findViewById(R.id.bottom_text);
         final ConsumerCreditsDisplayInfo displayInfo = model.metadata.displayInfo;
-        tintBackground(view.findViewById(R.id.background), displayInfo.color);
+        tintBackground(background, displayInfo.color);
         showDisplayInfo(view, displayInfo);
         view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
     }
+
+    @Override
+    protected void updateCardDrawerView(@NonNull final CardDrawerView cardDrawerView) { }
 
     protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
         topText.updateModel(displayInfo.topText);
@@ -119,6 +123,6 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
 
     @Override
     protected String getAccessibilityContentDescription() {
-        return model.getDescription();
+        return model.getCommonsByApplication().getCurrent().getDescription();
     }
 }

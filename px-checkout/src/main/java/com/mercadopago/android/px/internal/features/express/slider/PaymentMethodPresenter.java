@@ -7,6 +7,7 @@ import com.mercadopago.android.px.internal.repository.PayerCostSelectionReposito
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
+import com.mercadopago.android.px.tracking.internal.events.ComboSwitchEvent;
 import org.jetbrains.annotations.Nullable;
 
 class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implements PaymentMethod.Action {
@@ -25,14 +26,17 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
 
     @Nullable
     private String getHighlightText() {
-        final int payerCostIndex = payerCostSelectionRepository.get(item.getId());
-        final AmountConfiguration configuration = amountConfigurationRepository.getConfigurationFor(item.getId());
+        final String customOptionId = item.getCommonsByApplication().getCurrent().getCustomOptionId();
+        final int payerCostIndex = payerCostSelectionRepository.get(customOptionId);
+        final AmountConfiguration configuration =
+            amountConfigurationRepository.getConfigurationSelectedFor(customOptionId);
         final int installments = configuration == null || configuration.getPayerCosts().isEmpty() ?
             -1 : configuration.getCurrentPayerCost(false, payerCostIndex).getInstallments();
         final boolean hasReimbursement =
             item.getReimbursement() != null && item.getReimbursement().hasAppliedInstallment(installments);
         final String reimbursementMessage = hasReimbursement ? item.getReimbursement().getCard().getMessage() : null;
-        return item.getChargeMessage() != null ? item.getChargeMessage() : reimbursementMessage;
+        final String chargeMessage = item.getCommonsByApplication().getCurrent().getChargeMessage();
+        return chargeMessage != null ? chargeMessage : reimbursementMessage;
     }
 
     @Override
@@ -48,5 +52,14 @@ class PaymentMethodPresenter extends BasePresenter<PaymentMethod.View> implement
         if (item.shouldHighlightBottomDescription()) {
             getView().animateHighlightMessageOut();
         }
+    }
+
+    @Override
+    public void onApplicationChanged(@NonNull final String paymentTypeId) {
+        getTracker().track(new ComboSwitchEvent(paymentTypeId));
+        item.getCommonsByApplication().update(paymentTypeId);
+        onFocusOut();
+        getView().updateView();
+        getView().updateState();
     }
 }

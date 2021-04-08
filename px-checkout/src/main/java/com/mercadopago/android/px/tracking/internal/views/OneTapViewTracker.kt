@@ -2,13 +2,16 @@ package com.mercadopago.android.px.tracking.internal.views
 
 import com.mercadopago.android.px.addons.model.internal.Experiment
 import com.mercadopago.android.px.model.DiscountConfigurationModel
-import com.mercadopago.android.px.model.ExpressMetadata
+import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.TrackFactory
 import com.mercadopago.android.px.tracking.internal.TrackWrapper
+import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 import com.mercadopago.android.px.tracking.internal.model.OneTapData
 
-class OneTapViewTracker(expressMetadataList: Iterable<ExpressMetadata?>?,
+internal class OneTapViewTracker(
+    fromApplicationToApplicationInfo: FromApplicationToApplicationInfo,
+    oneTapItem: Iterable<OneTapItem?>?,
     checkoutPreference: CheckoutPreference,
     discountModel: DiscountConfigurationModel,
     cardsWithEsc: Set<String?>,
@@ -16,8 +19,8 @@ class OneTapViewTracker(expressMetadataList: Iterable<ExpressMetadata?>?,
     disabledMethodsQuantity: Int,
     private val experiments: List<Experiment>) : TrackWrapper() {
 
-    private val data = OneTapData.createFrom(expressMetadataList, checkoutPreference, discountModel, cardsWithEsc,
-        cardsWithSplit, disabledMethodsQuantity)
+    private val data = OneTapData.createFrom(fromApplicationToApplicationInfo, oneTapItem, checkoutPreference,
+        discountModel, cardsWithEsc, cardsWithSplit, disabledMethodsQuantity)
 
     override fun getTrack() = TrackFactory.withView(PATH_REVIEW_ONE_TAP_VIEW)
         .addData(data.toMap())

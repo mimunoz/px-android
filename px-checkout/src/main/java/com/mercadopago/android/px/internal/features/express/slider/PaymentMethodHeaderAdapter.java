@@ -1,15 +1,17 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import androidx.annotation.NonNull;
+import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorModelByApplication;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.PaymentMethodHeaderView;
 import com.mercadopago.android.px.internal.viewmodel.DisabledPaymentMethodDescriptorModel;
 import com.mercadopago.android.px.internal.viewmodel.GoingToModel;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
+import com.mercadopago.android.px.model.internal.Application;
 import java.util.List;
 
 public class PaymentMethodHeaderAdapter
-    extends HubableAdapter<List<PaymentMethodDescriptorView.Model>, PaymentMethodHeaderView> {
+    extends HubableAdapter<List<PaymentMethodDescriptorModelByApplication>, PaymentMethodHeaderView> {
 
     private static final int NO_SELECTED = -1;
 
@@ -26,9 +28,12 @@ public class PaymentMethodHeaderAdapter
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected,
-        @NonNull final SplitSelectionState splitSelectionState) {
+        @NonNull final SplitSelectionState splitSelectionState, @NonNull final Application application) {
         this.currentIndex = currentIndex;
-        final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
+        final PaymentMethodDescriptorModelByApplication paymentMethodDescriptorModelByApplication =
+            data.get(currentIndex);
+        paymentMethodDescriptorModelByApplication.update(application);
+        final PaymentMethodDescriptorView.Model currentModel = paymentMethodDescriptorModelByApplication.getCurrent();
         view.updateData(currentModel.hasPayerCostList(), currentModel instanceof DisabledPaymentMethodDescriptorModel);
     }
 
@@ -37,8 +42,8 @@ public class PaymentMethodHeaderAdapter
         final GoingToModel goingTo = position < currentIndex ? GoingToModel.BACKWARDS : GoingToModel.FORWARD;
         final int nextIndex = goingTo == GoingToModel.BACKWARDS ? currentIndex - 1 : currentIndex + 1;
         if (nextIndex >= 0 && nextIndex < data.size()) {
-            final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
-            final PaymentMethodDescriptorView.Model nextModel = data.get(nextIndex);
+            final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex).getCurrent();
+            final PaymentMethodDescriptorView.Model nextModel = data.get(nextIndex).getCurrent();
             final PaymentMethodHeaderView.Model viewModel =
                 new PaymentMethodHeaderView.Model(goingTo, currentModel.hasPayerCostList(),
                     nextModel.hasPayerCostList());
@@ -47,7 +52,7 @@ public class PaymentMethodHeaderAdapter
     }
 
     @Override
-    public List<PaymentMethodDescriptorView.Model> getNewModels(final HubAdapter.Model model) {
+    public List<PaymentMethodDescriptorModelByApplication> getNewModels(final HubAdapter.Model model) {
         return model.paymentMethodDescriptorModels;
     }
 }
