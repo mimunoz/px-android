@@ -1,3 +1,8 @@
+## VERSION 4.75.0
+_08_04_2021_
+* FEATURE - Hybrid card for MLB.
+* FEATURE - Combo card (turned off by default for now)
+
 ## VERSION 4.74.0
 _06_04_2021_
 * FEATURE - ThreeDSBehaviour added
