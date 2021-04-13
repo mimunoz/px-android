@@ -10,10 +10,11 @@ internal class CustomOptionIdSolverImpl(private val applicationSelectionReposito
     override fun get(oneTapItem: OneTapItem): String {
         val defaultCustomOptionId = defaultCustomOptionId(oneTapItem)
         val selectedPaymentMethod = applicationSelectionRepository[defaultCustomOptionId].paymentMethod
-        return if (PaymentTypes.isCardPaymentType(selectedPaymentMethod.type)) {
-            defaultCustomOptionId
-        } else {
-            selectedPaymentMethod.id
+
+        return when {
+            PaymentTypes.isCardPaymentType(selectedPaymentMethod.type) -> defaultCustomOptionId
+            oneTapItem.isOfflineMethods -> oneTapItem.getDefaultPaymentMethodType()
+            else -> selectedPaymentMethod.id
         }
     }
 }

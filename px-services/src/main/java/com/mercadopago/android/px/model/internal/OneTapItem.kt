@@ -17,10 +17,24 @@ class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
         throw UnsupportedOperationException("Parcelable implementation not available")
     }
 
-    fun getApplications() = applications.orIfNullOrEmpty(mutableListOf<Application>().also {
-        it.add(
-            Application(Application.PaymentMethod(paymentMethodId.orEmpty(), paymentTypeId.orEmpty()), listOf(), status)
-        )
+    fun getApplications() = applications.orIfNullOrEmpty(mutableListOf<Application>().also { applications ->
+        if (isOfflineMethods) {
+            offlineMethods.paymentTypes.forEach {
+                it.paymentMethods.forEach { offlineMethod ->
+                    applications.add(
+                        Application(Application.PaymentMethod(
+                            offlineMethod.id,
+                            offlineMethod.instructionId),
+                            listOf(),
+                            offlineMethod.status)
+                    )
+                }
+            }
+        } else {
+            applications.add(
+                Application(Application.PaymentMethod(paymentMethodId.orEmpty(), paymentTypeId.orEmpty()), listOf(), status)
+            )
+        }
     })
 
     fun getDefaultPaymentMethodType(): String = displayInfo

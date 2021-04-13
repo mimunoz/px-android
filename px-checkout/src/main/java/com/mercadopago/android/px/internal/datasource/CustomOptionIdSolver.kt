@@ -25,7 +25,17 @@ internal abstract class CustomOptionIdSolver {
         }
 
         fun compare(oneTapItem: OneTapItem, customOptionId: String): Boolean {
-            return with(oneTapItem) { (isCard && card.id == customOptionId) || paymentMethodId == customOptionId }
+            return with(oneTapItem) {
+                (isCard && card.id == customOptionId)
+                    || paymentMethodId == customOptionId
+                    || compareWithOfflineMethod(oneTapItem, customOptionId)
+            }
+        }
+
+        private fun compareWithOfflineMethod(oneTapItem: OneTapItem, customOptionId: String): Boolean {
+            return (oneTapItem.isOfflineMethods && oneTapItem.getApplications().find {
+                customOptionId == it.paymentMethod.id
+            } != null)
         }
     }
 }

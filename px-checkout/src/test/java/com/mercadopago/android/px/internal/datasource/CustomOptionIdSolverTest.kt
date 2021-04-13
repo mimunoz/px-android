@@ -70,6 +70,25 @@ class CustomOptionIdSolverTest {
     }
 
     @Test
+    fun whenIsOfflineMethod() {
+        val customOptionIdExpected = "new_card_and_offline_payment_methods"
+        val selectedPaymentMethod: Application.PaymentMethod = mock {
+            on { type }.thenReturn(customOptionIdExpected)
+        }
+        val application: Application = mock {
+            on { this.paymentMethod }.thenReturn(selectedPaymentMethod)
+        }
+        whenever(oneTapItem.paymentMethodId).thenReturn(customOptionIdExpected)
+        whenever(oneTapItem.isOfflineMethods).thenReturn(true)
+        whenever(oneTapItem.getDefaultPaymentMethodType()).thenReturn("new_card_and_offline_payment_methods")
+        whenever(applicationSelectionRepositoryImpl[any()]).thenReturn(application)
+
+        val actual = customOptionIdSolver[oneTapItem]
+
+        customOptionIdExpected.assertEquals(actual)
+    }
+
+    @Test
     fun whenGetCardCustomOptionIdByApplication() {
         val customOptionIdExpected = "123456"
         val card: CardMetadata = mock {
@@ -126,5 +145,26 @@ class CustomOptionIdSolverTest {
         whenever(oneTapItem.isCard).thenReturn(false)
 
         assertTrue(CustomOptionIdSolver.compare(oneTapItem, "account_money"))
+    }
+
+    @Test
+    fun compareWhenOneTapItemIsOfflineMethod() {
+        val paymentMethodId = "new_card_and_offline_payment_methods"
+        val customOptionIdExpected = "pago_facil"
+
+        val paymentMethod: Application.PaymentMethod = mock {
+            on { id }.thenReturn("pago_facil")
+        }
+
+        val application: Application = mock {
+            on { this.paymentMethod }.thenReturn(paymentMethod)
+        }
+
+        whenever(oneTapItem.paymentMethodId).thenReturn(paymentMethodId)
+        whenever(oneTapItem.isCard).thenReturn(false)
+        whenever(oneTapItem.isOfflineMethods).thenReturn(true)
+        whenever(oneTapItem.getApplications()).thenReturn(listOf(application))
+
+        assertTrue(CustomOptionIdSolver.compare(oneTapItem, customOptionIdExpected))
     }
 }
