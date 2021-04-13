@@ -86,7 +86,7 @@ internal class CongratsRepositoryImpl(
                 usedPayerPaymentMethodId,
                 escCardIds.contains(usedPayerPaymentMethodId),
                 alternativePayerPaymentMethodsMapper.map(payerPaymentMethodRepository.value).filter {
-                    it.customOptionId != usedPayerPaymentMethodId ||
+                    it.customOptionId != usedPayerPaymentMethodId &&
                         !disabledPaymentMethodRepository.hasKey(
                             PayerPaymentMethodKey(it.customOptionId, it.paymentTypeId))
                 },
