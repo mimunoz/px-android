@@ -1,3 +1,8 @@
+## VERSION 4.75.1
+_13_04_2021_
+* FIX - Offline methods were broken in last release.
+* FIX - Disabled methods in remedies.
+
 ## VERSION 4.75.0
 _08_04_2021_
 * FEATURE - Hybrid card for MLB.
