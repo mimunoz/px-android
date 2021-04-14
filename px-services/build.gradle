@@ -3,7 +3,7 @@ apply from: "$rootDir/gradle/deploy_services.gradle"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-def user_agent = "PX/Android/" + (version_to_deploy as String)
+def user_agent = "PX/Android/" + (libraryVersion as String)
 enum Environment {
     PRODUCTION('"production"'), BETA('"beta"'), ALPHA('"alpha"')
 
