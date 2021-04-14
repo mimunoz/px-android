@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.model
+package com.mercadopago.android.px.model.internal
 
 import com.mercadopago.android.px.model.Currency
 

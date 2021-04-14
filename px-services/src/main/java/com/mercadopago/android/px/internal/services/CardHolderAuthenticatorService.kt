@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.services
 
-import com.mercadopago.android.px.internal.model.CardHolderAuthenticatorBody
+import com.mercadopago.android.px.model.internal.CardHolderAuthenticatorBody
 import com.mercadopago.android.px.services.BuildConfig
 import retrofit2.http.Body
 import retrofit2.http.POST
