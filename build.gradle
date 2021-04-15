@@ -26,6 +26,9 @@ subprojects {
     repositories {
         mavenLocal()
         google()
+        maven {
+            url 'https://artifacts.mercadolibre.com/repository/android-releases/'
+        }
         jcenter()
     }
 }
