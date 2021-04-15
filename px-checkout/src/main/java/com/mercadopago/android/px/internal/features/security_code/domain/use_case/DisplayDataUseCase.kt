@@ -38,7 +38,7 @@ internal class DisplayDataUseCase(
 
             Response.Success(SecurityCodeDisplayData(title, message, securityCodeLength, cardDisplayInfo))
         }
-    }.map { securityCodeDisplayDataMapper.map(it) }
+    }.map(securityCodeDisplayDataMapper::map)
 
     data class CardParams(
         val id: String?,

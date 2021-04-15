@@ -6,8 +6,7 @@ import com.meli.android.carddrawer.configuration.SecurityCodeLocation
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessCardDisplayInfo
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.CardUiConfiguration
-import com.mercadopago.android.px.model.AccountMoneyDisplayInfo
-import com.mercadopago.android.px.model.CardDisplayInfo
+import com.mercadopago.android.px.model.*
 
 internal object CardUiMapper {
 
@@ -26,7 +25,7 @@ internal object CardUiMapper {
                 securityCodeLocation,
                 securityCodeLength,
                 null,
-                null
+                mapCardDisplayInfoTypeToCardDrawerStyle(type)
             )
         }
     }
@@ -46,7 +45,7 @@ internal object CardUiMapper {
                 securityCode.cardLocation,
                 securityCode.length,
                 null,
-                null
+                mapCardDisplayInfoTypeToCardDrawerStyle(type)
             )
         }
     }
@@ -66,12 +65,22 @@ internal object CardUiMapper {
                 SecurityCodeLocation.NONE,
                 0,
                 gradientColors,
-                if (type == AccountMoneyDisplayInfo.Type.HYBRID) {
-                    CardDrawerStyle.ACCOUNT_MONEY_HYBRID
-                } else {
-                    CardDrawerStyle.ACCOUNT_MONEY_DEFAULT
-                }
+                mapAccountMoneyDisplayInfoTypeToCardDrawerStyle(type)
             )
+        }
+    }
+
+    private fun mapAccountMoneyDisplayInfoTypeToCardDrawerStyle(type: AccountMoneyDisplayInfoType?): CardDrawerStyle {
+       return when(type) {
+           AccountMoneyDisplayInfoType.HYBRID -> CardDrawerStyle.ACCOUNT_MONEY_HYBRID
+            else -> CardDrawerStyle.ACCOUNT_MONEY_DEFAULT
+        }
+    }
+
+    private fun mapCardDisplayInfoTypeToCardDrawerStyle(type: CardDisplayInfoType?): CardDrawerStyle {
+        return when(type) {
+            CardDisplayInfoType.HYBRID -> CardDrawerStyle.ACCOUNT_MONEY_HYBRID
+            else -> CardDrawerStyle.REGULAR
         }
     }
 }

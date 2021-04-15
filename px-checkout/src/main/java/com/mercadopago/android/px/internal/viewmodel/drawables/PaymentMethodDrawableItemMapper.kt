@@ -1,6 +1,5 @@
 package com.mercadopago.android.px.internal.viewmodel.drawables
 
-import com.meli.android.carddrawer.configuration.CardDrawerStyle
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.features.generic_modal.ActionType
 import com.mercadopago.android.px.internal.features.generic_modal.FromModalToGenericDialogItem
@@ -11,15 +10,13 @@ import com.mercadopago.android.px.internal.mappers.NonNullMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem.Parameters
-import com.mercadopago.android.px.model.AccountMoneyMetadata
-import com.mercadopago.android.px.model.CardMetadata
-import com.mercadopago.android.px.model.CustomSearchItem
-import com.mercadopago.android.px.model.PaymentTypes
+import com.mercadopago.android.px.model.*
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.one_tap.CheckoutBehaviour
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey as Key
-import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentCommons.ByApplication as CommonsByApplication
+import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentCommons.ByApplication
+as CommonsByApplication
 
 internal class PaymentMethodDrawableItemMapper(
     private val chargeRepository: ChargeRepository,
@@ -48,19 +45,17 @@ internal class PaymentMethodDrawableItemMapper(
         }
     }
 
-    private fun getCardDrawable(cardMetadata: CardMetadata?, paymentMethod: Application.PaymentMethod): CardDrawable? {
-        return cardMetadata?.takeIf { PaymentTypes.isCardPaymentType(paymentMethod.type) }?.let {
-            CardDrawable(paymentMethod.id, cardUiMapper.map(it.displayInfo))
-        }
-    }
 
-    private fun getAccountMoneyCardDrawable(
-        accountMoneyMetadata: AccountMoneyMetadata?, paymentMethod: Application.PaymentMethod): CardDrawable? {
-        return accountMoneyMetadata?.takeIf { PaymentTypes.isAccountMoney(paymentMethod.type) }?.let { metadata ->
-            metadata.displayInfo.takeIf { it.type != null }?.let {
-                CardDrawable(paymentMethod.id, cardUiMapper.map(it))
-            } ?: CardDrawable(paymentMethod.id, null, CardDrawerStyle.ACCOUNT_MONEY_DEFAULT)
-        }
+    private fun getCardDrawable(
+        accountMoneyMetadata: AccountMoneyMetadata?,
+        cardMetadata: CardMetadata?,
+        paymentMethod: Application.PaymentMethod): CardDrawable? {
+
+        return when {
+            PaymentTypes.isAccountMoney(paymentMethod.type) -> accountMoneyMetadata?.displayInfo?.let(cardUiMapper::map)
+            PaymentTypes.isCardPaymentType(paymentMethod.type) -> cardMetadata?.displayInfo?.let(cardUiMapper::map)
+            else -> null
+        }?.let { CardDrawable(paymentMethod.id, it) }
     }
 
     private fun getParameters(
@@ -76,7 +71,9 @@ internal class PaymentMethodDrawableItemMapper(
         val commonsByApplication = CommonsByApplication(paymentMethodType).also {
             oneTapItem.getApplications().forEach { application ->
                 val customOptionIdByApplication = CustomOptionIdSolver.getByApplication(oneTapItem, application)
-                val (description, issuerName) = customSearchItems.firstOrNull { c -> c.id == customOptionIdByApplication }?.let {
+                val (description, issuerName) = customSearchItems.firstOrNull { c ->
+                    c.id == customOptionIdByApplication
+                }?.let {
                     Pair(it.description.orEmpty(), it.issuer?.name.orEmpty())
                 } ?: Pair(TextUtil.EMPTY, TextUtil.EMPTY)
 
@@ -88,8 +85,7 @@ internal class PaymentMethodDrawableItemMapper(
                     disabledPaymentMethodRepository[Key(customOptionIdByApplication, paymentTypeId)],
                     description,
                     issuerName,
-                    getCardDrawable(oneTapItem.card, application.paymentMethod)
-                        ?: getAccountMoneyCardDrawable(oneTapItem.accountMoney, application.paymentMethod)
+                    getCardDrawable(oneTapItem.accountMoney, oneTapItem.card, application.paymentMethod)
                 )
             }
         }

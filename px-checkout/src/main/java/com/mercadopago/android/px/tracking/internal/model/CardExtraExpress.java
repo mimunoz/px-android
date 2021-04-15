@@ -24,7 +24,7 @@ public final class CardExtraExpress extends CardExtraInfo {
         final boolean hasSplit) {
         return new CardExtraExpress(card.getId(),
             hasEsc,
-            card.getDisplayInfo().issuerId, null, hasSplit);
+            card.getDisplayInfo().getIssuerId(), null, hasSplit);
     }
 
     // este es el de confirm
@@ -32,7 +32,7 @@ public final class CardExtraExpress extends CardExtraInfo {
     public static CardExtraExpress selectedExpressSavedCard(final CardMetadata card, final PayerCost payerCost,
         final boolean hasEsc,
         final boolean hasSplit) {
-        return new CardExtraExpress(card.getId(), hasEsc, card.getDisplayInfo().issuerId, new PayerCostInfo(payerCost),
+        return new CardExtraExpress(card.getId(), hasEsc, card.getDisplayInfo().getIssuerId(), new PayerCostInfo(payerCost),
             hasSplit);
     }
 }

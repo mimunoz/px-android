@@ -4,6 +4,7 @@ import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMet
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
+import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.mappers.*
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper
@@ -89,4 +90,7 @@ internal object MapperProvider {
 
     val fromApplicationToApplicationInfo: FromApplicationToApplicationInfo
         get() = FromApplicationToApplicationInfo()
+
+    val fromSecurityCodeDisplayDataToBusinessSecurityCodeDisplayData: BusinessSecurityCodeDisplayDataMapper
+        get() = BusinessSecurityCodeDisplayDataMapper()
 }

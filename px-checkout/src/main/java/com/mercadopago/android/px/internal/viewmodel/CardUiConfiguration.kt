@@ -24,7 +24,7 @@ internal class CardUiConfiguration(
     private val securityCodeLocation: String,
     private val securityCodeLength: Int,
     private val gradientColors: List<String>? = null,
-    private val style: CardDrawerStyle? = null) : CardUI, Parcelable {
+    private val style: CardDrawerStyle) : CardUI, Parcelable {
 
     override fun getBankImageRes() = 0
 

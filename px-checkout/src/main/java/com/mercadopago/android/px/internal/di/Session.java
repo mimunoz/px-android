@@ -376,7 +376,7 @@ public final class Session extends ApplicationModule {
 
     public UseCaseModule getUseCaseModule() {
         if (useCaseModule == null) {
-            useCaseModule = new UseCaseModule(configurationModule);
+            useCaseModule = new UseCaseModule(configurationModule, MapperProvider.INSTANCE);
         }
         return useCaseModule;
     }

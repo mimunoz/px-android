@@ -4,11 +4,13 @@ import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.internal.base.use_case.TokenizeUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
-import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.features.validation_program.AuthenticateUseCase
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase
 
-internal class UseCaseModule(val configurationModule: CheckoutConfigurationModule) {
+internal class UseCaseModule(
+    private val configurationModule: CheckoutConfigurationModule,
+    private val mapperProvider: MapperProvider
+) {
 
     val tokenizeUseCase: TokenizeUseCase
         get() {
@@ -25,7 +27,7 @@ internal class UseCaseModule(val configurationModule: CheckoutConfigurationModul
         get() {
             val session = Session.getInstance()
             return DisplayDataUseCase(
-                BusinessSecurityCodeDisplayDataMapper(),
+                mapperProvider.fromSecurityCodeDisplayDataToBusinessSecurityCodeDisplayData,
                 session.tracker,
                 session.oneTapItemRepository)
         }

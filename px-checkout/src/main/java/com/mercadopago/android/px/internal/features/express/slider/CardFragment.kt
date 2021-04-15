@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.meli.android.carddrawer.model.CardDrawerView
 import com.mercadopago.android.px.R
-import com.mercadopago.android.px.internal.extensions.isNotNull
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem
 import com.mercadopago.android.px.model.PaymentTypes
@@ -21,14 +20,13 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
 
     override fun updateCardDrawerView(cardDrawerView: CardDrawerView) {
         model.commonsByApplication.getCurrent().cardDrawable?.let { byApplication ->
-            byApplication.cardConfiguration?.takeIf { it.isNotNull() }?.let { card ->
+            byApplication.cardConfiguration?.let { card ->
                 cardView = cardDrawerView
                 cardView.card.name = card.name
                 cardView.card.expiration = card.date
                 cardView.card.number = card.number
                 cardView.show(card)
             }
-            byApplication.cardStyle.takeIf { it.isNotNull() }?.let (cardView::setStyle)
             cardView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         }
     }

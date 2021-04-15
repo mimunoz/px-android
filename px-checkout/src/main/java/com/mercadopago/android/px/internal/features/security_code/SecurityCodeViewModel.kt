@@ -9,10 +9,10 @@ import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase.CardParams
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
-import com.mercadopago.android.px.internal.features.security_code.mapper.SecurityCodeDisplayModelMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.TrackingParamModelMapper
 import com.mercadopago.android.px.internal.features.security_code.model.SecurityCodeDisplayModel
 import com.mercadopago.android.px.internal.features.security_code.tracking.SecurityCodeTracker
+import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PaymentRecovery
 import com.mercadopago.android.px.model.internal.PaymentConfiguration
@@ -24,7 +24,7 @@ internal class SecurityCodeViewModel(
     private val displayDataUseCase: DisplayDataUseCase,
     private val trackModelUseCase: SecurityTrackModelUseCase,
     private val trackParamsMapper: TrackingParamModelMapper,
-    private val securityCodeDisplayModelMapper: SecurityCodeDisplayModelMapper,
+    private val cardUiMapper: CardUiMapper,
     tracker: MPTracker) : BaseViewModel(tracker) {
 
     private val displayModelMutableLiveData = MutableLiveData<SecurityCodeDisplayModel>()
@@ -66,7 +66,12 @@ internal class SecurityCodeViewModel(
 
         displayDataUseCase.execute(cardParams,
             success = { displayData ->
-                displayModelMutableLiveData.value = securityCodeDisplayModelMapper.map(displayData)
+                displayModelMutableLiveData.value = SecurityCodeDisplayModel(
+                    displayData.title,
+                    displayData.message,
+                    displayData.securityCodeLength,
+                    displayData.cardDisplayInfo?.let(cardUiMapper::map)
+                )
             })
     }
 

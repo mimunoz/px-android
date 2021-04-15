@@ -35,7 +35,7 @@ public final class ExpressInstallmentsData extends TrackingMapModel {
         final String paymentMethodType = expressMetadata.getPaymentTypeId();
         final String paymentMethodId = expressMetadata.getPaymentMethodId();
         final String cardId = expressMetadata.isCard() ? expressMetadata.getCard().getId() : TextUtil.EMPTY;
-        final Long issuerId = expressMetadata.isCard() ? expressMetadata.getCard().getDisplayInfo().issuerId : -1;
+        final Long issuerId = expressMetadata.isCard() ? expressMetadata.getCard().getDisplayInfo().getIssuerId() : -1;
         final List<PayerCostInfo> payerCostTrackModels = new ArrayList<>();
         for (final PayerCost payerCost : amountConfiguration.getPayerCosts()) {
             payerCostTrackModels.add(new PayerCostInfo(payerCost));

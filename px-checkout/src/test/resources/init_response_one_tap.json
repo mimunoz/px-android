@@ -7,6 +7,7 @@
                 "available_balance": 16725.22,
                 "invested": true,
                 "display_info": {
+                    "type": "default",
                     "slider_title": "You are using money that is invested",
                     "message": "Balance in Mercado Pago: $ 16.725,22"
                 }
@@ -25,6 +26,7 @@
             "card": {
                 "id": "268434496",
                 "display_info": {
+                    "type": "default",
                     "expiration": "9/24",
                     "last_four_digits": "3810",
                     "first_six_digits": "482469",
@@ -70,6 +72,7 @@
             "card": {
                 "id": "8757740698",
                 "display_info": {
+                    "type": "default",
                     "expiration": "9/24",
                     "last_four_digits": "7764",
                     "first_six_digits": "521872",
@@ -115,6 +118,7 @@
             "card": {
                 "id": "8784605917",
                 "display_info": {
+                    "type": "default",
                     "expiration": "10/29",
                     "last_four_digits": "3422",
                     "first_six_digits": "525855",
@@ -151,6 +155,7 @@
             "card": {
                 "id": "8761396989",
                 "display_info": {
+                    "type": "default",
                     "expiration": "9/24",
                     "last_four_digits": "4184",
                     "first_six_digits": "554730",
@@ -346,6 +351,7 @@
             "card": {
                 "id": "8886797901",
                 "display_info": {
+                    "type": "default",
                     "expiration": "11/21",
                     "last_four_digits": "0000",
                     "first_six_digits": "439818",
@@ -386,6 +392,7 @@
             "card": {
                 "id": "7645309910",
                 "display_info": {
+                    "type": "default",
                     "expiration": "3/24",
                     "last_four_digits": "7519",
                     "first_six_digits": "451751",
@@ -426,6 +433,7 @@
             "card": {
                 "id": "8784610899",
                 "display_info": {
+                    "type": "default",
                     "expiration": "2/24",
                     "last_four_digits": "7726",
                     "first_six_digits": "451765",
@@ -466,6 +474,7 @@
             "card": {
                 "id": "8784610203",
                 "display_info": {
+                    "type": "default",
                     "expiration": "4/21",
                     "last_four_digits": "9098",
                     "first_six_digits": "604201",

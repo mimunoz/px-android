@@ -7,7 +7,7 @@ import com.mercadopago.android.px.internal.mappers.Mapper
 
 internal class BusinessSecurityCodeDisplayDataMapper: Mapper<SecurityCodeDisplayData, BusinessSecurityCodeDisplayData>()
 {
-    override fun map(model: SecurityCodeDisplayData) = model.run {
+    override fun map(value: SecurityCodeDisplayData) = value.run {
 
         val businessCardDisplayInfo = cardDisplayInfo?.let { displayInfo ->
             BusinessCardDisplayInfo(
@@ -25,14 +25,15 @@ internal class BusinessSecurityCodeDisplayDataMapper: Mapper<SecurityCodeDisplay
                 displayInfo.issuerImage,
                 displayInfo.fontType,
                 displayInfo.paymentMethodImageUrl,
-                displayInfo.issuerImageUrl
+                displayInfo.issuerImageUrl,
+                displayInfo.type
             )
         }
 
         BusinessSecurityCodeDisplayData(
             title,
             message,
-            model.securityCodeLength,
+            value.securityCodeLength,
             businessCardDisplayInfo
         )
     }

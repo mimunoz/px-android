@@ -1,10 +1,12 @@
 package com.mercadopago.android.px.securitycode
 
+import com.meli.android.carddrawer.configuration.CardDrawerStyle
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessCardDisplayInfo
 import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.internal.viewmodel.CardUiConfiguration
 import com.mercadopago.android.px.model.CardDisplayInfo
+import com.mercadopago.android.px.model.CardDisplayInfoType
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -17,6 +19,7 @@ class CardUiMapperTest {
     fun whenMapBusinessCardDisplayInfoToCardUiConfiguration() {
         val businessCardDisplayInfo = mock(BusinessCardDisplayInfo::class.java)
 
+        `when`(businessCardDisplayInfo.type).thenReturn(CardDisplayInfoType.DEFAULT)
         `when`(businessCardDisplayInfo.paymentMethodImage).thenReturn("paymentMethodImage")
         `when`(businessCardDisplayInfo.paymentMethodImageUrl).thenReturn("paymentMethodImageUrl")
         `when`(businessCardDisplayInfo.cardPattern).thenReturn(intArrayOf(1, 2, 3, 4))
@@ -44,7 +47,8 @@ class CardUiMapperTest {
             businessCardDisplayInfo.color,
             businessCardDisplayInfo.fontColor,
             businessCardDisplayInfo.securityCodeLocation,
-            businessCardDisplayInfo.securityCodeLength
+            businessCardDisplayInfo.securityCodeLength,
+            style = CardDrawerStyle.REGULAR
         )
 
         val actualResult = CardUiMapper.map(businessCardDisplayInfo)
@@ -87,7 +91,7 @@ class CardUiMapperTest {
                 securityCode.cardLocation,
                 securityCode.length,
                 null,
-                null
+                CardDrawerStyle.REGULAR
             )
         }
 

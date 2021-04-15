@@ -9,10 +9,10 @@ import com.mercadopago.android.px.internal.features.security_code.SecurityCodeVi
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessSecurityCodeDisplayData
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
-import com.mercadopago.android.px.internal.features.security_code.mapper.SecurityCodeDisplayModelMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.TrackingParamModelMapper
 import com.mercadopago.android.px.internal.features.security_code.model.SecurityCodeDisplayModel
 import com.mercadopago.android.px.internal.features.security_code.tracking.SecurityCodeTracker
+import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PaymentRecovery
 import com.mercadopago.android.px.model.Token
@@ -47,10 +47,10 @@ class SecurityCodeViewModelTest {
     private lateinit var trackingParamModelMapper: TrackingParamModelMapper
 
     @Mock
-    private lateinit var securityCodeDisplayModelMapper: SecurityCodeDisplayModelMapper
+    private lateinit var paymentConfiguration: PaymentConfiguration
 
     @Mock
-    private lateinit var paymentConfiguration: PaymentConfiguration
+    private lateinit var cardUiMapper: CardUiMapper
 
     @Mock
     private lateinit var card: Card
@@ -75,7 +75,7 @@ class SecurityCodeViewModelTest {
             displayDataUseCaseTest,
             trackModelUseCase,
             trackingParamModelMapper,
-            securityCodeDisplayModelMapper,
+            cardUiMapper,
             mock()
         )
 
@@ -83,7 +83,6 @@ class SecurityCodeViewModelTest {
         securityCodeViewModel.tokenizeErrorApiLiveData.observeForever(tokenizeErrorApiObserver)
 
         whenever(trackingParamModelMapper.map(any(), any())).thenReturn(mock())
-        whenever(securityCodeDisplayModelMapper.map(any())).thenReturn(mock())
         with(card) {
             whenever(id).thenReturn("123")
             whenever(getSecurityCodeLength()).thenReturn(3)
@@ -96,7 +95,10 @@ class SecurityCodeViewModelTest {
         val successTrackerCaptor = argumentCaptor<CallBack<SecurityCodeTracker>>()
         val successDisplayDataCaptor = argumentCaptor<CallBack<BusinessSecurityCodeDisplayData>>()
         val securityCodeTrackerMock = mock<SecurityCodeTracker>()
-        val displayBusinessDataMock = mock<BusinessSecurityCodeDisplayData>()
+        val displayBusinessDataMock = mock<BusinessSecurityCodeDisplayData> {
+            on { title }.thenReturn(mock())
+            on { message }.thenReturn(mock())
+        }
 
         securityCodeViewModel.init(
             paymentConfiguration,
@@ -119,7 +121,10 @@ class SecurityCodeViewModelTest {
         val successTrackerCaptor = argumentCaptor<CallBack<SecurityCodeTracker>>()
         val successDisplayDataCaptor = argumentCaptor<CallBack<BusinessSecurityCodeDisplayData>>()
         val securityCodeTrackerMock = mock<SecurityCodeTracker>()
-        val displayBusinessDataMock = mock<BusinessSecurityCodeDisplayData>()
+        val displayBusinessDataMock = mock<BusinessSecurityCodeDisplayData> {
+            on { title }.thenReturn(mock())
+            on { message }.thenReturn(mock())
+        }
 
         whenever(paymentRecovery.card).thenReturn(card)
 

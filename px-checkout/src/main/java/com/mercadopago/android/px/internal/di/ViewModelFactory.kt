@@ -7,7 +7,6 @@ import com.mercadopago.android.px.internal.core.ConnectionHelper
 import com.mercadopago.android.px.internal.features.express.offline_methods.OfflineMethodsViewModel
 import com.mercadopago.android.px.internal.features.pay_button.PayButtonViewModel
 import com.mercadopago.android.px.internal.features.security_code.SecurityCodeViewModel
-import com.mercadopago.android.px.internal.features.security_code.mapper.SecurityCodeDisplayModelMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.TrackingParamModelMapper
 import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.internal.mappers.PayButtonViewModelMapper
@@ -49,7 +48,7 @@ internal class ViewModelFactory : ViewModelProvider.Factory {
                     useCaseModule.displayDataUseCase,
                     useCaseModule.securityTrackModelUseCase,
                     TrackingParamModelMapper(),
-                    SecurityCodeDisplayModelMapper(CardUiMapper),
+                    CardUiMapper,
                     session.tracker
                 )
             }

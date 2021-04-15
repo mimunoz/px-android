@@ -20,6 +20,7 @@ class BusinessSecurityCodeDisplayDataMapperTest {
         val securityCodeDisplayData = mock(SecurityCodeDisplayData::class.java)
 
         val cardDisplayInfo = JsonUtil.fromJson("""{
+            "type":"default",
             "payment_method_image": "paymentMethodImage",
             "payment_method_image_url": "paymentMethodImageUrl",
             "card_pattern": [1, 2, 3, 4],
@@ -59,7 +60,8 @@ class BusinessSecurityCodeDisplayDataMapperTest {
                 issuerImage,
                 fontType,
                 paymentMethodImageUrl,
-                issuerImageUrl
+                issuerImageUrl,
+                type
             )
         }
         
