@@ -210,19 +210,24 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         return new Callback<CheckoutResponse>() {
             @Override
             public void success(final CheckoutResponse checkoutResponse) {
-                refreshRetriesAvailable--;
+                final boolean retryAvailable = --refreshRetriesAvailable > 0;
                 final List<OneTapItem> oneTap = checkoutResponse.getOneTapItems();
-                for (final ExpressMetadata node : oneTap) {
+                boolean cardFound = false;
+                boolean retryNeeded = true;
+                for (final OneTapItem node : oneTap) {
                     if (node.isCard() && node.getCard().getId().equals(cardId)) {
-                        refreshRetriesAvailable = MAX_REFRESH_RETRIES;
-                        new OneTapItemSorter(oneTap, disabledPaymentMethodMap)
-                            .setPrioritizedCardId(cardId).sort();
-                        getPostResponse().call(checkoutResponse);
-                        callback.success(checkoutResponse);
-                        return;
+                        cardFound = true;
+                        retryNeeded = node.getCard().getRetry().isNeeded();
+                        break;
                     }
                 }
-                if (refreshRetriesAvailable > 0) {
+                if (cardFound && (!retryNeeded || !retryAvailable)) {
+                    refreshRetriesAvailable = MAX_REFRESH_RETRIES;
+                    new OneTapItemSorter(oneTap, disabledPaymentMethodMap)
+                        .setPrioritizedCardId(cardId).sort();
+                    getPostResponse().call(checkoutResponse);
+                    callback.success(checkoutResponse);
+                } else if (retryAvailable) {
                     if (retryHandler == null) {
                         final HandlerThread thread = new HandlerThread("MyInitRetryThread");
                         thread.start();
