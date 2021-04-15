@@ -10,6 +10,5 @@ ext {
 }
 
 group = groupName
-archivesBaseName = artifactLib
 
 apply from:"$rootDir/gradle/deploy_base.gradle"

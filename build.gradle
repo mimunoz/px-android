@@ -13,15 +13,13 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePlugin"
         classpath "org.jacoco:org.jacoco.core:$jacoco"
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintray"
-        classpath "com.github.dcendents:android-maven-gradle-plugin:$maven"
         classpath "com.monits:static-code-analysis-plugin:$staticCodeAnalysis"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin"
     }
 }
 
 ext {
-    dateNow = project.hasProperty('production') ? "" : new Date().format("ddMMyyyyHHmmssS")
+    dateNow = new Date().format("ddMMyyyyHHmmssS")
 }
 
 subprojects {
