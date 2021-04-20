@@ -1,3 +1,9 @@
+## VERSION 4.76.1
+_20_04_2021_
+* FIX - Crash serializing complex map keys.
+* FIX - Crash disabling lowres credits card.
+* FIX - Incorrect warning on offline methods.
+
 ## VERSION 4.76.0
 _15_04_2021_
 * FEATURE - Enables combo card.
