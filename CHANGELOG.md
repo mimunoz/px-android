@@ -1,3 +1,11 @@
+## VERSION 4.76.0
+_15_04_2021_
+* FEATURE - Enables combo card.
+* FEATURE - Retries STP tokenization in case it's needed.
+* ENHANCEMENT - Migrates from Bintray to Nexus.
+* ENHANCEMENT - Changed CHA package.
+* FIX - Shows correct style for hybrid card.
+
 ## VERSION 4.75.1
 _13_04_2021_
 * FIX - Offline methods were broken in last release.
