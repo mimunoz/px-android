@@ -106,7 +106,9 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         background.clearColorFilter();
         background.setImageResource(0);
         background.setBackgroundColor(disableConfiguration.getBackgroundColor());
-        topText.setVisibility(View.GONE);
+        if (topText != null) {
+            topText.setVisibility(View.GONE);
+        }
         bottomText.setVisibility(View.GONE);
         centerLogo();
     }
