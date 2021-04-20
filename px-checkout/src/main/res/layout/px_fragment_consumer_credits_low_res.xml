@@ -17,6 +17,7 @@
         app:cardPreventCornerOverlap="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/credits_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -29,6 +30,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/background_shape"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:adjustViewBounds="true"
@@ -48,7 +50,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="spread" />
-
 
             <com.mercadopago.android.px.internal.view.LinkableTextView
                 android:id="@+id/bottom_text"
