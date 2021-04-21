@@ -1,3 +1,10 @@
+## VERSION 4.75.2
+_21_04_2021_
+* FIX - Crash serializing complex map keys.
+* FIX - Crash disabling lowres credits card.
+* FIX - Incorrect warning on offline methods.
+* ENHANCEMENT - Migrates from Bintray to Nexus.
+
 ## VERSION 4.75.1
 _13_04_2021_
 * FIX - Offline methods were broken in last release.
