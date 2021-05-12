@@ -3,6 +3,7 @@ package com.mercadopago.android.px.services;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.mercadopago.android.px.addons.BehaviourProvider;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.services.BankDealService;
 import com.mercadopago.android.px.internal.services.CheckoutService;
@@ -14,7 +15,6 @@ import com.mercadopago.android.px.internal.services.InstructionsClient;
 import com.mercadopago.android.px.internal.services.IssuersService;
 import com.mercadopago.android.px.internal.services.PaymentService;
 import com.mercadopago.android.px.internal.services.PreferenceService;
-import com.mercadopago.android.px.internal.util.LocaleUtil;
 import com.mercadopago.android.px.internal.util.RetrofitUtil;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.model.BankDeal;
@@ -55,8 +55,8 @@ public class MercadoPagoServices {
     private final Retrofit retrofitClient;
 
     /**
-     * @param context context to obtain connection interceptor and cache.
-     * @param publicKey merchant public key / collector public key {@see <a href="https://www.mercadopago.com/mla/account/credentials">credentials</a>}
+     * @param context    context to obtain connection interceptor and cache.
+     * @param publicKey  merchant public key / collector public key {@see <a href="https://www.mercadopago.com/mla/account/credentials">credentials</a>}
      * @param privateKey user private key / access_token if you have it.
      */
     public MercadoPagoServices(@NonNull final Context context,
@@ -143,7 +143,7 @@ public class MercadoPagoServices {
 
     public void getBankDeals(final Callback<List<BankDeal>> callback) {
         final BankDealService service = retrofitClient.create(BankDealService.class);
-        service.getBankDeals(publicKey, privateKey, LocaleUtil.getLanguage(context))
+        service.getBankDeals(publicKey, privateKey, BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag())
             .enqueue(callback);
     }
 
@@ -173,8 +173,8 @@ public class MercadoPagoServices {
         final Callback<List<Installment>> callback) {
         final InstallmentService service = retrofitClient.create(InstallmentService.class);
         service.getInstallments(API_ENVIRONMENT, publicKey, privateKey, bin, amount, issuerId, paymentMethodId,
-            LocaleUtil.getLanguage(context), processingMode.asQueryParamName(), differentialPricingId)
-            .enqueue(callback);
+            BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag(),
+            processingMode.asQueryParamName(), differentialPricingId).enqueue(callback);
     }
 
     public void getIssuers(final String paymentMethodId, final String bin, final Callback<List<Issuer>> callback) {
@@ -190,9 +190,9 @@ public class MercadoPagoServices {
     }
 
     /**
-     * @param amount amount to pay
+     * @param amount     amount to pay
      * @param payerEmail payer email
-     * @param callback your callback
+     * @param callback   your callback
      * @deprecated this mechanism will not be available anymore in {@version 5.0}
      */
     @Deprecated
@@ -202,10 +202,10 @@ public class MercadoPagoServices {
     }
 
     /**
-     * @param amount amount to pay
+     * @param amount     amount to pay
      * @param payerEmail payer email
      * @param couponCode the code to be rewarded
-     * @param callback your callback
+     * @param callback   your callback
      * @deprecated this mechanism will not be available anymore in {@version 5.0}
      */
     @Deprecated

@@ -95,7 +95,7 @@ public final class HttpClientUtil {
             baseClient.addInterceptor(new ScreenDensityInterceptor(context));
             baseClient.addInterceptor(new PlatformInterceptor(context));
             baseClient.addInterceptor(new FlowIdInterceptor(ConfigurationModule.INSTANCE.getTrackingRepository()));
-            baseClient.addInterceptor(new LanguageInterceptor(context));
+            baseClient.addInterceptor(new LanguageInterceptor(BehaviourProvider.getLocaleBehaviour()));
         }
 
         baseClient.addInterceptor(new StrictModeInterceptor());

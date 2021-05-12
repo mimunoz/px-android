@@ -1,9 +1,7 @@
 package com.mercadopago
 
-import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.os.Bundle
 import androidx.multidex.MultiDex
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.stetho.Stetho
@@ -11,9 +9,8 @@ import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.mercadopago.android.px.BuildConfig
 import com.mercadopago.android.px.addons.*
 import com.mercadopago.android.px.di.Dependencies.Companion.instance
-import com.mercadopago.android.px.font.FontConfigurator.Companion.configure
+import com.mercadopago.android.px.font.FontConfigurator
 import com.mercadopago.android.px.internal.util.HttpClientUtil
-import java.util.*
 
 class SampleApplication : Application() {
     override fun attachBaseContext(base: Context) {
@@ -24,19 +21,6 @@ class SampleApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         initialize()
-        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-                val (language, country) = localeTag.split("-")
-                LocaleContextWrapper.wrap(activity, Locale(language, country))
-            }
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-            override fun onActivityStarted(activity: Activity) {}
-            override fun onActivityResumed(activity: Activity) {}
-            override fun onActivityPaused(activity: Activity) {}
-            override fun onActivityStopped(activity: Activity) {}
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-            override fun onActivityDestroyed(activity: Activity) {}
-        })
     }
 
     private fun initialize() {
@@ -53,13 +37,14 @@ class SampleApplication : Application() {
         HttpClientUtil.setCustomClient(customClient)
         instance.initialize(applicationContext)
         val escManagerBehaviour: ESCManagerBehaviour = FakeEscManagerBehaviourImpl()
-        val builder = PXBehaviourConfigurer()
-        if (BuildConfig.DEBUG) {
-            builder.with(MockSecurityBehaviour(escManagerBehaviour))
-        }
-        builder.with(escManagerBehaviour)
-            .configure()
-        configure()
+        with(PXBehaviourConfigurer()) {
+            if (BuildConfig.DEBUG) {
+                with(MockSecurityBehaviour(escManagerBehaviour))
+            }
+            with(escManagerBehaviour)
+            with(FakeLocaleBehaviourImpl)
+        }.configure()
+        FontConfigurator.configure()
     }
 
     companion object {

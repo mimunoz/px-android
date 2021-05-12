@@ -2,8 +2,8 @@ package com.mercadopago.android.px.addons;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import java.util.Locale;
 
-@Deprecated
 public interface LocaleBehaviour {
 
     /**
@@ -12,4 +12,13 @@ public interface LocaleBehaviour {
      */
     @NonNull
     Context attachBaseContext(@NonNull final Context context);
+
+
+    /**
+     * @return the locale being used in the app.
+     */
+    @NonNull
+    default Locale getLocale() {
+        return Locale.getDefault();
+    }
 }
