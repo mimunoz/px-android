@@ -9,7 +9,6 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -335,12 +334,9 @@ public final class ViewUtils {
      *
      * @param color the color to use. The color will be darkened by {@link #DARKEN_FACTOR} percent
      */
-    @SuppressLint({ "InlinedApi" })
     public static void setStatusBarColor(@ColorInt final int color, @NonNull final Window window) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getDarkPrimaryColor(color));
-        }
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(getDarkPrimaryColor(color));
     }
 
     public static boolean isScreenSize(@NonNull final Context context, final int screenLayoutSize) {

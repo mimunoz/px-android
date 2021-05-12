@@ -19,9 +19,7 @@ public final class LocaleUtil {
             if (!locales.isEmpty()) {
                 return locales.get(0).toLanguageTag();
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return configuration.locale.toLanguageTag();
         }
-        return configuration.locale.getLanguage();
+        return configuration.locale.toLanguageTag();
     }
 }
