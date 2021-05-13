@@ -8,6 +8,7 @@ apply plugin:'kotlin-android-extensions'
 android {
     defaultConfig {
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
     }
     kotlinOptions {
         jvmTarget = "1.8"

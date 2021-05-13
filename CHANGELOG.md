@@ -1,3 +1,7 @@
+## VERSION 4.77.1
+_13_05_2021_
+* FIX - Reverted Minimum API level to 19.
+
 ## VERSION 4.77.0
 _13_05_2021_
 * FEATURE - Minimum API level 21.

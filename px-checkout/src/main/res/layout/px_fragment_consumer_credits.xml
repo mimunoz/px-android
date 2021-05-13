@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_above="@id/top_text"
                 android:layout_marginBottom="@dimen/px_xxs_margin"
-                android:src="@drawable/px_consumer_credits_onetap"
+                app:srcCompat="@drawable/px_consumer_credits_onetap"
                 app:layout_constraintBottom_toTopOf="@id/top_text"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

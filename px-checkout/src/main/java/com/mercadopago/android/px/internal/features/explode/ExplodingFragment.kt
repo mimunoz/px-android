@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -267,7 +268,11 @@ class ExplodingFragment : Fragment() {
             val cy = (progressBar.top + progressBar.bottom) / 2 + buttonYPosition
             val startColor = explodeDecorator.getDarkPrimaryColor(context)
             val endColor = explodeDecorator.getPrimaryColor(context)
-            ViewAnimationUtils.createCircularReveal(reveal, cx, cy, startRadius.toFloat(), finalRadius).apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ViewAnimationUtils.createCircularReveal(reveal, cx, cy, startRadius.toFloat(), finalRadius)
+            } else {
+                ObjectAnimator.ofFloat(reveal, "alpha", 0f, 1f)
+            }.apply {
                 duration = resources.getInteger(R.integer.px_long_animation_time).toLong()
                 startDelay = resources.getInteger(R.integer.px_long_animation_time).toLong()
                 interpolator = AccelerateInterpolator()
