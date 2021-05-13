@@ -1,19 +1,17 @@
 package com.mercadopago.android.px.internal.core
 
-import android.content.Context
-import com.mercadopago.android.px.internal.util.LocaleUtil
+import com.mercadopago.android.px.addons.LocaleBehaviour
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
-class LanguageInterceptor(context: Context) : Interceptor {
-    private val context = context.applicationContext
+internal class LanguageInterceptor(private val localeBehaviour: LocaleBehaviour) : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val request = originalRequest.newBuilder()
-            .header(LANGUAGE_HEADER, LocaleUtil.getLanguage(context))
+            .header(LANGUAGE_HEADER, localeBehaviour.locale.toLanguageTag())
             .build()
         return chain.proceed(request)
     }

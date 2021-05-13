@@ -7,6 +7,7 @@ public final class PXBehaviourConfigurer {
     private SecurityBehaviour securityBehaviour;
     private ESCManagerBehaviour escManagerBehaviour;
     private TrackingBehaviour trackingBehaviour;
+    private LocaleBehaviour localeBehaviour;
     private FlowBehaviour flowBehaviour;
     private ThreeDSBehaviour threeDSBehaviour;
 
@@ -25,8 +26,8 @@ public final class PXBehaviourConfigurer {
         return this;
     }
 
-    @Deprecated
     public PXBehaviourConfigurer with(@NonNull final LocaleBehaviour localeBehaviour) {
+        this.localeBehaviour = localeBehaviour;
         return this;
     }
 
@@ -44,6 +45,7 @@ public final class PXBehaviourConfigurer {
         BehaviourProvider.set(securityBehaviour);
         BehaviourProvider.set(escManagerBehaviour);
         BehaviourProvider.set(trackingBehaviour);
+        BehaviourProvider.set(localeBehaviour);
         BehaviourProvider.set(flowBehaviour);
         BehaviourProvider.set(threeDSBehaviour);
     }

@@ -3,6 +3,7 @@ package com.mercadopago.android.px.addons;
 import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.internal.ESCManagerDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.FlowDefaultBehaviour;
+import com.mercadopago.android.px.addons.internal.LocaleDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.SecurityDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.ThreeDSDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.TrackingDefaultBehaviour;
@@ -12,6 +13,7 @@ public final class BehaviourProvider {
     private static SecurityBehaviour securityBehaviour;
     private static ESCManagerBehaviour escManagerBehaviour;
     private static TrackingBehaviour trackingBehaviour;
+    private static LocaleBehaviour localeBehaviour;
     private static FlowBehaviour flowBehaviour;
     private static ThreeDSBehaviour threeDSBehaviour;
 
@@ -34,8 +36,8 @@ public final class BehaviourProvider {
     }
 
     /* default */
-    @Deprecated
     static void set(final LocaleBehaviour localeBehaviour) {
+        BehaviourProvider.localeBehaviour = localeBehaviour;
     }
 
     /* default */
@@ -114,9 +116,8 @@ public final class BehaviourProvider {
     }
 
     @NonNull
-    @Deprecated
     public static LocaleBehaviour getLocaleBehaviour() {
-        return null;
+        return localeBehaviour != null ? localeBehaviour : new LocaleDefaultBehaviour();
     }
 
     @NonNull
