@@ -1,3 +1,8 @@
+## VERSION 4.77.0
+_13_05_2021_
+* FEATURE - Minimum API level 21.
+* FIX - Locale interceptor.
+
 ## VERSION 4.75.2
 _21_04_2021_
 * FIX - Crash serializing complex map keys.
