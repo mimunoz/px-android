@@ -25,7 +25,6 @@ import com.mercadopago.android.px.internal.extensions.postDelayed
 import com.mercadopago.android.px.internal.extensions.runWhenLaidOut
 import com.mercadopago.android.px.internal.extensions.showSnackBar
 import com.mercadopago.android.px.internal.features.Constants
-import com.mercadopago.android.px.internal.features.express.RenderMode
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.pay_button.PayButtonFragment
 import com.mercadopago.android.px.internal.features.security_code.model.SecurityCodeParams
@@ -37,8 +36,6 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 
 private const val ARG_PARAMS = "security_code_params"
 private const val CVV_IS_FULL = "cvv_is_full"
-private const val HIGH_RES_MIN_HEIGHT = 620
-private const val LOW_RES_MIN_HEIGHT = 585
 
 internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHandler {
 
@@ -48,7 +45,6 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
     private lateinit var cvvTitle: TextView
     private lateinit var payButtonFragment: PayButtonFragment
     private lateinit var cvvToolbar: Toolbar
-    private lateinit var renderMode: RenderMode
     private lateinit var cardDrawer: CardDrawerView
     private lateinit var cvvSubtitle: TextView
     private lateinit var transition: SecurityCodeTransition
@@ -60,14 +56,14 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         arguments?.getParcelable<SecurityCodeParams>(ARG_PARAMS)?.let {
             fragmentContainer = it.fragmentContainer
-            defineRenderMode(it.renderMode)
+
 
             val view = inflater.inflate(
-                if (renderMode == RenderMode.LOW_RES) {
-                    R.layout.px_fragment_security_code_lowres
-                } else {
-                    R.layout.px_fragment_security_code
-                },
+                    when (it.renderMode) {
+                        RenderMode.LOW_RES -> R.layout.px_fragment_security_code_lowres
+                        RenderMode.MEDIUM_RES -> R.layout.px_fragment_security_code_mediumres
+                        else -> R.layout.px_fragment_security_code
+                    },
                 container, false
             ) as ConstraintLayout
 
@@ -80,7 +76,7 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
             transition = SecurityCodeTransition(view, cardDrawer, cvvToolbar, cvvTitle, cvvSubtitle, cvvEditText,
                 view.findViewById(R.id.pay_button))
 
-            if (renderMode == RenderMode.NO_CARD) {
+            if (it.renderMode == RenderMode.NO_CARD) {
                 cardDrawer.visibility = GONE
                 cvvSubtitle.visibility = VISIBLE
             }
@@ -127,15 +123,6 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
             applyTo(constraint)
             cardDrawer.showSecurityCode()
             ViewUtils.openKeyboard(cvvEditText)
-        }
-    }
-
-    private fun defineRenderMode(parentRenderMode: RenderMode) {
-        val availableHeight = resources.configuration.screenHeightDp
-        renderMode = when (parentRenderMode) {
-            RenderMode.HIGH_RES -> if (availableHeight >= HIGH_RES_MIN_HEIGHT) RenderMode.HIGH_RES else RenderMode.NO_CARD
-            RenderMode.LOW_RES -> if (availableHeight >= LOW_RES_MIN_HEIGHT) RenderMode.LOW_RES else RenderMode.NO_CARD
-            else -> RenderMode.NO_CARD
         }
     }
 
@@ -268,7 +255,7 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
         }
     }
 
-    override fun onCvvRequested() = PayButton.CvvRequestedModel(fragmentContainer, renderMode)
+    override fun onCvvRequested() = PayButton.CvvRequestedModel(fragmentContainer)
 
     override fun handleBack(): Boolean {
         if (backEnabled && !payButtonFragment.isExploding()) {

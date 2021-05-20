@@ -20,6 +20,7 @@ import com.mercadopago.android.px.internal.features.pay_button.PayButton.OnReady
 import com.mercadopago.android.px.internal.features.pay_button.UIProgress.*
 import com.mercadopago.android.px.internal.features.pay_button.UIResult.VisualProcessorResult
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
+import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.model.SecurityCodeParams
 import com.mercadopago.android.px.internal.livedata.MediatorSingleLiveData
 import com.mercadopago.android.px.internal.mappers.PayButtonViewModelMapper
@@ -52,6 +53,7 @@ internal class PayButtonViewModel(
     payButtonViewModelMapper: PayButtonViewModelMapper,
     private val paymentCongratsMapper: PaymentCongratsModelMapper,
     private val postPaymentUrlsMapper: PostPaymentUrlsMapper,
+    private val renderModeMapper: RenderModeMapper,
     private val factory: PaymentResultViewModelFactory,
     private val audioPlayer: AudioPlayer,
     tracker: MPTracker) : BaseViewModelWithState<PayButtonViewModel.State>(tracker), PayButton.ViewModel {
@@ -165,7 +167,7 @@ internal class PayButtonViewModel(
             value?.let { pair ->
                 handler?.onCvvRequested()?.let {
                     this.cvvRequiredLiveData.value = SecurityCodeParams(state.paymentConfiguration!!,
-                        it.fragmentContainer, it.renderMode, card = pair.first, reason = pair.second)
+                        it.fragmentContainer, renderModeMapper.map(it.renderMode), card = pair.first, reason = pair.second)
                 }
             }
             stateUILiveData.value = ButtonLoadingCanceled
@@ -223,7 +225,7 @@ internal class PayButtonViewModel(
 
     private fun recoverPayment(recovery: PaymentRecovery) {
         handler?.onCvvRequested()?.let {
-            cvvRequiredLiveData.value = SecurityCodeParams(state.paymentConfiguration!!, it.fragmentContainer, it.renderMode,
+            cvvRequiredLiveData.value = SecurityCodeParams(state.paymentConfiguration!!, it.fragmentContainer, renderModeMapper.map(it.renderMode),
                 paymentRecovery = recovery)
         }
     }

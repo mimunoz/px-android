@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.security_code.model
 
 import android.os.Parcel
-import com.mercadopago.android.px.internal.features.express.RenderMode
+import com.mercadopago.android.px.internal.features.security_code.RenderMode
 import com.mercadopago.android.px.internal.util.KParcelable
 import com.mercadopago.android.px.internal.util.parcelableCreator
 import com.mercadopago.android.px.model.Card
@@ -10,12 +10,12 @@ import com.mercadopago.android.px.model.internal.PaymentConfiguration
 import com.mercadopago.android.px.tracking.internal.model.Reason
 
 data class SecurityCodeParams(
-    val paymentConfiguration: PaymentConfiguration,
-    val fragmentContainer: Int,
-    val renderMode: RenderMode,
-    val card: Card? = null,
-    val paymentRecovery: PaymentRecovery? = null,
-    val reason: Reason? = null
+        val paymentConfiguration: PaymentConfiguration,
+        val fragmentContainer: Int,
+        val renderMode: RenderMode,
+        val card: Card? = null,
+        val paymentRecovery: PaymentRecovery? = null,
+        val reason: Reason? = null
 ) : KParcelable {
 
     constructor(parcel: Parcel): this(

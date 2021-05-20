@@ -1,9 +1,12 @@
 package com.mercadopago.android.px.internal.di
 
+import android.content.Context
+import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
+import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.mappers.*
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
@@ -33,6 +36,12 @@ internal object MapperProvider {
             session.configurationModule.applicationSelectionRepository,
             session.amountRepository
         )
+    }
+
+    fun getRenderModeMapper(context: Context): RenderModeMapper {
+        with(context.resources) {
+            return RenderModeMapper(configuration.screenHeightDp, getString(R.string.px_render_mode))
+        }
     }
 
     fun getPaymentCongratsMapper(): PaymentCongratsModelMapper {

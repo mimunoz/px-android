@@ -9,9 +9,11 @@ import com.mercadopago.android.px.internal.core.ProductIdProvider
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.explode.ExplodeDecorator
+import com.mercadopago.android.px.internal.features.express.RenderMode
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesModel
+import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.model.SecurityCodeParams
 import com.mercadopago.android.px.internal.livedata.MutableSingleLiveData
 import com.mercadopago.android.px.internal.mappers.PayButtonViewModelMapper
@@ -78,6 +80,8 @@ internal class PayButtonViewModelTest {
     private lateinit var state: PayButtonViewModel.State
     @Mock
     private lateinit var postPaymentUrlsMapper: PostPaymentUrlsMapper
+    @Mock
+    private lateinit var renderModeMapper: RenderModeMapper
 
     private val paymentErrorLiveData = MutableSingleLiveData<MercadoPagoError>()
     private val paymentFinishedLiveData = MutableSingleLiveData<PaymentModel>()
@@ -98,6 +102,8 @@ internal class PayButtonViewModelTest {
         whenever(connectionHelper.checkConnection()).thenReturn(true)
         whenever(paymentSettingRepository.checkoutPreference).thenReturn(mock())
         whenever(paymentSettingRepository.site).thenReturn(Sites.ARGENTINA)
+        whenever(renderModeMapper.map(any<RenderMode>())).thenReturn(mock())
+
         configurePaymentSettingServiceObservableEvents()
 
         payButtonViewModel = PayButtonViewModel(
@@ -109,6 +115,7 @@ internal class PayButtonViewModelTest {
             payButtonViewModelMapper,
             paymentCongratsMapper,
             postPaymentUrlsMapper,
+            renderModeMapper,
             paymentResultViewModelFactory,
             mock(),
             mock())

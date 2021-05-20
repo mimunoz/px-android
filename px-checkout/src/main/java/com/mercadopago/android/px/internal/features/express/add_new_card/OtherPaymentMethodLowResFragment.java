@@ -30,6 +30,4 @@ public class OtherPaymentMethodLowResFragment extends OtherPaymentMethodFragment
             inflater.inflate(R.layout.px_fragment_other_payment_method_large_low_res, container, false);
     }
 
-    @Override
-    protected void loadSecondaryMessageView(@NonNull final View view, @Nullable final Text secondaryMessage) { }
 }

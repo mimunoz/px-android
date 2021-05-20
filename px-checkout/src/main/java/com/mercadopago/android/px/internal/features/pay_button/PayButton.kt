@@ -62,7 +62,7 @@ interface PayButton {
         fun overrideStateChange(uiState: State): Boolean
     }
 
-    data class CvvRequestedModel(val fragmentContainer: Int = 0, val renderMode: RenderMode = RenderMode.NO_CARD)
+    data class CvvRequestedModel(val fragmentContainer: Int = 0, val renderMode: RenderMode = RenderMode.DYNAMIC)
 
     enum class State {
         IN_PROGRESS,

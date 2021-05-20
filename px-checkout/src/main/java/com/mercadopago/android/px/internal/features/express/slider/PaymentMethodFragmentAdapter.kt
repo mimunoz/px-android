@@ -41,9 +41,17 @@ class PaymentMethodFragmentAdapter(fm: FragmentManager) : FragmentStatePagerAdap
     }
 
     fun setRenderMode(renderMode: RenderMode) {
-        if (this.renderMode != renderMode && renderMode == RenderMode.LOW_RES) {
+        when (renderMode) {
+            RenderMode.LOW_RES -> setRenderModeAndDrawer(renderMode, PaymentMethodLowResDrawer())
+            RenderMode.DYNAMIC -> setRenderModeAndDrawer(renderMode, PaymentMethodDynamicDrawer())
+            else -> {}
+        }
+    }
+
+    private fun setRenderModeAndDrawer(renderMode: RenderMode, paymentMethodFragmentDrawer: PaymentMethodFragmentDrawer) {
+        if (this.renderMode != renderMode) {
             this.renderMode = renderMode
-            drawer = PaymentMethodLowResDrawer()
+            drawer = paymentMethodFragmentDrawer
             notifyDataSetChanged()
         }
     }

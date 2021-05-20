@@ -438,7 +438,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
                 @Override
                 public void visit(@NonNull final ScrolledVariant variant) {
                     if (!variant.isDefault()) {
-                        renderMode = RenderMode.LOW_RES;
+                        renderMode = RenderMode.DYNAMIC;
                     }
                 }
             });
