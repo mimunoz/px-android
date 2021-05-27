@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations.map
 import com.mercadopago.android.px.addons.model.SecurityValidationData
 import com.mercadopago.android.px.internal.audio.AudioPlayer
+import com.mercadopago.android.px.internal.audio.PlaySoundUseCase
 import com.mercadopago.android.px.internal.base.BaseState
 import com.mercadopago.android.px.internal.base.BaseViewModelWithState
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler
@@ -54,8 +55,8 @@ internal class PayButtonViewModel(
     private val paymentCongratsMapper: PaymentCongratsModelMapper,
     private val postPaymentUrlsMapper: PostPaymentUrlsMapper,
     private val renderModeMapper: RenderModeMapper,
+    private val playSoundUseCase: PlaySoundUseCase,
     private val factory: PaymentResultViewModelFactory,
-    private val audioPlayer: AudioPlayer,
     tracker: MPTracker) : BaseViewModelWithState<PayButtonViewModel.State>(tracker), PayButton.ViewModel {
 
     val buttonTextLiveData = MutableLiveData<ButtonConfig>()
@@ -278,8 +279,8 @@ internal class PayButtonViewModel(
     override fun onResultIconAnimation() {
         state.paymentModel?.paymentResult?.let { it ->
             when {
-                it.isApproved -> stateUILiveData.postValue(PlayResultAudio(audioPlayer, AudioPlayer.Sound.SUCCESS))
-                it.isRejected -> stateUILiveData.postValue(PlayResultAudio(audioPlayer, AudioPlayer.Sound.FAILURE))
+                it.isApproved -> playSoundUseCase.execute(AudioPlayer.Sound.SUCCESS)
+                it.isRejected -> playSoundUseCase.execute(AudioPlayer.Sound.FAILURE)
             }
         }
     }
@@ -295,7 +296,7 @@ internal class PayButtonViewModel(
         }
     }
 
-    private fun resolvePostPaymentUrls(paymentModel: PaymentModel) : PostPaymentUrlsMapper.Response? {
+    private fun resolvePostPaymentUrls(paymentModel: PaymentModel): PostPaymentUrlsMapper.Response? {
         return paymentSettingRepository.checkoutPreference?.let { preference ->
             val congratsResponse = paymentModel.congratsResponse
             postPaymentUrlsMapper.map(PostPaymentUrlsMapper.Model(

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.mercadopago.android.px.assertEquals
 import com.mercadopago.android.px.internal.audio.AudioPlayer
+import com.mercadopago.android.px.internal.audio.PlaySoundUseCase
 import com.mercadopago.android.px.internal.core.ConnectionHelper
 import com.mercadopago.android.px.internal.core.ProductIdProvider
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory
@@ -82,6 +83,8 @@ internal class PayButtonViewModelTest {
     private lateinit var postPaymentUrlsMapper: PostPaymentUrlsMapper
     @Mock
     private lateinit var renderModeMapper: RenderModeMapper
+    @Mock
+    private lateinit var playSoundUseCase: PlaySoundUseCase
 
     private val paymentErrorLiveData = MutableSingleLiveData<MercadoPagoError>()
     private val paymentFinishedLiveData = MutableSingleLiveData<PaymentModel>()
@@ -116,8 +119,8 @@ internal class PayButtonViewModelTest {
             paymentCongratsMapper,
             postPaymentUrlsMapper,
             renderModeMapper,
+            playSoundUseCase,
             paymentResultViewModelFactory,
-            mock(),
             mock())
 
         payButtonViewModel.stateUILiveData.observeForever(uiStateObserver)
@@ -252,10 +255,7 @@ internal class PayButtonViewModelTest {
         whenever(state.paymentModel).thenReturn(paymentModel)
 
         payButtonViewModel.onResultIconAnimation()
-
-        verify(uiStateObserver).onChanged(any<UIProgress.PlayResultAudio>())
-        val actual = (payButtonViewModel.stateUILiveData.value as UIProgress.PlayResultAudio)
-        actual.sound.assertEquals(AudioPlayer.Sound.SUCCESS)
+        verify(playSoundUseCase).execute(AudioPlayer.Sound.SUCCESS)
     }
 
     @Test
@@ -268,9 +268,7 @@ internal class PayButtonViewModelTest {
 
         payButtonViewModel.onResultIconAnimation()
 
-        verify(uiStateObserver).onChanged(any<UIProgress.PlayResultAudio>())
-        val actual = (payButtonViewModel.stateUILiveData.value as UIProgress.PlayResultAudio)
-        actual.sound.assertEquals(AudioPlayer.Sound.FAILURE)
+        verify(playSoundUseCase).execute(AudioPlayer.Sound.FAILURE)
     }
 
     @Test

@@ -120,9 +120,6 @@ class PayButtonFragment : BaseFragment(), PayButton.View, SecurityValidationHand
             is UIResult.PaymentResult -> PaymentResultActivity.start(this, REQ_CODE_CONGRATS, stateUI.model)
             is UIResult.NoCongratsResult -> DummyResultActivity.start(this, REQ_CODE_CONGRATS, stateUI.model)
             is UIResult.CongratsPaymentModel -> PaymentCongrats.show(stateUI.model, this, REQ_CODE_CONGRATS)
-            is UIProgress.PlayResultAudio -> with(stateUI) {
-                context?.let { audioPlayer.play(it, sound) }
-            }
         }
     }
 
