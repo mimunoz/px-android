@@ -89,7 +89,7 @@ public class AvailableMethod extends TrackingMapModel implements Parcelable {
     public static class Builder {
         private static final String HAS_INTEREST_FREE = "has_interest_free";
         private static final String HAS_REIMBURSEMENT = "has_reimbursement";
-        private static final String APPLICATIONS = "applications";
+        private static final String APPLICATIONS = "methods_applications";
         String paymentMethodId;
         String paymentMethodType;
         Map<String, Object> extraInfo = new HashMap<>();
