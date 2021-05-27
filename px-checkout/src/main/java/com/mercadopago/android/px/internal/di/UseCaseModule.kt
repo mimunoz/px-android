@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.di
 
 import com.mercadopago.android.px.addons.BehaviourProvider
+import com.mercadopago.android.px.internal.audio.PlaySoundUseCase
 import com.mercadopago.android.px.internal.base.use_case.TokenizeUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
@@ -56,5 +57,11 @@ internal class UseCaseModule(
                 BehaviourProvider.getThreeDSBehaviour(),
                 session.cardHolderAuthenticationRepository
             )
+        }
+
+    val playSoundUseCase: PlaySoundUseCase
+        get() {
+            val session = Session.getInstance()
+            return PlaySoundUseCase(session.tracker, configurationModule.paymentSettings, session.audioPlayer)
         }
 }

@@ -30,8 +30,8 @@ internal class ViewModelFactory : ViewModelProvider.Factory {
                     MapperProvider.getPaymentCongratsMapper(),
                     MapperProvider.getPostPaymentUrlsMapper(),
                     MapperProvider.getRenderModeMapper(session.applicationContext),
+                    useCaseModule.playSoundUseCase,
                     session.paymentResultViewModelFactory,
-                    session.audioPlayer,
                     session.tracker
                 )
             }

@@ -1,11 +1,16 @@
 package com.mercadopago.android.px.internal.audio
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.mercadopago.android.px.R
 
-internal interface AudioPlayer {
+internal class AudioPlayer(context: Context) {
 
-    fun play(context: Context, sound: Sound)
+    val context: Context = context.applicationContext
+
+    fun play(sound: Sound) {
+        MediaPlayer.create(context, sound.id).start()
+    }
 
     enum class Sound(val id: Int) {
         SUCCESS(R.raw.congrats_success),
