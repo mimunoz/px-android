@@ -1,3 +1,9 @@
+## VERSION 4.79.0
+_27_05_2021_
+* FIX - Applications track collided with Melidata application.
+* FIX - Audio player crash when api call failed.
+* ENHANCEMENT - Added long retry for special cases.
+
 ## VERSION 4.78.0
 _20_05_2021_
 * FEATURE - Installments v2.1
