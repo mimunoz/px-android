@@ -5,7 +5,7 @@ import com.mercadopago.android.px.tracking.internal.TrackFactory
 import com.mercadopago.android.px.tracking.internal.TrackWrapper
 import com.mercadopago.android.px.tracking.internal.model.InitData
 
-class InitEvent(paymentSettingRepository: PaymentSettingRepository) : TrackWrapper() {
+internal class InitEvent(paymentSettingRepository: PaymentSettingRepository) : TrackWrapper() {
 
     private val initData = InitData.from(paymentSettingRepository)
 

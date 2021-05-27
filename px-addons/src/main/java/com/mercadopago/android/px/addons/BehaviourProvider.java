@@ -16,6 +16,7 @@ public final class BehaviourProvider {
     private static LocaleBehaviour localeBehaviour;
     private static FlowBehaviour flowBehaviour;
     private static ThreeDSBehaviour threeDSBehaviour;
+    private static TokenDeviceBehaviour tokenDeviceBehaviour;
 
     private BehaviourProvider() {
     }
@@ -48,6 +49,11 @@ public final class BehaviourProvider {
     /* default */
     static void set(final ThreeDSBehaviour threeDSBehaviour) {
         BehaviourProvider.threeDSBehaviour = threeDSBehaviour;
+    }
+
+    /* default */
+    static void set(final TokenDeviceBehaviour tokenDeviceBehaviour) {
+        BehaviourProvider.tokenDeviceBehaviour = tokenDeviceBehaviour;
     }
 
     @NonNull
@@ -127,6 +133,10 @@ public final class BehaviourProvider {
 
     public static ThreeDSBehaviour getThreeDSBehaviour() {
         return threeDSBehaviour != null ? threeDSBehaviour : new ThreeDSDefaultBehaviour();
+    }
+
+    public static TokenDeviceBehaviour getTokenDeviceBehaviour() {
+        return tokenDeviceBehaviour;
     }
 
     @NonNull

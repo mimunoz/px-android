@@ -8,6 +8,7 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.configuration.DiscountParamsConfiguration;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
+import com.mercadopago.android.px.internal.features.FeatureProvider;
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.CheckoutRepository;
@@ -25,8 +26,6 @@ import com.mercadopago.android.px.internal.services.CheckoutService;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.exceptions.ApiException;
-import com.mercadopago.android.px.model.internal.Application;
-import com.mercadopago.android.px.model.internal.CheckoutFeatures;
 import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.InitRequest;
@@ -35,7 +34,6 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +57,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
     @NonNull private final AmountConfigurationRepository amountConfigurationRepository;
     @NonNull private final DiscountRepository discountRepository;
     @NonNull private final TrackingRepository trackingRepository;
+    @NonNull private final FeatureProvider featureProvider;
     /* default */ int refreshRetriesAvailable = MAX_REFRESH_RETRIES;
     /* default */ Handler retryHandler;
 
@@ -73,7 +72,8 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         @NonNull final ModalRepository modalRepository,
         @NonNull final PayerComplianceRepository payerComplianceRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
-        @NonNull final DiscountRepository discountRepository) {
+        @NonNull final DiscountRepository discountRepository,
+        @NonNull final FeatureProvider featureProvider) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.experimentsRepository = experimentsRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
@@ -88,6 +88,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         this.payerComplianceRepository = payerComplianceRepository;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.discountRepository = discountRepository;
+        this.featureProvider = featureProvider;
     }
 
     @NonNull
@@ -170,21 +171,12 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         final DiscountParamsConfiguration discountParamsConfiguration =
             advancedConfiguration.getDiscountParamsConfiguration();
 
-        final CheckoutFeatures features = new CheckoutFeatures.Builder()
-            .setSplit(paymentConfiguration.getPaymentProcessor().supportsSplitPayment(checkoutPreference))
-            .setExpress(advancedConfiguration.isExpressPaymentEnabled())
-            .setOdrFlag(true)
-            .setComboCard(true)
-            .setHybridCard(true)
-            .addValidationPrograms(Collections.singletonList(Application.KnownValidationProgram.STP.name().toLowerCase()))
-            .build();
-
         final Map<String, Object> body = JsonUtil.getMapFromObject(
             new InitRequest.Builder(paymentSettingRepository.getPublicKey())
                 .setCardWithEsc(new ArrayList<>(escManagerBehaviour.getESCCardIds()))
                 .setCharges(paymentConfiguration.getCharges())
                 .setDiscountParamsConfiguration(discountParamsConfiguration)
-                .setCheckoutFeatures(features)
+                .setCheckoutFeatures(featureProvider.getAvailableFeatures())
                 .setCheckoutPreference(checkoutPreference)
                 .setFlow(trackingRepository.getFlowId())
                 .build());

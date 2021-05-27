@@ -159,7 +159,7 @@ public class PaymentSettingService implements PaymentSettingRepository {
 
     @NonNull
     @Override
-    public List<PaymentTypeChargeRule> chargeRules() {
+    public List<PaymentTypeChargeRule> getChargeRules() {
         return getPaymentConfiguration().getCharges();
     }
 

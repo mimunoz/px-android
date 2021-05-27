@@ -13,7 +13,7 @@ import com.mercadopago.android.px.tracking.internal.model.RemedyTrackData
 import com.mercadopago.android.px.tracking.internal.model.ResultViewTrackModel
 import java.util.*
 
-class ResultViewTrack : TrackWrapper {
+internal class ResultViewTrack : TrackWrapper {
     private val resultViewTrackModel: ResultViewTrackModel
     private val relativePath: String
     private val remediesResponse: RemediesResponse

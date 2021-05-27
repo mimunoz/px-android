@@ -32,6 +32,8 @@ import com.mercadopago.android.px.internal.datasource.PaymentMethodRepositoryImp
 import com.mercadopago.android.px.internal.datasource.PaymentService;
 import com.mercadopago.android.px.internal.datasource.PrefetchInitService;
 import com.mercadopago.android.px.internal.datasource.TokenizeService;
+import com.mercadopago.android.px.internal.features.FeatureProvider;
+import com.mercadopago.android.px.internal.features.FeatureProviderImpl;
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PXPaymentCongratsTracking;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModel;
@@ -213,6 +215,8 @@ public final class Session extends ApplicationModule {
     public CheckoutRepository getCheckoutRepository() {
         if (checkoutRepository == null) {
             final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
+            final FeatureProvider featureProvider =
+                new FeatureProviderImpl(paymentSettings, BehaviourProvider.getTokenDeviceBehaviour());
             checkoutRepository = new CheckoutRepositoryImpl(paymentSettings, getExperimentsRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
@@ -220,7 +224,7 @@ public final class Session extends ApplicationModule {
                 getPayerPaymentMethodRepository(), getOneTapItemRepository(),
                 getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
-                getAmountConfigurationRepository(), getDiscountRepository()) {
+                getAmountConfigurationRepository(), getDiscountRepository(), featureProvider) {
             };
         }
         return checkoutRepository;
@@ -428,9 +432,10 @@ public final class Session extends ApplicationModule {
     @NonNull
     public PrefetchInitService getPrefetchInitService(@NonNull final MercadoPagoCheckout checkout) {
         configIds(checkout);
-        return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(
-            CheckoutService.class),
-            getMercadoPagoESC(), configurationModule.getTrackingRepository());
+        final FeatureProvider featureProvider =
+            new FeatureProviderImpl(checkout, BehaviourProvider.getTokenDeviceBehaviour());
+        return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(CheckoutService.class),
+            getMercadoPagoESC(), configurationModule.getTrackingRepository(), featureProvider);
     }
 
     @NonNull

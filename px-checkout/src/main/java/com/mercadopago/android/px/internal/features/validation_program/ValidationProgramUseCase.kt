@@ -8,7 +8,6 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.model.internal.Application.KnownValidationProgram
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.ProgramValidationEvent
-import java.util.*
 
 internal class ValidationProgramUseCase @JvmOverloads constructor(
     private val applicationSelectionRepository: ApplicationSelectionRepository,
@@ -25,8 +24,8 @@ internal class ValidationProgramUseCase @JvmOverloads constructor(
         when (knownValidationProgram) {
             KnownValidationProgram.STP -> authenticateUseCase.execute(mainPaymentData)
         }
-        val validationProgramId = knownValidationProgram?.toString()
+        val validationProgramId = knownValidationProgram?.value
         tracker.track(ProgramValidationEvent(validationProgramId))
-        return Response.Success(validationProgramId?.toLowerCase(Locale.ROOT))
+        return Response.Success(validationProgramId)
     }
 }
