@@ -42,7 +42,8 @@ import java.util.Map;
 public class CheckoutRepositoryImpl implements CheckoutRepository {
 
     private static final int MAX_REFRESH_RETRIES = 4;
-    private static final int RETRY_DELAY = 500;
+    private static final int DEFAULT_RETRY_DELAY = 500;
+    private static final int LONG_RETRY_DELAY = 5000;
 
     @NonNull private final ESCManagerBehaviour escManagerBehaviour;
     @NonNull private final CheckoutService checkoutService;
@@ -212,7 +213,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
                 final boolean retryAvailable = --refreshRetriesAvailable > 0;
                 final List<OneTapItem> oneTap = checkoutResponse.getOneTapItems();
                 boolean cardFound = false;
-                boolean retryNeeded = true;
+                boolean retryNeeded = false;
                 for (final OneTapItem node : oneTap) {
                     if (node.isCard() && node.getCard().getId().equals(cardId)) {
                         cardFound = true;
@@ -227,12 +228,13 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
                     getPostResponse().call(checkoutResponse);
                     callback.success(checkoutResponse);
                 } else if (retryAvailable) {
+                    final int retryDelay = retryNeeded ? LONG_RETRY_DELAY : DEFAULT_RETRY_DELAY;
                     if (retryHandler == null) {
                         final HandlerThread thread = new HandlerThread("MyInitRetryThread");
                         thread.start();
                         retryHandler = new Handler(thread.getLooper());
                     }
-                    retryHandler.postDelayed(() -> refreshWithNewCard(cardId).enqueue(callback), RETRY_DELAY);
+                    retryHandler.postDelayed(() -> refreshWithNewCard(cardId).enqueue(callback), retryDelay);
                 } else {
                     callback.failure(new ApiException());
                 }
