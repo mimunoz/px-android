@@ -12,7 +12,7 @@ import com.mercadopago.android.px.model.PaymentRecovery
 import com.mercadopago.android.px.model.Token
 import com.mercadopago.android.px.tracking.internal.MPTracker
 
-class TokenizeUseCase(
+internal class TokenizeUseCase(
     private val cardTokenRepository: CardTokenRepository,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val paymentSettingRepository: PaymentSettingRepository,

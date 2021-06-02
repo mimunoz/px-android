@@ -18,12 +18,13 @@ data class Application(
         val mandatory: Boolean
     )
 
-    enum class KnownValidationProgram {
-        STP;
+    enum class KnownValidationProgram(val value: String) {
+        STP("stp"),
+        TOKEN_DEVICE("token-device");
 
         companion object {
             operator fun get(validationProgramId: String?): KnownValidationProgram? {
-                return values().firstOrNull { it.name.equals(validationProgramId, true) }
+                return values().firstOrNull { it.value.equals(validationProgramId, true) }
             }
         }
     }

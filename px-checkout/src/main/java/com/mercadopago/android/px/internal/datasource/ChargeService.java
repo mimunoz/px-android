@@ -24,7 +24,7 @@ public class ChargeService implements ChargeRepository {
     @Nullable
     @Override
     public PaymentTypeChargeRule getChargeRule(@NonNull final String paymentTypeId) {
-        for (final PaymentTypeChargeRule rule : configuration.chargeRules()) {
+        for (final PaymentTypeChargeRule rule : configuration.getChargeRules()) {
             if (shouldApply(paymentTypeId, rule)) {
                 return rule;
             }
@@ -39,7 +39,7 @@ public class ChargeService implements ChargeRepository {
     @NonNull
     private BigDecimal charges(@NonNull final String paymentTypeId) {
         BigDecimal chargeAmount = BigDecimal.ZERO;
-        for (final PaymentTypeChargeRule rule : configuration.chargeRules()) {
+        for (final PaymentTypeChargeRule rule : configuration.getChargeRules()) {
             if (shouldApply(paymentTypeId, rule)) {
                 chargeAmount = chargeAmount.add(rule.charge());
             }

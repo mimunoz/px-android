@@ -1,0 +1,92 @@
+package com.mercadopago.android.px.internal.features
+
+import com.mercadopago.android.px.addons.TokenDeviceBehaviour
+import com.mercadopago.android.px.configuration.PaymentConfiguration
+import com.mercadopago.android.px.core.MercadoPagoCheckout
+import com.mercadopago.android.px.core.SplitPaymentProcessor
+import com.mercadopago.android.px.core.internal.ConfigurationProvider
+import com.mercadopago.android.px.model.internal.Application
+import com.mercadopago.android.px.preferences.CheckoutPreference
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.whenever
+
+@RunWith(MockitoJUnitRunner::class)
+internal class FeatureProviderTest {
+
+    @Mock
+    private lateinit var configurationProvider: ConfigurationProvider
+
+    @Mock
+    private lateinit var tokenDeviceBehaviour: TokenDeviceBehaviour
+
+    @Mock
+    lateinit var paymentConfiguration: PaymentConfiguration
+
+    @Mock
+    lateinit var splitPaymentProcessor: SplitPaymentProcessor
+
+    @Mock
+    lateinit var checkoutPreference: CheckoutPreference
+
+    @Mock
+    lateinit var mercadoPagoCheckout: MercadoPagoCheckout
+
+    @Before
+    fun setUp() {
+        whenever(configurationProvider.paymentConfiguration).thenReturn(paymentConfiguration)
+        whenever(configurationProvider.checkoutPreference).thenReturn(checkoutPreference)
+        whenever(paymentConfiguration.paymentProcessor).thenReturn(splitPaymentProcessor)
+        whenever(mercadoPagoCheckout.paymentConfiguration).thenReturn(paymentConfiguration)
+        whenever(mercadoPagoCheckout.checkoutPreference).thenReturn(checkoutPreference)
+    }
+
+    @Test
+    fun testBasicFeatures() {
+        val checkoutFeatures = FeatureProviderImpl(configurationProvider, tokenDeviceBehaviour).availableFeatures
+        Assert.assertTrue(checkoutFeatures.express)
+        Assert.assertTrue(checkoutFeatures.comboCard)
+        Assert.assertTrue(checkoutFeatures.hybridCard)
+        Assert.assertTrue(checkoutFeatures.odrFlag)
+    }
+
+    @Test
+    fun testWhenPaymentProcessorDoesNotSupportSplit_thenNoSplitFeature() {
+        whenever(splitPaymentProcessor.supportsSplitPayment(checkoutPreference)).thenReturn(false)
+        val checkoutFeatures = FeatureProviderImpl(configurationProvider, tokenDeviceBehaviour).availableFeatures
+        Assert.assertFalse(checkoutFeatures.split)
+    }
+
+    @Test
+    fun testWhenPaymentProcessorSupportSplit_thenSplitFeature() {
+        whenever(splitPaymentProcessor.supportsSplitPayment(checkoutPreference)).thenReturn(true)
+        val checkoutFeatures = FeatureProviderImpl(configurationProvider, tokenDeviceBehaviour).availableFeatures
+        Assert.assertTrue(checkoutFeatures.split)
+    }
+
+    @Test
+    fun testWhenCheckoutIsLazyInitAndPaymentProcessorSupportSplit_thenSplitFeature() {
+        whenever(splitPaymentProcessor.supportsSplitPayment(checkoutPreference)).thenReturn(true)
+        val checkoutFeatures = FeatureProviderImpl(mercadoPagoCheckout, tokenDeviceBehaviour).availableFeatures
+        Assert.assertTrue(checkoutFeatures.split)
+    }
+
+    @Test
+    fun testWhenTokenDeviceFeatureIsAvailable_thenValidationProgramsFeatureContainsTokenDevice() {
+        whenever(tokenDeviceBehaviour.isFeatureAvailable).thenReturn(true)
+        val checkoutFeatures = FeatureProviderImpl(configurationProvider, tokenDeviceBehaviour).availableFeatures
+        Assert.assertTrue(checkoutFeatures.validationPrograms.contains(Application.KnownValidationProgram.TOKEN_DEVICE.value))
+    }
+
+    @Test
+    fun testWhenTokenDeviceFeatureIsNotAvailable_thenValidationProgramsFeatureDoesNotContainsTokenDevice() {
+        whenever(tokenDeviceBehaviour.isFeatureAvailable).thenReturn(false)
+        val checkoutFeatures = FeatureProviderImpl(configurationProvider, tokenDeviceBehaviour).availableFeatures
+        Assert.assertFalse(checkoutFeatures.validationPrograms.contains(Application.KnownValidationProgram.TOKEN_DEVICE.value))
+    }
+
+}
