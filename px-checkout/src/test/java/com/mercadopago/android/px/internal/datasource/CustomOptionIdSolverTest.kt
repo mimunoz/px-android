@@ -42,9 +42,8 @@ class CustomOptionIdSolverTest {
         val application: Application = mock {
             on { this.paymentMethod }.thenReturn(selectedPaymentMethod)
         }
-        whenever(oneTapItem.isCard).thenReturn(true)
         whenever(oneTapItem.card).thenReturn(card)
-        whenever(applicationSelectionRepositoryImpl[any()]).thenReturn(application)
+        whenever(applicationSelectionRepositoryImpl[any<OneTapItem>()]).thenReturn(application)
 
         val actual = customOptionIdSolver[oneTapItem]
 
@@ -61,8 +60,7 @@ class CustomOptionIdSolverTest {
         val application: Application = mock {
             on { this.paymentMethod }.thenReturn(selectedPaymentMethod)
         }
-        whenever(oneTapItem.paymentMethodId).thenReturn(customOptionIdExpected)
-        whenever(applicationSelectionRepositoryImpl[any()]).thenReturn(application)
+        whenever(applicationSelectionRepositoryImpl[any<OneTapItem>()]).thenReturn(application)
 
         val actual = customOptionIdSolver[oneTapItem]
 
@@ -78,10 +76,9 @@ class CustomOptionIdSolverTest {
         val application: Application = mock {
             on { this.paymentMethod }.thenReturn(selectedPaymentMethod)
         }
-        whenever(oneTapItem.paymentMethodId).thenReturn(customOptionIdExpected)
         whenever(oneTapItem.isOfflineMethods).thenReturn(true)
         whenever(oneTapItem.getDefaultPaymentMethodType()).thenReturn("new_card_and_offline_payment_methods")
-        whenever(applicationSelectionRepositoryImpl[any()]).thenReturn(application)
+        whenever(applicationSelectionRepositoryImpl[any<OneTapItem>()]).thenReturn(application)
 
         val actual = customOptionIdSolver[oneTapItem]
 
@@ -113,12 +110,11 @@ class CustomOptionIdSolverTest {
         val customOptionIdExpected = "account_money"
         val selectedPaymentMethod: Application.PaymentMethod = mock {
             on { type }.thenReturn(customOptionIdExpected)
+            on { id }.thenReturn(customOptionIdExpected)
         }
         val application: Application = mock {
             on { this.paymentMethod }.thenReturn(selectedPaymentMethod)
         }
-        whenever(oneTapItem.paymentMethodId).thenReturn(customOptionIdExpected)
-
         val actual = CustomOptionIdSolver.getByApplication(oneTapItem, application)
 
         customOptionIdExpected.assertEquals(actual)

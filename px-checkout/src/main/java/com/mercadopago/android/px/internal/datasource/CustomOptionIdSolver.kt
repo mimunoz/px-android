@@ -20,7 +20,7 @@ internal abstract class CustomOptionIdSolver {
         fun getByApplication(oneTapItem: OneTapItem, application: Application): String {
             return when {
                 PaymentTypes.isCardPaymentType(application.paymentMethod.type) && oneTapItem.isCard -> oneTapItem.card.id
-                else -> oneTapItem.paymentMethodId
+                else -> application.paymentMethod.id
             }
         }
 

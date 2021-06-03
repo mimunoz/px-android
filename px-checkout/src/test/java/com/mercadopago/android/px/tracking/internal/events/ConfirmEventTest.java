@@ -56,8 +56,7 @@ public class ConfirmEventTest {
         final AccountMoneyMetadata am = mock(AccountMoneyMetadata.class);
         final String paymentMethodId = "account_money";
         when(application.getPaymentMethod()).thenReturn(new PaymentMethod(paymentMethodId, paymentMethodId));
-        when(applicationSelectionRepository.get(paymentMethodId)).thenReturn(application);
-        when(oneTapItem.getPaymentMethodId()).thenReturn(paymentMethodId);
+        when(applicationSelectionRepository.get(oneTapItem)).thenReturn(application);
         when(oneTapItem.getAccountMoney()).thenReturn(am);
         when(oneTapItem.isAccountMoney()).thenReturn(true);
         when(am.getBalance()).thenReturn(BigDecimal.TEN);
@@ -83,9 +82,8 @@ public class ConfirmEventTest {
         final String paymentMethodId = "visa";
         final String paymentTypeId = "credit_card";
         when(application.getPaymentMethod()).thenReturn(new PaymentMethod(paymentMethodId, paymentTypeId));
-        when(applicationSelectionRepository.get(card.getId())).thenReturn(application);
+        when(applicationSelectionRepository.get(oneTapItem)).thenReturn(application);
         when(oneTapItem.getCard()).thenReturn(card);
-        when(oneTapItem.isCard()).thenReturn(true);
 
         final ConfirmEvent event = getConfirmEvent(payerCost);
         assertEquals(EXPECTED_PATH, event.getTrack().getPath());

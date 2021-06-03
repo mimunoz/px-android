@@ -23,7 +23,7 @@ internal class FromExpressMetadataToPaymentConfiguration(
 
         val customOptionId = customOptionIdSolver[value]
         val (paymentMethodId, paymentTypeId) =
-            with(applicationSelectionRepository[customOptionId].paymentMethod) { id to type }
+            with(applicationSelectionRepository[value].paymentMethod) { id to type }
 
         var payerCost: PayerCost? = null
         val amountConfiguration = amountConfigurationRepository.getConfigurationSelectedFor(customOptionId)

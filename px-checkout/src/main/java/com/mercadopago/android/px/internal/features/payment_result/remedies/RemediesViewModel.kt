@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.internal.base.BaseState
 import com.mercadopago.android.px.internal.base.BaseViewModelWithState
-import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
@@ -55,10 +54,9 @@ internal class RemediesViewModel(
         remediesModel.retryPayment?.let {
             if (isSilverBullet) {
                 val paymentTypeId = previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
-                applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(methodData)] =
-                    methodData.getApplications().first { application ->
-                        application.paymentMethod.type == paymentTypeId
-                    }
+                applicationSelectionRepository[methodData] = methodData.getApplications().first { application ->
+                    application.paymentMethod.type == paymentTypeId
+                }
             }
             remedyState.value = RemedyState.ShowRetryPaymentRemedy(Pair(it, methodData))
         }

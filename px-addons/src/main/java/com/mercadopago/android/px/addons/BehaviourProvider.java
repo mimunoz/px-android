@@ -6,6 +6,7 @@ import com.mercadopago.android.px.addons.internal.FlowDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.LocaleDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.SecurityDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.ThreeDSDefaultBehaviour;
+import com.mercadopago.android.px.addons.internal.TokenDeviceDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.TrackingDefaultBehaviour;
 
 public final class BehaviourProvider {
@@ -136,7 +137,7 @@ public final class BehaviourProvider {
     }
 
     public static TokenDeviceBehaviour getTokenDeviceBehaviour() {
-        return tokenDeviceBehaviour;
+        return tokenDeviceBehaviour != null ? tokenDeviceBehaviour : new TokenDeviceDefaultBehaviour();
     }
 
     @NonNull

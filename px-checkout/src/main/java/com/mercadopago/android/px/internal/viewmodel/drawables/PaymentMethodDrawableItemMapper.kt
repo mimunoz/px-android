@@ -65,9 +65,7 @@ internal class PaymentMethodDrawableItemMapper(
     ): Parameters {
         val displayInfo = oneTapItem.displayInfo
 
-        val defaultCustomOptionId = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)
-
-        val paymentMethodType = applicationSelectedRepository[defaultCustomOptionId].paymentMethod.type
+        val paymentMethodType = applicationSelectedRepository[oneTapItem].paymentMethod.type
         val commonsByApplication = CommonsByApplication(paymentMethodType).also {
             oneTapItem.getApplications().forEach { application ->
                 val customOptionIdByApplication = CustomOptionIdSolver.getByApplication(oneTapItem, application)
