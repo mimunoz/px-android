@@ -1,3 +1,8 @@
+## VERSION 4.80.0
+_03_06_2021_
+* FIX - Application selection by one tap item.
+* ENHANCEMENT - Added feature flag provider.
+
 ## VERSION 4.79.0
 _27_05_2021_
 * FIX - Applications track collided with Melidata application.
