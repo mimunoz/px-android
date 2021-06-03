@@ -8,7 +8,6 @@ import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.CardDrawerSwitch
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.one_tap.SliderDisplayInfo
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,6 +53,7 @@ class ApplicationSelectionRepositoryTest {
 
         whenever(oneTapItemRepository["123456"]).thenReturn(oneTapItem)
         whenever(oneTapItem.displayInfo).thenReturn(displayInfo)
+        whenever(oneTapItem.id).thenReturn("123456")
         whenever(displayInfo.cardDrawerSwitch).thenReturn(cardDrawerSwitch)
         whenever(cardDrawerSwitch.default).thenReturn("account_money")
         whenever(oneTapItem.getApplications()).thenReturn(listOf(accountMoneyApplication, creditCardApplication))
@@ -85,7 +85,7 @@ class ApplicationSelectionRepositoryTest {
 
     @Test
     fun updateApplicationSelection() {
-        applicationSelectionRepository["123456"] = creditCardApplication
+        applicationSelectionRepository[oneTapItem] = creditCardApplication
         val currentApplication = applicationSelectionRepository["123456"]
 
         currentApplication.paymentMethod.id.assertEquals("visa")

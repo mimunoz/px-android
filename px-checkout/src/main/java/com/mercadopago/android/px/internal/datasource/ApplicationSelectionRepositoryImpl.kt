@@ -17,14 +17,19 @@ internal class ApplicationSelectionRepositoryImpl(private val fileManager: FileM
     override val file: File = fileManager.create(SELECTED_APPLICATIONS)
 
     override fun get(payerPaymentMethodId: PayerPaymentTypeId): Application {
-        val selectedApplication = value[payerPaymentMethodId]
-        return selectedApplication ?: resolveDefault(payerPaymentMethodId)
+        return value.keys.firstOrNull { it.contains(payerPaymentMethodId, true) }?.let {
+            value[it]
+        } ?: resolveDefault(payerPaymentMethodId)
+    }
+
+    override fun get(oneTapItem: OneTapItem): Application {
+        return value[oneTapItem.id] ?: resolveDefault(CustomOptionIdSolver.defaultCustomOptionId(oneTapItem))
     }
 
     private fun resolveDefault(payerPaymentMethodId: PayerPaymentTypeId): Application {
         return oneTapItemRepository[payerPaymentMethodId].let { oneTapItem ->
             getApplication(oneTapItem, oneTapItem.getApplications()).also {
-                set(payerPaymentMethodId, it)
+                set(oneTapItem, it)
             }
         }
     }
@@ -35,8 +40,8 @@ internal class ApplicationSelectionRepositoryImpl(private val fileManager: FileM
         } ?: applications.first()
     }
 
-    override fun set(payerPaymentMethodId: PayerPaymentTypeId, application: Application) {
-        value[payerPaymentMethodId] = application
+    override fun set(oneTapItem: OneTapItem, application: Application) {
+        value[oneTapItem.id] = application
         configure(value)
     }
 

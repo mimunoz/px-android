@@ -67,8 +67,7 @@ internal class SummaryViewModelMapper(
     }
 
     private fun getCurrentPmTypeSelection(oneTapItem: OneTapItem): String {
-        val defaultCustomOptionId = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)
-        return applicationSelectionRepository[defaultCustomOptionId].paymentMethod.type
+        return applicationSelectionRepository[oneTapItem].paymentMethod.type
     }
 
     private fun createModel(

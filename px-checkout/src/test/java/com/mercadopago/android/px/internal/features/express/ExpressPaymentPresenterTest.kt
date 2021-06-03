@@ -163,6 +163,7 @@ class ExpressPaymentPresenterTest {
         `when`(disabledPaymentMethodRepository.value).thenReturn(hashMapOf())
         `when`(applicationPaymentMethod.type).thenReturn("credit_card")
         `when`(application.paymentMethod).thenReturn(applicationPaymentMethod)
+        `when`(applicationSelectionRepository[oneTapItem]).thenReturn(application)
         `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
         `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
@@ -282,7 +283,7 @@ class ExpressPaymentPresenterTest {
         val disabledPaymentMethod = mock(DisabledPaymentMethod::class.java)
         val statusMetadata = mock(StatusMetadata::class.java)
         `when`(disabledPaymentMethodRepository[any()]).thenReturn(disabledPaymentMethod)
-        `when`(applicationSelectionRepository[any()]).thenReturn(application)
+        `when`(applicationSelectionRepository[any<String>()]).thenReturn(application)
         `when`(application.status).thenReturn(statusMetadata)
 
         expressPaymentPresenter.onDisabledDescriptorViewClick()

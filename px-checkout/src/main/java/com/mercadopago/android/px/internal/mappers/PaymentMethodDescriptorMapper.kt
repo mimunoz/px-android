@@ -19,9 +19,8 @@ internal class PaymentMethodDescriptorMapper(
 
     override fun map(value: OneTapItem): Model {
         val currency = paymentSettings.currency
-        val customOptionId = CustomOptionIdSolver.defaultCustomOptionId(value)
 
-        return Model(applicationSelectionRepository[customOptionId].paymentMethod.type).also { model ->
+        return Model(applicationSelectionRepository[value].paymentMethod.type).also { model ->
             value.getApplications().forEach { application ->
                 val customOptionIdByApplication = CustomOptionIdSolver.getByApplication(value, application)
                 val paymentTypeId = application.paymentMethod.type

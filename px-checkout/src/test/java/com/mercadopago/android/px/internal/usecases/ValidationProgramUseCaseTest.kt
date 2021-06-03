@@ -73,7 +73,7 @@ class ValidationProgramUseCaseTest {
 
     @Test
     fun whenIsNotKnownValidationProgram() {
-        whenever(applicationSelectionRepository[any()]).thenReturn(mock())
+        whenever(applicationSelectionRepository[any<String>()]).thenReturn(mock())
 
         validationProgramUseCase.execute(
             listOf(createPaymentData()),
@@ -94,7 +94,7 @@ class ValidationProgramUseCaseTest {
         val application: Application = mock {
             on { validationPrograms }.thenReturn(listOf(validationProgram))
         }
-        whenever(applicationSelectionRepository[any()]).thenReturn(application)
+        whenever(applicationSelectionRepository[any<String>()]).thenReturn(application)
 
         validationProgramUseCase.execute(
             listOf(createPaymentData()),

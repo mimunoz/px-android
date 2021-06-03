@@ -52,8 +52,7 @@ public class FromSelectedExpressMetadataToAvailableMethods extends Mapper<OneTap
         }
 
         final Application.PaymentMethod paymentMethod =
-            applicationSelectionRepository.get(CustomOptionIdSolver.defaultCustomOptionId(
-                oneTapItem)).getPaymentMethod();
+            applicationSelectionRepository.get(oneTapItem).getPaymentMethod();
 
         final AvailableMethod.Builder builder = new AvailableMethod.Builder(
             paymentMethod.getId(),

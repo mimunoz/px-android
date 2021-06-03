@@ -7,6 +7,14 @@ import com.mercadopago.android.px.model.ExpressMetadata
 class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
 
     private var applications: List<Application>? = null
+    val id: String
+        get () {
+            var allPaymentMethods = ""
+            getApplications().forEach {
+                allPaymentMethods += it.paymentMethod.id
+            }
+            return allPaymentMethods + card?.id.orEmpty()
+        }
 
     init {
         throw UnsupportedOperationException("Parcelable implementation not available")

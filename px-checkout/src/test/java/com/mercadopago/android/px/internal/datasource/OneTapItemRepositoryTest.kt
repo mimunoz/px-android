@@ -56,6 +56,7 @@ class OneTapItemRepositoryTest {
         }
 
         val accountMoneyPaymentMethod: Application.PaymentMethod = mock {
+            on { id }.thenReturn(accountMoneyCustomOptionId)
             on { type }.thenReturn(accountMoneyCustomOptionId)
         }
 

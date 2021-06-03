@@ -163,8 +163,7 @@ public class PaymentServiceTest {
         final AmountConfiguration amountConfiguration = mock(AmountConfiguration.class);
         when(amountConfigurationRepository.getConfigurationSelectedFor(anyString())).thenReturn(amountConfiguration);
         when(amountConfiguration.getCurrentPayerCost(anyBoolean(), anyInt())).thenReturn(payerCost);
-        final String defaultOneTapItem = CustomOptionIdSolver.defaultCustomOptionId(oneTapItem);
-        when(applicationSelectionRepository.get(defaultOneTapItem)).thenReturn(application);
+        when(applicationSelectionRepository.get(oneTapItem)).thenReturn(application);
         return new FromExpressMetadataToPaymentConfiguration(amountConfigurationRepository, splitSelectionState,
             payerCostSelectionRepository, applicationSelectionRepository, customOptionIdSolver).map(oneTapItem);
     }
@@ -399,8 +398,6 @@ public class PaymentServiceTest {
     private Card creditCardPresetMock(final String cardId) {
         final Card card = getCardById(cardId);
         final CardMetadata cardMetadata = mock(CardMetadata.class);
-        when(cardMetadata.getId()).thenReturn(cardId);
-        when(node.isCard()).thenReturn(true);
         when(node.getCard()).thenReturn(cardMetadata);
         when(customOptionIdSolver.get(node)).thenReturn(cardId);
         when(fromPayerPaymentMethodToCardMapper

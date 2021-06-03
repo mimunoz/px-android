@@ -589,7 +589,7 @@ import java.util.List;
         final OneTapItem oneTapItem = getCurrentOneTapItem();
         for (final Application application : oneTapItem.getApplications()) {
             if (application.getPaymentMethod().getType().equals(paymentTypeId)) {
-                applicationSelectionRepository.set(CustomOptionIdSolver.defaultCustomOptionId(oneTapItem), application);
+                applicationSelectionRepository.set(oneTapItem, application);
                 updateElements();
             }
         }
