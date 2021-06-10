@@ -32,6 +32,7 @@ import com.mercadopago.android.px.internal.features.Constants;
 import com.mercadopago.android.px.internal.features.pay_button.PayButton;
 import com.mercadopago.android.px.internal.features.pay_button.PayButtonFragment;
 import com.mercadopago.android.px.internal.features.payment_result.components.PaymentResultLegacyRenderer;
+import com.mercadopago.android.px.internal.features.payment_result.instruction.Instruction;
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter;
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesFragment;
 import com.mercadopago.android.px.internal.features.payment_result.viewmodel.PaymentResultViewModel;
@@ -63,6 +64,9 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
     private PayButtonFragment payButtonFragment;
     private RemediesFragment remediesFragment;
     private PaymentResultFooter footer;
+    private PaymentResultHeader header;
+    private PaymentResultBody body;
+    private Instruction instructions;
     private ScrollView scrollView;
 
     public static void start(@NonNull final Fragment fragment, final int requestCode, @NonNull final PaymentModel model) {
@@ -80,6 +84,9 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
         setContentView(R.layout.px_activity_payment_result);
 
         footer = findViewById(R.id.footer);
+        instructions = findViewById(R.id.instructions);
+        header = findViewById(R.id.header);
+        body = findViewById(R.id.body);
         scrollView = findViewById(R.id.scroll_view);
 
         presenter = createPresenter();
@@ -106,26 +113,28 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
     private PaymentResultPresenter createPresenter() {
         final PaymentModel paymentModel = getIntent().getParcelableExtra(EXTRA_PAYMENT_MODEL);
         final Session session = Session.getInstance();
-
+        final MapperProvider mapperProvider = MapperProvider.INSTANCE;
         return new PaymentResultPresenter(session.getConfigurationModule().getPaymentSettings(),
-            session.getInstructionsRepository(), paymentModel, BehaviourProvider.getFlowBehaviour(), isMP(this),
-            MapperProvider.INSTANCE.getPaymentCongratsMapper(), session.getPaymentResultViewModelFactory(),
+            paymentModel, BehaviourProvider.getFlowBehaviour(), isMP(this),
+            mapperProvider.getPaymentCongratsMapper(), mapperProvider.getPaymentResultViewModelMapper(),
             session.getTracker());
     }
 
     @Override
     public void configureViews(@NonNull final PaymentResultViewModel model, @NonNull final PaymentModel paymentModel,
         @NonNull final PaymentResult.Listener listener, @NonNull final PaymentResultFooter.Listener footerListener) {
-        findViewById(R.id.loading).setVisibility(View.GONE);
-        final PaymentResultHeader header = findViewById(R.id.header);
         header.setModel(model.getHeaderModel());
-        final PaymentResultBody body = findViewById(R.id.body);
-
         if (model.getRemediesModel().hasRemedies()) {
             body.setVisibility(View.GONE);
             loadRemedies(paymentModel, model);
         } else {
-            body.init(model.getBodyModel(), listener);
+            final Instruction.Model instructionModel = model.getInstructionModel();
+            if (instructionModel != null) {
+                instructions.setVisibility(View.VISIBLE);
+                instructions.init(instructionModel, listener);
+            } else {
+                body.init(model.getBodyModel(), listener);
+            }
             final PaymentResultFooter.Model footerModel = model.getFooterModel();
             if (footerModel != null) {
                 footer.init(footerModel, footerListener);
@@ -136,7 +145,7 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
                 footer.setVisibility(View.GONE);
             }
             PaymentResultLegacyRenderer.render(findViewById(R.id.container), listener, model.getLegacyViewModel(),
-                shouldDrawLegacyFooter, Session.getInstance().getPaymentResultViewModelFactory());
+                shouldDrawLegacyFooter, instructions == null, Session.getInstance().getPaymentResultViewModelFactory());
         }
     }
 

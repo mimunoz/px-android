@@ -92,8 +92,8 @@ public final class PaymentProcessorActivity extends PXActivity
 
         paymentServiceHandlerWrapper = new PaymentServiceHandlerWrapper(session.getPaymentRepository(),
             session.getConfigurationModule().getDisabledPaymentMethodRepository(),
-            session.getEscPaymentManager(), session.getInstructionsRepository(),
-            session.getCongratsRepository(), session.getConfigurationModule().getUserSelectionRepository());
+            session.getEscPaymentManager(), session.getCongratsRepository(),
+            session.getConfigurationModule().getUserSelectionRepository());
 
         if (getFragmentByTag() == null) { // if fragment is not added, then create it.
             addPaymentProcessorFragment(session);

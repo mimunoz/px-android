@@ -22,8 +22,9 @@ import kotlinx.coroutines.withContext
 
 internal class CongratsRepositoryImpl(
     private val congratsService: CongratsService,
-    private val paymentSetting: PaymentSettingRepository, private val platform: String,
-    private val trackingRepository: TrackingRepository, private val userSelectionRepository: UserSelectionRepository,
+    private val platform: String,
+    private val trackingRepository: TrackingRepository,
+    private val userSelectionRepository: UserSelectionRepository,
     private val amountRepository: AmountRepository,
     private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
     private val payerComplianceRepository: PayerComplianceRepository,
@@ -35,11 +36,10 @@ internal class CongratsRepositoryImpl(
 
     private val paymentRewardCache = HashMap<String, CongratsResponse>()
     private val remediesCache = HashMap<String, RemediesResponse>()
-    private val privateKey = paymentSetting.privateKey
 
     override fun getPostPaymentData(payment: IPaymentDescriptor, paymentResult: PaymentResult,
         callback: PostPaymentCallback) {
-        val whiteLabel = TextUtil.isEmpty(privateKey)
+        val whiteLabel = TextUtil.isEmpty(paymentSettingRepository.privateKey)
         val isSuccess = StatusHelper.isSuccess(payment)
         CoroutineScope(Dispatchers.IO).launch {
             val paymentId = payment.paymentIds?.get(0) ?: payment.id.toString()
@@ -56,7 +56,7 @@ internal class CongratsRepositoryImpl(
                 }
             }
             withContext(Dispatchers.Main) {
-                handleResult(payment, paymentResult, congrats, remedies, paymentSetting.currency, callback)
+                handleResult(payment, paymentResult, congrats, remedies, paymentSettingRepository.currency, callback)
             }
         }
     }
@@ -67,10 +67,12 @@ internal class CongratsRepositoryImpl(
             val joinedPaymentMethodsIds = paymentResult.paymentDataList
                 .joinToString(TextUtil.CSV_DELIMITER) { p -> (p.paymentMethod.id) }
             val campaignId = paymentResult.paymentData.campaign?.run { id } ?: ""
-            val preference = paymentSetting.checkoutPreference
-            congratsService.getCongrats(PermissionHelper.instance.isLocationGranted(),
-                privateKey!!, joinedPaymentIds, platform, campaignId, payerComplianceRepository.turnedIFPECompliant(),
-                joinedPaymentMethodsIds, trackingRepository.flowId, preference?.merchantOrderId, preference?.id)
+            with(paymentSettingRepository) {
+                congratsService.getCongrats(PermissionHelper.instance.isLocationGranted(),
+                    privateKey!!, publicKey, joinedPaymentIds, platform, campaignId,
+                    payerComplianceRepository.turnedIFPECompliant(), joinedPaymentMethodsIds,
+                    trackingRepository.flowId, checkoutPreference?.merchantOrderId, checkoutPreference?.id)
+            }
         } catch (e: Exception) {
             CongratsResponse.EMPTY
         }
@@ -94,7 +96,7 @@ internal class CongratsRepositoryImpl(
             ).map(paymentData)
             congratsService.getRemedies(
                 payment.id.toString(),
-                privateKey!!,
+                paymentSettingRepository.privateKey!!,
                 hasOneTap,
                 body
             )

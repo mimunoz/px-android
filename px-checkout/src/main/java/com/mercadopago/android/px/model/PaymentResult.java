@@ -3,6 +3,7 @@ package com.mercadopago.android.px.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
+import com.mercadopago.android.px.internal.util.StatusHelper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +88,7 @@ public class PaymentResult implements Serializable {
      */
     public boolean isOffPayment() {
         return paymentId != null && Payment.StatusCodes.STATUS_PENDING.equalsIgnoreCase(paymentStatus) &&
-            Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equalsIgnoreCase(paymentStatusDetail);
+            StatusHelper.isPendingStatusDetailSuccess(paymentStatusDetail);
     }
 
     public String getPaymentStatusDetail() {
@@ -111,7 +112,7 @@ public class PaymentResult implements Serializable {
     public boolean isInstructions() {
         return (Payment.StatusCodes.STATUS_PENDING.equals(getPaymentStatus()) ||
             Payment.StatusCodes.STATUS_IN_PROCESS.equals(getPaymentStatus())) &&
-            Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equals(getPaymentStatusDetail());
+            StatusHelper.isPendingStatusDetailSuccess(getPaymentStatusDetail());
     }
 
     public boolean isPending() {

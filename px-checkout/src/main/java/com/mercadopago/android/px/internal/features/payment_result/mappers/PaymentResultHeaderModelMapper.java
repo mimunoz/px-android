@@ -7,6 +7,7 @@ import com.mercadopago.android.px.configuration.PaymentResultScreenConfiguration
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_result.model.Badge;
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesModel;
+import com.mercadopago.android.px.internal.util.StatusHelper;
 import com.mercadopago.android.px.internal.view.PaymentResultHeader;
 import com.mercadopago.android.px.internal.viewmodel.GenericLocalized;
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel;
@@ -128,7 +129,7 @@ public class PaymentResultHeaderModelMapper extends Mapper<PaymentModel, Payment
 
         return Payment.StatusCodes.STATUS_APPROVED.equalsIgnoreCase(status) ||
             Payment.StatusCodes.STATUS_PENDING.equalsIgnoreCase(status) &&
-                Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equalsIgnoreCase(statusDetail);
+                StatusHelper.isPendingStatusDetailSuccess(statusDetail);
     }
 
     private boolean isCardIconImage(@NonNull final PaymentResult paymentResult) {

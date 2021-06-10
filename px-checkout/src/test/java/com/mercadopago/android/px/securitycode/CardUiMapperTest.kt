@@ -4,7 +4,7 @@ import com.meli.android.carddrawer.configuration.CardDrawerStyle
 import com.mercadopago.android.px.internal.features.security_code.domain.model.BusinessCardDisplayInfo
 import com.mercadopago.android.px.internal.mappers.CardUiMapper
 import com.mercadopago.android.px.internal.util.JsonUtil
-import com.mercadopago.android.px.internal.viewmodel.CardUiConfiguration
+import com.mercadopago.android.px.internal.viewmodel.PaymentCard
 import com.mercadopago.android.px.model.CardDisplayInfo
 import com.mercadopago.android.px.model.CardDisplayInfoType
 import org.junit.Assert.assertTrue
@@ -36,7 +36,7 @@ class CardUiMapperTest {
         `when`(businessCardDisplayInfo.securityCodeLocation).thenReturn("back")
         `when`(businessCardDisplayInfo.securityCodeLength).thenReturn(3)
 
-        val expectedResult = CardUiConfiguration(
+        val expectedResult = PaymentCard(
             businessCardDisplayInfo.cardholderName,
             businessCardDisplayInfo.expiration,
             businessCardDisplayInfo.cardPatternMask,
@@ -48,6 +48,7 @@ class CardUiMapperTest {
             businessCardDisplayInfo.fontColor,
             businessCardDisplayInfo.securityCodeLocation,
             businessCardDisplayInfo.securityCodeLength,
+            tag = null,
             style = CardDrawerStyle.REGULAR
         )
 
@@ -78,7 +79,7 @@ class CardUiMapperTest {
         }""".trimIndent(), CardDisplayInfo::class.java)
 
         val expectedResult = with(cardDisplayInfo!!) {
-            CardUiConfiguration(
+            PaymentCard(
                 cardholderName,
                 expiration,
                 getCardPattern(),
@@ -91,11 +92,12 @@ class CardUiMapperTest {
                 securityCode.cardLocation,
                 securityCode.length,
                 null,
+                null,
                 CardDrawerStyle.REGULAR
             )
         }
 
-        val actualResult = CardUiMapper.map(cardDisplayInfo)
+        val actualResult = CardUiMapper.map(cardDisplayInfo, null)
 
         assertTrue(ReflectionEquals(actualResult).matches(expectedResult))
     }

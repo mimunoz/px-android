@@ -5,6 +5,8 @@ import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
+import com.mercadopago.android.px.internal.features.payment_result.instruction.mapper.*
+import com.mercadopago.android.px.internal.features.payment_result.mappers.PaymentResultViewModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
 import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
@@ -96,6 +98,36 @@ internal object MapperProvider {
             getAmountDescriptorMapper()
         )
     }
+
+    val paymentResultViewModelMapper: PaymentResultViewModelMapper
+        get() {
+            val session = Session.getInstance()
+            val paymentSettings = session.configurationModule.paymentSettings
+            return PaymentResultViewModelMapper(
+                paymentSettings.advancedConfiguration.paymentResultScreenConfiguration,
+                session.paymentResultViewModelFactory,
+                session.tracker,
+                instructionMapper,
+                paymentSettings.checkoutPreference?.autoReturn
+            )
+        }
+
+    val instructionMapper: InstructionMapper
+        get() = InstructionMapper(
+            instructionInfoMapper, instructionInteractionMapper, instructionReferenceMapper, instructionActionMapper
+        )
+
+    val instructionInfoMapper: InstructionInfoMapper
+        get() = InstructionInfoMapper()
+
+    val instructionActionMapper: InstructionActionMapper
+        get() = InstructionActionMapper()
+
+    val instructionInteractionMapper: InstructionInteractionMapper
+        get() = InstructionInteractionMapper(instructionActionMapper)
+
+    val instructionReferenceMapper: InstructionReferenceMapper
+        get() = InstructionReferenceMapper()
 
     val fromApplicationToApplicationInfo: FromApplicationToApplicationInfo
         get() = FromApplicationToApplicationInfo()

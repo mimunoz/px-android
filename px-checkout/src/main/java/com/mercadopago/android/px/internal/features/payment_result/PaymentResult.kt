@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.features.payment_result
 
 import androidx.annotation.ColorRes
 import com.mercadopago.android.px.internal.base.MvpView
+import com.mercadopago.android.px.internal.features.payment_result.instruction.adapter.InstructionActionAdapter
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
 import com.mercadopago.android.px.internal.features.payment_result.viewmodel.PaymentResultViewModel
 import com.mercadopago.android.px.internal.view.ActionDispatcher
@@ -33,5 +34,5 @@ internal interface PaymentResult {
         fun onStop()
     }
 
-    interface Listener : PaymentResultBody.Listener, ActionDispatcher
+    interface Listener : PaymentResultBody.Listener, ActionDispatcher, InstructionActionAdapter.Listener
 }

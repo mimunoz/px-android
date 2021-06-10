@@ -29,6 +29,9 @@ subprojects {
         maven {
             url 'https://artifacts.mercadolibre.com/repository/android-releases/'
         }
+        maven {
+            url 'https://artifacts.mercadolibre.com/repository/android-experimental/'
+        }
         jcenter()
     }
 }

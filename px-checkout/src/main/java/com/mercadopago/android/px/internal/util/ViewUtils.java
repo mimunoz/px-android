@@ -33,6 +33,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import com.mercadolibre.android.picassodiskcache.PicassoDiskLoader;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsText;
@@ -108,6 +109,15 @@ public final class ViewUtils {
             textView.setVisibility(GONE);
         } else {
             textView.setText(text);
+            textView.setVisibility(VISIBLE);
+        }
+    }
+
+    public static void loadLikeHtmlOrGone(@Nullable final CharSequence text, @NonNull final TextView textView) {
+        if (TextUtil.isEmpty(text)) {
+            textView.setVisibility(GONE);
+        } else {
+            textView.setText(HtmlCompat.fromHtml(text.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY));
             textView.setVisibility(VISIBLE);
         }
     }

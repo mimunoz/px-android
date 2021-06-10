@@ -32,6 +32,7 @@ internal class FeatureProviderImpl(
                 .setOdrFlag(true)
                 .setComboCard(true)
                 .setHybridCard(true)
+                .setPix(true)
                 .addValidationProgram(Application.KnownValidationProgram.STP.value)
 
             if (tokenDeviceBehaviour.isFeatureAvailable) {

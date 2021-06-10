@@ -11,26 +11,19 @@ import com.mercadopago.android.px.internal.actions.LinkAction;
 import com.mercadopago.android.px.internal.actions.NextAction;
 import com.mercadopago.android.px.internal.actions.RecoverPaymentAction;
 import com.mercadopago.android.px.internal.base.BasePresenter;
-import com.mercadopago.android.px.internal.callbacks.FailureRecovery;
-import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper;
 import com.mercadopago.android.px.internal.features.payment_result.mappers.PaymentResultViewModelMapper;
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton;
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter;
 import com.mercadopago.android.px.internal.features.payment_result.viewmodel.PaymentResultViewModel;
-import com.mercadopago.android.px.internal.repository.InstructionsRepository;
+import com.mercadopago.android.px.internal.mappers.FlowBehaviourResultMapper;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
-import com.mercadopago.android.px.internal.util.ApiUtil;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.ActionDispatcher;
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel;
-import com.mercadopago.android.px.internal.mappers.FlowBehaviourResultMapper;
 import com.mercadopago.android.px.model.Action;
 import com.mercadopago.android.px.model.IPaymentDescriptor;
-import com.mercadopago.android.px.model.Instruction;
-import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.internal.CongratsResponse;
-import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import com.mercadopago.android.px.tracking.internal.events.AbortEvent;
 import com.mercadopago.android.px.tracking.internal.events.ChangePaymentMethodEvent;
@@ -44,50 +37,38 @@ import com.mercadopago.android.px.tracking.internal.events.ScoreEvent;
 import com.mercadopago.android.px.tracking.internal.events.SeeAllDiscountsEvent;
 import com.mercadopago.android.px.tracking.internal.events.ViewReceiptEvent;
 import com.mercadopago.android.px.tracking.internal.views.ResultViewTrack;
-import java.util.List;
 
 /* default */ class PaymentResultPresenter extends BasePresenter<PaymentResult.View>
     implements ActionDispatcher, PaymentResult.Presenter, PaymentResult.Listener {
 
-    @NonNull private final PaymentSettingRepository paymentSettings;
     private final PaymentModel paymentModel;
-    private final InstructionsRepository instructionsRepository;
     private final ResultViewTrack resultViewTrack;
-    private final PaymentResultScreenConfiguration screenConfiguration;
-    @NonNull private final PaymentResultViewModelFactory factory;
+    @NonNull private final PaymentResultViewModelMapper paymentResultViewModelMapper;
     @NonNull /* default */ final PaymentCongratsModelMapper paymentCongratsMapper;
     private final FlowBehaviour flowBehaviour;
-
-    private FailureRecovery failureRecovery;
     @Nullable /* default */ CongratsAutoReturn autoReturnTimer;
 
     /* default */ PaymentResultPresenter(@NonNull final PaymentSettingRepository paymentSettings,
-        @NonNull final InstructionsRepository instructionsRepository, @NonNull final PaymentModel paymentModel,
+        @NonNull final PaymentModel paymentModel,
         @NonNull final FlowBehaviour flowBehaviour, final boolean isMP,
         @NonNull final PaymentCongratsModelMapper paymentCongratsMapper,
-        @NonNull final PaymentResultViewModelFactory factory,
+        @NonNull final PaymentResultViewModelMapper paymentResultViewModelMapper,
         @NonNull final MPTracker tracker) {
         super(tracker);
-        this.paymentSettings = paymentSettings;
         this.paymentModel = paymentModel;
-        this.instructionsRepository = instructionsRepository;
         this.flowBehaviour = flowBehaviour;
         this.paymentCongratsMapper = paymentCongratsMapper;
 
-        screenConfiguration = paymentSettings.getAdvancedConfiguration().getPaymentResultScreenConfiguration();
-        this.factory = factory;
+        final PaymentResultScreenConfiguration screenConfiguration =
+            paymentSettings.getAdvancedConfiguration().getPaymentResultScreenConfiguration();
+        this.paymentResultViewModelMapper = paymentResultViewModelMapper;
         resultViewTrack = new ResultViewTrack(paymentModel, screenConfiguration, paymentSettings, isMP);
     }
 
     @Override
     public void attachView(@NonNull final PaymentResult.View view) {
         super.attachView(view);
-
-        if (paymentModel.getPaymentResult().isOffPayment()) {
-            getInstructions();
-        } else {
-            configureView(null);
-        }
+        configureView();
     }
 
     @Override
@@ -121,67 +102,9 @@ import java.util.List;
         finishWithResult(MercadoPagoCheckout.PAYMENT_RESULT_CODE);
     }
 
-    /* default */ void getInstructions() {
-        instructionsRepository.getInstructions(paymentModel.getPaymentResult()).enqueue(
-            new Callback<List<Instruction>>() {
-                @Override
-                public void success(final List<Instruction> instructions) {
-                    resolveInstructions(instructions);
-                }
-
-                @Override
-                public void failure(final ApiException apiException) {
-                    if (isViewAttached()) {
-                        getView().showApiExceptionError(apiException, ApiUtil.RequestOrigin.GET_INSTRUCTIONS);
-                        setFailureRecovery(() -> getInstructions());
-                    }
-                }
-            });
-    }
-
-    public void recoverFromFailure() {
-        if (failureRecovery != null) {
-            failureRecovery.recover();
-        }
-    }
-
-    /* default */ void setFailureRecovery(final FailureRecovery failureRecovery) {
-        this.failureRecovery = failureRecovery;
-    }
-
-    /* default */ void resolveInstructions(final List<Instruction> instructions) {
-        final Instruction instruction = getInstruction(instructions);
-        if (isViewAttached() && instruction == null) {
-            getView().showInstructionsError();
-        } else {
-            configureView(instruction);
-        }
-    }
-
-    @Nullable
-    private Instruction getInstruction(@NonNull final List<Instruction> instructions) {
-        if (instructions.size() == 1) {
-            return instructions.get(0);
-        } else {
-            return getInstructionForType(instructions,
-                paymentModel.getPaymentResult().getPaymentData().getPaymentMethod().getPaymentTypeId());
-        }
-    }
-
-    @Nullable
-    private Instruction getInstructionForType(final Iterable<Instruction> instructions, final String paymentTypeId) {
-        for (final Instruction instruction : instructions) {
-            if (instruction.getType().equals(paymentTypeId)) {
-                return instruction;
-            }
-        }
-        return null;
-    }
-
-    private void configureView(@Nullable final Instruction instruction) {
+    private void configureView() {
         if (isViewAttached()) {
-            final PaymentResultViewModel viewModel = new PaymentResultViewModelMapper(screenConfiguration, factory,
-                getTracker(), instruction, paymentSettings.getCheckoutPreference().getAutoReturn()).map(paymentModel);
+            final PaymentResultViewModel viewModel = paymentResultViewModelMapper.map(paymentModel);
             getView().configureViews(viewModel, paymentModel, this, new PaymentResultFooter.Listener() {
                 @Override
                 public void onClick(@NonNull final PaymentResultButton.Action action) {
@@ -229,9 +152,19 @@ import java.util.List;
             getView().changePaymentMethod();
         } else if (action instanceof RecoverPaymentAction) {
             getView().recoverPayment();
-        } else if (action instanceof LinkAction) {
+        }
+    }
+
+    @Override
+    public void onLinkAction(@NonNull final LinkAction action) {
+        if (isViewAttached()) {
             getView().openLink(((LinkAction) action).url);
-        } else if (action instanceof CopyAction) {
+        }
+    }
+
+    @Override
+    public void onCopyAction(@NonNull final CopyAction action) {
+        if (isViewAttached()) {
             getView().copyToClipboard(((CopyAction) action).content);
         }
     }

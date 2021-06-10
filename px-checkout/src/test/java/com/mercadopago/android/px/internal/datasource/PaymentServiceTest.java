@@ -13,7 +13,6 @@ import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
 import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
-import com.mercadopago.android.px.internal.mappers.PaymentMethodMapper;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
@@ -22,7 +21,6 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
-import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PayerCostSelectionRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
@@ -97,7 +95,6 @@ public class PaymentServiceTest {
     @Mock private EscPaymentManager escPaymentManager;
     @Mock private ESCManagerBehaviour escManagerBehaviour;
     @Mock private TokenRepository tokenRepository;
-    @Mock private InstructionsRepository instructionsRepository;
     @Mock private AmountConfigurationRepository amountConfigurationRepository;
     @Mock private CongratsRepository congratsRepository;
     @Mock private SplitSelectionState splitSelectionState;
@@ -131,7 +128,6 @@ public class PaymentServiceTest {
             escPaymentManager,
             escManagerBehaviour,
             tokenRepository,
-            instructionsRepository,
             amountConfigurationRepository,
             congratsRepository,
             fileManager,

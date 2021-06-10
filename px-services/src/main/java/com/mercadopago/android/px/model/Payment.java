@@ -338,6 +338,7 @@ public final class Payment implements IPayment, IPaymentDescriptor {
             || paymentTypeId.equals(PaymentTypes.PREPAID_CARD);
     }
 
+    @Deprecated
     public static boolean isPendingStatus(final String status, final String statusDetail) {
         return StatusCodes.STATUS_PENDING.equals(status) &&
             StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equals(statusDetail);
@@ -424,6 +425,7 @@ public final class Payment implements IPayment, IPaymentDescriptor {
         public static final String STATUS_DETAIL_PENDING_CONTINGENCY = "pending_contingency";
         public static final String STATUS_DETAIL_PENDING_REVIEW_MANUAL = "pending_review_manual";
         public static final String STATUS_DETAIL_PENDING_WAITING_PAYMENT = "pending_waiting_payment";
+        public static final String STATUS_DETAIL_PENDING_WAITING_TRANSFER = "pending_waiting_transfer";
         public static final String STATUS_DETAIL_CC_REJECTED_OTHER_REASON = "cc_rejected_other_reason";
 
         public static final String STATUS_DETAIL_INVALID_ESC = "invalid_esc";

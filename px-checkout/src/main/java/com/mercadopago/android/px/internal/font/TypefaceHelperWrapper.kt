@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.Log
 import android.widget.TextView
-import com.mercadolibre.android.ui.font.Font
-import com.mercadolibre.android.ui.font.TypefaceHelper
+import com.mercadolibre.android.andesui.font.Font
+import com.mercadolibre.android.andesui.font.TypefaceHelper
 
 object TypefaceHelperWrapper {
 

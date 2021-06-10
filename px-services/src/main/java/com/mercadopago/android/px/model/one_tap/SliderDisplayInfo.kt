@@ -10,5 +10,6 @@ import kotlinx.android.parcel.Parcelize
 data class SliderDisplayInfo(
     val bottomDescription: Text,
     @SerializedName("switch")
-    val cardDrawerSwitch: CardDrawerSwitch? = null
+    val cardDrawerSwitch: CardDrawerSwitch? = null,
+    val tag: Text?
 ) : Parcelable

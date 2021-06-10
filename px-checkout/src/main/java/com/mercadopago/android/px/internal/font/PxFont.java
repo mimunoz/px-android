@@ -3,7 +3,7 @@ package com.mercadopago.android.px.internal.font;
 import android.graphics.Typeface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.mercadolibre.android.ui.font.Font;
+import com.mercadolibre.android.andesui.font.Font;
 
 public enum PxFont {
     BLACK(0, Font.BLACK, Typeface.BOLD),

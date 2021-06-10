@@ -12,6 +12,7 @@ interface CongratsService {
     suspend fun getCongrats(
         @Header("X-Location-Enabled") locationEnabled: Boolean,
         @Query("access_token") accessToken: String,
+        @Query("public_key") publicKey: String,
         @Query("payment_ids") paymentIds: String,
         @Query("platform") platform: String,
         @Query("campaign_id") campaignId: String,

@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android-extensions'
 
 def user_agent = "PX/Android/" + (libraryVersion as String)
 enum Environment {
-    PRODUCTION('"production"'), BETA('"beta"'), ALPHA('"alpha"')
+    PRODUCTION('"production"'), BETA('"beta"'), ALPHA('"alpha"'), GAMMA('"gamma"'), LEGACY_PROD('"v1"')
 
     private final String value
 
@@ -26,13 +26,13 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "API_ENVIRONMENT", '"v1"'
+            buildConfigField "String", "API_ENVIRONMENT", "$Environment.LEGACY_PROD"
             buildConfigField "String", "API_ENVIRONMENT_NEW", "$Environment.PRODUCTION"
             buildConfigField "boolean", "HTTP_CLIENT_LOG", "true"
         }
 
         release {
-            buildConfigField "String", "API_ENVIRONMENT", '"v1"'
+            buildConfigField "String", "API_ENVIRONMENT", "$Environment.LEGACY_PROD"
             buildConfigField "String", "API_ENVIRONMENT_NEW", "$Environment.PRODUCTION"
             buildConfigField "boolean", "HTTP_CLIENT_LOG", "false"
         }

@@ -1,11 +1,10 @@
 package com.mercadopago.android.px.internal.features.payment_result.components;
 
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.payment_result.props.BodyErrorProps;
-import com.mercadopago.android.px.internal.features.payment_result.props.InstructionsProps;
 import com.mercadopago.android.px.internal.features.payment_result.props.PaymentResultBodyProps;
 import com.mercadopago.android.px.internal.util.CurrenciesUtil;
 import com.mercadopago.android.px.internal.util.PaymentDataHelper;
@@ -24,18 +23,7 @@ public class Body extends CompactComponent<PaymentResultBodyProps, ActionDispatc
     }
 
     /* default */ boolean hasSomethingToDraw() {
-        return hasInstructions() || hasBodyError();
-    }
-
-    private boolean hasInstructions() {
-        return props.instruction != null;
-    }
-
-    private Instructions getInstructionsComponent() {
-        final InstructionsProps instructionsProps = new InstructionsProps.Builder()
-            .setInstruction(props.instruction)
-            .build();
-        return new Instructions(instructionsProps, getActions());
+        return hasBodyError();
     }
 
     private boolean hasBodyError() {
@@ -56,9 +44,7 @@ public class Body extends CompactComponent<PaymentResultBodyProps, ActionDispatc
 
     @Override
     public View render(@NonNull final ViewGroup parent) {
-        if (hasInstructions()) {
-            getInstructionsComponent().render(parent);
-        } else if (hasBodyError()) {
+        if (hasBodyError()) {
             getBodyErrorComponent().render(parent);
         }
         return parent;

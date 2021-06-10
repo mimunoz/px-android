@@ -2,6 +2,7 @@ package com.mercadopago.android.px.model.internal
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.mercadopago.android.px.model.Instruction
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
 
@@ -18,7 +19,8 @@ data class CongratsResponse(
     val redirectUrl: String? = null,
     val backUrl: String? = null,
     val primaryButton: Button? = null,
-    val secondaryButton: Button? = null
+    val secondaryButton: Button? = null,
+    val instructions: Instruction? = null
 ) : Parcelable {
 
     fun getCrossSellings() = crossSellingList ?: emptyList()

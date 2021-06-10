@@ -19,7 +19,6 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
-import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -29,7 +28,6 @@ import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.util.TokenErrorWrapper;
 import com.mercadopago.android.px.model.AmountConfiguration;
 import com.mercadopago.android.px.model.Card;
-import com.mercadopago.android.px.model.CardInformation;
 import com.mercadopago.android.px.model.Discount;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.IPaymentDescriptor;
@@ -89,7 +87,6 @@ public class PaymentService implements PaymentRepository {
         @NonNull final EscPaymentManager escPaymentManager,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
         @NonNull final TokenRepository tokenRepository,
-        @NonNull final InstructionsRepository instructionsRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final CongratsRepository congratsRepository,
         @NonNull final FileManager fileManager,
@@ -116,7 +113,7 @@ public class PaymentService implements PaymentRepository {
 
         handlerWrapper =
             new PaymentServiceHandlerWrapper(this, disabledPaymentMethodRepository, escPaymentManager,
-                instructionsRepository, congratsRepository, userSelectionRepository);
+                congratsRepository, userSelectionRepository);
     }
 
     @Nullable

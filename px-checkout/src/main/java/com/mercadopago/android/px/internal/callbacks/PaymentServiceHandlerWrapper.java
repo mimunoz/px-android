@@ -6,7 +6,6 @@ import androidx.annotation.VisibleForTesting;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
-import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel;
@@ -15,17 +14,13 @@ import com.mercadopago.android.px.model.Card;
 import com.mercadopago.android.px.model.IPayment;
 import com.mercadopago.android.px.model.IPaymentDescriptor;
 import com.mercadopago.android.px.model.IPaymentDescriptorHandler;
-import com.mercadopago.android.px.model.Instruction;
 import com.mercadopago.android.px.model.PaymentRecovery;
 import com.mercadopago.android.px.model.PaymentResult;
 import com.mercadopago.android.px.model.PaymentTypes;
-import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
-import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.model.Reason;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import kotlin.Pair;
 import kotlin.Unit;
@@ -36,7 +31,6 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
     @Nullable private WeakReference<PaymentServiceHandler> handler;
     private PaymentServiceEventHandler eventHandler;
     @NonNull private final EscPaymentManager escPaymentManager;
-    @NonNull private final InstructionsRepository instructionsRepository;
     @NonNull private final CongratsRepository congratsRepository;
     private UserSelectionRepository userSelectionRepository;
     @NonNull private final Queue<Message> messages;
@@ -55,22 +49,7 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
                 //Must be after store
                 final PaymentResult paymentResult = paymentRepository.createPaymentResult(payment);
                 disabledPaymentMethodRepository.handleRejectedPayment(paymentResult);
-                if (paymentResult.isOffPayment()) {
-                    instructionsRepository.getInstructions(paymentResult)
-                        .enqueue(new Callback<List<Instruction>>() {
-                            @Override
-                            public void success(final List<Instruction> instructions) {
-                                onPostPayment(payment, paymentResult);
-                            }
-
-                            @Override
-                            public void failure(final ApiException apiException) {
-                                onPostPayment(payment, paymentResult);
-                            }
-                        });
-                } else {
-                    onPostPayment(payment, paymentResult);
-                }
+                onPostPayment(payment, paymentResult);
             }
         }
 
@@ -88,13 +67,11 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
         @NonNull final PaymentRepository paymentRepository,
         @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final EscPaymentManager escPaymentManager,
-        @NonNull final InstructionsRepository instructionsRepository,
         @NonNull final CongratsRepository congratsRepository,
         @NonNull final UserSelectionRepository userSelectionRepository) {
         this.paymentRepository = paymentRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         this.escPaymentManager = escPaymentManager;
-        this.instructionsRepository = instructionsRepository;
         this.congratsRepository = congratsRepository;
         this.userSelectionRepository = userSelectionRepository;
         messages = new LinkedList<>();

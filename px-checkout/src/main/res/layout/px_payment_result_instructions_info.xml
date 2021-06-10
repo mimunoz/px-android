@@ -1,50 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat"
     android:orientation="vertical">
 
-    <LinearLayout
+    <com.mercadopago.android.px.internal.view.MPTextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingEnd="@dimen/px_l_margin"
-        android:paddingLeft="@dimen/px_l_margin"
-        android:paddingRight="@dimen/px_l_margin"
-        android:paddingStart="@dimen/px_l_margin">
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="12dp"
+        android:textColor="@color/px_payment_result_black_text"
+        android:textSize="@dimen/px_l_text"
+        tools:text="Title" />
 
-        <com.mercadopago.android.px.internal.view.MPTextView
-            android:id="@+id/mpsdkInstructionsInfoTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/px_l_alternative_margin"
-            android:textColor="@color/ui_meli_black"
-            android:textSize="@dimen/px_l_text"
-            tools:text="Title"/>
-
-        <com.mercadopago.android.px.internal.view.MPTextView
-            android:id="@+id/mpsdkInstructionsInfoContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/px_l_margin"
-            android:textColor="@color/ui_meli_dark_grey"
-            android:textSize="@dimen/px_s_text"
-            tools:text="content"/>
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/mpsdkInstructionsInfoDividerBottom"
+    <com.mercadopago.android.px.internal.view.MPTextView
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/px_l_alternative_margin"
-        android:visibility="gone">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="12dp"
+        android:textColor="@color/px_payment_result_gray_text"
+        android:textSize="@dimen/px_s_text"
+        tools:text="content sdfsdf\nsdfdsfds" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/px_xxxs_height"
-            android:layout_gravity="bottom"
-            android:background="@color/px_med_light_gray"/>
-    </FrameLayout>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
 
-</LinearLayout>
+</merge>

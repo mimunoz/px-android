@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.viewmodel.drawables
 
 import android.os.Parcelable
+import com.mercadopago.android.px.internal.viewmodel.CardDrawerConfiguration
 import com.mercadopago.android.px.model.StatusMetadata
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
@@ -14,7 +15,7 @@ internal data class DrawableFragmentCommons(
     val disabledPaymentMethod: DisabledPaymentMethod?,
     val description: String,
     val issuerName: String,
-    val cardDrawable: CardDrawable? = null
+    val cardDrawerConfiguration: CardDrawerConfiguration?
 ) : Parcelable {
 
     @Parcelize

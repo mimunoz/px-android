@@ -8,6 +8,7 @@ import com.mercadopago.android.px.internal.actions.NextAction;
 import com.mercadopago.android.px.internal.actions.RecoverPaymentAction;
 import com.mercadopago.android.px.internal.features.payment_result.PaymentResultDecorator;
 import com.mercadopago.android.px.internal.features.payment_result.props.BodyErrorProps;
+import com.mercadopago.android.px.internal.util.StatusHelper;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.viewmodel.PaymentResultViewModel;
 import com.mercadopago.android.px.model.Payment;
@@ -35,7 +36,6 @@ import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAI
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_MAX_ATTEMPTS;
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_PLUGIN_PM;
-import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT;
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_REJECTED_BY_REGULATIONS;
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_REJECTED_HIGH_RISK;
 import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_REJECTED_REJECTED_BY_BANK;
@@ -113,9 +113,9 @@ public final class PaymentResultViewModelFactory {
                 .setTitleResId(checkPaymentMethodsOff(status, detail))
                 .setDescriptionResId(getPendingDescription(detail))
                 .setLinkActionTitle(R.string.px_got_it)
-                .setApprovedSuccess(pendingStatusIsSuccess(detail))
-                .setPendingSuccess(pendingStatusIsSuccess(detail))
-                .setPendingWarning(!pendingStatusIsSuccess(detail))
+                .setApprovedSuccess(StatusHelper.isPendingStatusDetailSuccess(detail))
+                .setPendingSuccess(StatusHelper.isPendingStatusDetailSuccess(detail))
+                .setPendingWarning(!StatusHelper.isPendingStatusDetailSuccess(detail))
                 .setHasDetail(true);
 
         case STATUS_REJECTED:
@@ -131,10 +131,6 @@ public final class PaymentResultViewModelFactory {
             builder.setHasDetail(true);
             return unknownStatusFallback(builder, status, detail);
         }
-    }
-
-    private boolean pendingStatusIsSuccess(final String detail) {
-        return STATUS_DETAIL_PENDING_WAITING_PAYMENT.equalsIgnoreCase(detail);
     }
 
     /**
@@ -156,7 +152,7 @@ public final class PaymentResultViewModelFactory {
     }
 
     private int checkPaymentMethodsOff(final String status, final String detail) {
-        if (status.equalsIgnoreCase(STATUS_PENDING) && detail.equalsIgnoreCase(STATUS_DETAIL_PENDING_WAITING_PAYMENT)) {
+        if (status.equalsIgnoreCase(STATUS_PENDING) && StatusHelper.isPendingStatusDetailSuccess(detail)) {
             return EMPTY_LABEL;
         } else {
             return R.string.px_title_pending_payment;
@@ -327,10 +323,10 @@ public final class PaymentResultViewModelFactory {
 
     private void setPendingResources(@NonNull final PaymentResultViewModel.Builder builder,
         @NonNull final String statusDetail) {
-        if (pendingStatusIsSuccess(statusDetail)) {
+        if (StatusHelper.isPendingStatusDetailSuccess(statusDetail)) {
             builder
                 .setBackgroundColor(R.color.ui_components_success_color)
-                .setBadgeResId(R.drawable.px_badge_pending);
+                .setBadgeResId(R.drawable.px_badge_check);
         } else {
             builder
                 .setBadgeResId(R.drawable.px_badge_pending_orange)

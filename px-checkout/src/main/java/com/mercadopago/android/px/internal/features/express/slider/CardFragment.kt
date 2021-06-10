@@ -5,11 +5,13 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.meli.android.carddrawer.configuration.CardDrawerStyle
 import com.meli.android.carddrawer.model.CardDrawerView
 import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem
 import com.mercadopago.android.px.model.PaymentTypes
+import com.meli.android.carddrawer.model.PaymentCard as CardDrawerPaymentCard
 
 internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>() {
     private lateinit var cardView: CardDrawerView
@@ -19,15 +21,23 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
     }
 
     override fun updateCardDrawerView(cardDrawerView: CardDrawerView) {
-        model.commonsByApplication.getCurrent().cardDrawable?.let { byApplication ->
-            byApplication.cardConfiguration?.let { card ->
-                cardView = cardDrawerView
-                cardView.card.name = card.name
-                cardView.card.expiration = card.date
-                cardView.card.number = card.number
-                cardView.show(card)
+        cardView = cardDrawerView
+        with(cardView) {
+            model.commonsByApplication.getCurrent().cardDrawerConfiguration?.let { configuration ->
+                configuration.paymentCard?.let {
+                    card.name = it.name
+                    card.expiration = it.date
+                    card.number = it.number
+                    if (it.style != CardDrawerStyle.REGULAR) {
+                        cardView.id = R.id.px_card_account_money
+                    }
+                    // To show tag we have to create the CardDrawerPaymentCard
+                    show(CardDrawerPaymentCard(it, it.getTag()))
+                } ?: configuration.genericPaymentMethod?.let {
+                    show(it)
+                }
             }
-            cardView.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         }
     }
 
@@ -35,10 +45,10 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
         val builder = SpannableStringBuilder()
         with(model.commonsByApplication.getCurrent()) {
             when {
-                PaymentTypes.isAccountMoney(cardDrawable?.paymentMethodId) -> builder
+                PaymentTypes.isAccountMoney(cardDrawerConfiguration?.paymentMethodId) -> builder
                     .append(description)
                 else -> builder
-                    .append(cardDrawable?.paymentMethodId)
+                    .append(cardDrawerConfiguration?.paymentMethodId)
                     .append(TextUtil.SPACE)
                     .append(issuerName)
                     .append(TextUtil.SPACE)
@@ -46,7 +56,7 @@ internal open class CardFragment : PaymentMethodFragment<DrawableFragmentItem>()
                     .append(TextUtil.SPACE)
                     .append(getString(R.string.px_date_divider))
                     .append(TextUtil.SPACE)
-                    .append(cardDrawable?.cardConfiguration?.name)
+                    .append(cardDrawerConfiguration?.paymentCard?.name)
             }
         }
         return builder.toString()

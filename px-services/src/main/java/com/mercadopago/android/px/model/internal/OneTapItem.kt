@@ -7,6 +7,8 @@ import com.mercadopago.android.px.model.ExpressMetadata
 class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
 
     private var applications: List<Application>? = null
+    var offlineMethodCard: OfflineMethodCard? = null
+        private set
     val id: String
         get () {
             var allPaymentMethods = ""
@@ -24,6 +26,8 @@ class OneTapItem(parcel: Parcel?) : ExpressMetadata(parcel) {
         super.writeToParcel(dest, flags)
         throw UnsupportedOperationException("Parcelable implementation not available")
     }
+
+    fun isOfflineMethodCard() = offlineMethodCard != null
 
     fun getApplications() = applications.orIfNullOrEmpty(mutableListOf<Application>().also { applications ->
         if (isOfflineMethods) {

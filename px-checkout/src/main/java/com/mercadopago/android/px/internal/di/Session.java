@@ -24,7 +24,6 @@ import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolverImpl;
 import com.mercadopago.android.px.internal.datasource.DiscountServiceImpl;
 import com.mercadopago.android.px.internal.datasource.EscPaymentManagerImp;
 import com.mercadopago.android.px.internal.datasource.ExperimentsRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.InstructionsService;
 import com.mercadopago.android.px.internal.datasource.ModalRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.PayerPaymentMethodRepositoryImpl;
@@ -46,7 +45,6 @@ import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
-import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.ModalRepository;
 import com.mercadopago.android.px.internal.repository.OneTapItemRepository;
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodRepository;
@@ -58,7 +56,6 @@ import com.mercadopago.android.px.internal.services.CardHolderAuthenticatorServi
 import com.mercadopago.android.px.internal.services.CheckoutService;
 import com.mercadopago.android.px.internal.services.CongratsService;
 import com.mercadopago.android.px.internal.services.GatewayService;
-import com.mercadopago.android.px.internal.services.InstructionsClient;
 import com.mercadopago.android.px.internal.tracking.TrackingRepository;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.model.Device;
@@ -83,7 +80,6 @@ public final class Session extends ApplicationModule {
     private CheckoutRepository checkoutRepository;
     private PaymentRepository paymentRepository;
     private AmountConfigurationRepository amountConfigurationRepository;
-    private InstructionsService instructionsRepository;
     private CardTokenRepository cardTokenRepository;
     private CongratsRepository congratsRepository;
     private ExperimentsRepository experimentsRepository;
@@ -195,7 +191,6 @@ public final class Session extends ApplicationModule {
         amountRepository = null;
         checkoutRepository = null;
         paymentRepository = null;
-        instructionsRepository = null;
         amountConfigurationRepository = null;
         cardTokenRepository = null;
         congratsRepository = null;
@@ -303,7 +298,6 @@ public final class Session extends ApplicationModule {
                 getEscPaymentManager(),
                 getMercadoPagoESC(),
                 getTokenRepository(),
-                getInstructionsRepository(),
                 getAmountConfigurationRepository(),
                 getCongratsRepository(),
                 getFileManager(),
@@ -331,16 +325,6 @@ public final class Session extends ApplicationModule {
     }
 
     @NonNull
-    public InstructionsRepository getInstructionsRepository() {
-        if (instructionsRepository == null) {
-            instructionsRepository =
-                new InstructionsService(getConfigurationModule().getPaymentSettings(),
-                    networkModule.getRetrofitClient().create(InstructionsClient.class));
-        }
-        return instructionsRepository;
-    }
-
-    @NonNull
     public CardTokenRepository getCardTokenRepository() {
         if (cardTokenRepository == null) {
             final GatewayService gatewayService =
@@ -355,8 +339,7 @@ public final class Session extends ApplicationModule {
     public CongratsRepository getCongratsRepository() {
         if (congratsRepository == null) {
             final CongratsService congratsService = networkModule.getRetrofitClient().create(CongratsService.class);
-            final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
-            congratsRepository = new CongratsRepositoryImpl(congratsService, paymentSettings,
+            congratsRepository = new CongratsRepositoryImpl(congratsService,
                 getPlatform(getApplicationContext()), configurationModule.getTrackingRepository(),
                 configurationModule.getUserSelectionRepository(), getAmountRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(),

@@ -306,7 +306,11 @@ import java.util.List;
         final OneTapItem oneTapItem = getCurrentOneTapItem();
         final AmountConfiguration amountConfiguration =
             amountConfigurationRepository.getConfigurationSelectedFor(customOptionIdSolver.get(oneTapItem));
-        return amountConfiguration.getAppliedPayerCost(getState().getSplitSelectionState().userWantsToSplit());
+        if (amountConfiguration != null) {
+            return amountConfiguration.getAppliedPayerCost(getState().getSplitSelectionState().userWantsToSplit());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     /**
