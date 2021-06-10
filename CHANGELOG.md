@@ -1,3 +1,7 @@
+## VERSION 4.81.0
+_10_06_2021_
+* FEATURE - Added PIX payment method.
+
 ## VERSION 4.80.0
 _03_06_2021_
 * FIX - Application selection by one tap item.
