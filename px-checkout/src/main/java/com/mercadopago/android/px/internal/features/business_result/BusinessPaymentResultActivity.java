@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,7 +75,6 @@ public class BusinessPaymentResultActivity extends PXActivity<BusinessPaymentRes
     public void configureViews(@NonNull final BusinessPaymentResultViewModel model,
         @NonNull final PaymentResultBody.Listener bodyListener,
         @NonNull final PaymentResultFooter.Listener footerListener) {
-        findViewById(R.id.loading).setVisibility(View.GONE);
         final PaymentResultHeader header = findViewById(R.id.header);
         header.setModel(model.getHeaderModel());
         final PaymentResultBody body = findViewById(R.id.body);

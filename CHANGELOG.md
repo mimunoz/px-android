@@ -1,3 +1,7 @@
+## VERSION 4.81.1
+_11_06_2021_
+* FIX - BusinessResult crash.
+
 ## VERSION 4.81.0
 _10_06_2021_
 * FEATURE - Added PIX payment method.
