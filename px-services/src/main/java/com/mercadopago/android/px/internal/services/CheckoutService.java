@@ -30,6 +30,17 @@ public interface CheckoutService {
         @Query("access_token") String privateKey,
         @Body Map<String, Object> body);
 
+    @POST(ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout")
+    CheckoutResponse checkoutNew(
+        @Query("access_token") String privateKey,
+        @Body Map<String, Object> body);
+
+    @POST(ENVIRONMENT + "/px_mobile/" + CHECKOUT_VERSION + "/checkout/{preference_id}")
+    CheckoutResponse checkoutNew(
+        @Path(value = "preference_id", encoded = true) String preferenceId,
+        @Query("access_token") String privateKey,
+        @Body Map<String, Object> body);
+
     /**
      * Old api call version ; used by MercadoPagoServices.
      *
