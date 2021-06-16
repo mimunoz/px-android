@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
-import com.mercadopago.android.px.internal.extensions.isNotNull
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*
@@ -15,7 +14,7 @@ import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import java.util.*
 
-internal open class CheckoutRepositoryImplNew(
+internal open class CheckoutRepositoryImpl(
     val paymentSettingRepository: PaymentSettingRepository,
     val experimentsRepository: ExperimentsRepository,
     val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
@@ -30,7 +29,7 @@ internal open class CheckoutRepositoryImplNew(
     val payerComplianceRepository: PayerComplianceRepository,
     val amountConfigurationRepository: AmountConfigurationRepository,
     val discountRepository: DiscountRepository,
-    val featureProvider: FeatureProvider) : CheckoutRepositoryNew {
+    val featureProvider: FeatureProvider) : CheckoutRepository {
 
     override suspend fun checkout(): CheckoutResponse {
         val checkoutPreference = paymentSettingRepository.checkoutPreference
@@ -51,10 +50,10 @@ internal open class CheckoutRepositoryImplNew(
         )
 
         val preferenceId = paymentSettingRepository.checkoutPreferenceId
-        return if (preferenceId.isNotNull()) {
-            checkoutService.checkoutNew(preferenceId, paymentSettingRepository.privateKey, body)
-        } else {
-            checkoutService.checkoutNew(paymentSettingRepository.privateKey, body)
+        return preferenceId?.let {
+            checkoutService.checkoutV2(preferenceId, paymentSettingRepository.privateKey, body)
+        } ?: run {
+            checkoutService.checkoutV2(paymentSettingRepository.privateKey, body)
         }
     }
 

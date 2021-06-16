@@ -16,7 +16,6 @@ import com.mercadopago.android.px.internal.datasource.AmountService;
 import com.mercadopago.android.px.internal.datasource.CardHolderAuthenticatorRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.CardTokenService;
 import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
-import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImplNew;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolverImpl;
 import com.mercadopago.android.px.internal.datasource.CongratsRepositoryImpl;
@@ -42,7 +41,6 @@ import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.CardHolderAuthenticatorRepository;
 import com.mercadopago.android.px.internal.repository.CardTokenRepository;
 import com.mercadopago.android.px.internal.repository.CheckoutRepository;
-import com.mercadopago.android.px.internal.repository.CheckoutRepositoryNew;
 import com.mercadopago.android.px.internal.repository.CongratsRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;
@@ -80,7 +78,6 @@ public final class Session extends ApplicationModule {
     private DiscountRepository discountRepository;
     private AmountRepository amountRepository;
     private CheckoutRepository checkoutRepository;
-    private CheckoutRepositoryNew checkoutRepositoryNew;
     private PaymentRepository paymentRepository;
     private AmountConfigurationRepository amountConfigurationRepository;
     private CardTokenRepository cardTokenRepository;
@@ -226,25 +223,6 @@ public final class Session extends ApplicationModule {
             };
         }
         return checkoutRepository;
-    }
-
-    @NonNull
-    public CheckoutRepositoryNew getCheckoutRepositoryNew() {
-        if (checkoutRepositoryNew == null) {
-            final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
-            final FeatureProvider featureProvider =
-                    new FeatureProviderImpl(paymentSettings, BehaviourProvider.getTokenDeviceBehaviour());
-            checkoutRepositoryNew = new CheckoutRepositoryImplNew(paymentSettings, getExperimentsRepository(),
-                    configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
-                    networkModule.getRetrofitClient().create(CheckoutService.class),
-                    configurationModule.getTrackingRepository(), getTracker(),
-                    getPayerPaymentMethodRepository(), getOneTapItemRepository(),
-                    getPaymentMethodRepository(),
-                    getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
-                    getAmountConfigurationRepository(), getDiscountRepository(), featureProvider) {
-            };
-        }
-        return checkoutRepositoryNew;
     }
 
     @NonNull

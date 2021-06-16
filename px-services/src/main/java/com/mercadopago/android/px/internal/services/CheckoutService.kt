@@ -10,6 +10,7 @@ import java.math.BigDecimal
 
 
 interface CheckoutService {
+
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     fun checkout(
         @Query("access_token") privateKey: String?,
@@ -25,14 +26,14 @@ interface CheckoutService {
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     @JvmSuppressWildcards
-    suspend fun checkoutNew(
+    suspend fun checkoutV2(
         @Query("access_token") privateKey: String?,
         @Body body: Map<String, Any>
     ): CheckoutResponse
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
     @JvmSuppressWildcards
-    suspend fun checkoutNew(
+    suspend fun checkoutV2(
         @Path(value = "preference_id", encoded = true) preferenceId: String?,
         @Query("access_token") privateKey: String?,
         @Body body: Map<String, Any>
@@ -56,26 +57,26 @@ interface CheckoutService {
      */
     @GET("{environment}/px_mobile_api/payment_methods?api_version=1.8")
     fun getPaymentMethodSearch(
-        @Path(value = "environment", encoded = true) environment: String?,
-        @Query("public_key") publicKey: String?,
-        @Query("amount") amount: BigDecimal?,
-        @Query("excluded_payment_types") excludedPaymentTypes: String?,
-        @Query("excluded_payment_methods") excludedPaymentMethods: String?,
-        @Query("site_id") siteId: String?,
-        @Query("processing_mode") processingMode: String?,
-        @Query("cards_esc") cardsWithEsc: String?,
+        @Path(value = "environment", encoded = true) environment: String,
+        @Query("public_key") publicKey: String,
+        @Query("amount") amount: BigDecimal,
+        @Query("excluded_payment_types") excludedPaymentTypes: String,
+        @Query("excluded_payment_methods") excludedPaymentMethods: String,
+        @Query("site_id") siteId: String,
+        @Query("processing_mode") processingMode: String,
+        @Query("cards_esc") cardsWithEsc: String,
         @Query("differential_pricing_id") differentialPricingId: Int?,
         @Query("default_installments") defaultInstallments: Int?,
         @Query("express_enabled") expressEnabled: Boolean,
         @Query("access_token") accessToken: String?
-    ): MPCall<PaymentMethodSearch?>?
+    ): MPCall<PaymentMethodSearch>
 
     @GET("{environment}/payment_methods")
     fun getPaymentMethods(
-        @Path(value = "environment", encoded = true) environment: String?,
-        @Query("public_key") publicKey: String?,
-        @Query("access_token") privateKey: String?
-    ): MPCall<List<PaymentMethod?>?>?
+        @Path(value = "environment", encoded = true) environment: String,
+        @Query("public_key") publicKey: String,
+        @Query("access_token") privateKey: String
+    ): MPCall<List<PaymentMethod>>
 
     companion object {
         const val CHECKOUT_VERSION = "v2"

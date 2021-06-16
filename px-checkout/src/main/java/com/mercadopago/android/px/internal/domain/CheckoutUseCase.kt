@@ -1,11 +1,8 @@
 package com.mercadopago.android.px.internal.domain
 
-import android.os.Handler
-import android.os.HandlerThread
 import com.mercadopago.android.px.internal.base.use_case.UseCase
 import com.mercadopago.android.px.internal.callbacks.Response
-import com.mercadopago.android.px.internal.extensions.isNotNull
-import com.mercadopago.android.px.internal.repository.CheckoutRepositoryNew
+import com.mercadopago.android.px.internal.repository.CheckoutRepository
 import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
@@ -15,7 +12,7 @@ import com.mercadopago.android.px.tracking.internal.MPTracker
 import kotlinx.coroutines.delay
 
 internal class CheckoutUseCase (
-    private val checkoutRepository: CheckoutRepositoryNew,
+    private val checkoutRepository: CheckoutRepository,
     tracker: MPTracker,
     override val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
 ) : UseCase<CheckoutUseCase.CheckoutParams, CheckoutResponse>(tracker) {
