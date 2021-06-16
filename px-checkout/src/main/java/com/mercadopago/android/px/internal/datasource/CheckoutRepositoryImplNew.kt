@@ -32,8 +32,30 @@ internal open class CheckoutRepositoryImplNew(
     val discountRepository: DiscountRepository,
     val featureProvider: FeatureProvider) : CheckoutRepositoryNew {
 
-    override fun checkout(): CheckoutResponse {
-        return getCheckoutResponse()
+    override suspend fun checkout(): CheckoutResponse {
+        val checkoutPreference = paymentSettingRepository.checkoutPreference
+        val paymentConfiguration = paymentSettingRepository.paymentConfiguration
+
+        val advancedConfiguration = paymentSettingRepository.advancedConfiguration
+        val discountParamsConfiguration = advancedConfiguration.discountParamsConfiguration
+
+        val body = getMapFromObject(
+            InitRequest.Builder(paymentSettingRepository.publicKey)
+                .setCardWithEsc(ArrayList(escManagerBehaviour.escCardIds))
+                .setCharges(paymentConfiguration.charges)
+                .setDiscountParamsConfiguration(discountParamsConfiguration)
+                .setCheckoutFeatures(featureProvider.availableFeatures)
+                .setCheckoutPreference(checkoutPreference)
+                .setFlow(trackingRepository.flowId)
+                .build()
+        )
+
+        val preferenceId = paymentSettingRepository.checkoutPreferenceId
+        return if (preferenceId.isNotNull()) {
+            checkoutService.checkoutNew(preferenceId, paymentSettingRepository.privateKey, body)
+        } else {
+            checkoutService.checkoutNew(paymentSettingRepository.privateKey, body)
+        }
     }
 
     override fun configure(checkoutResponse: CheckoutResponse) {
@@ -62,31 +84,5 @@ internal open class CheckoutRepositoryImplNew(
             disabledPaymentMethodRepository.value
         OneTapItemSorter(oneTap, disabledPaymentMethodMap)
             .setPrioritizedCardId(cardId).sort()
-    }
-
-    private fun getCheckoutResponse() : CheckoutResponse{
-        val checkoutPreference = paymentSettingRepository.checkoutPreference
-        val paymentConfiguration = paymentSettingRepository.paymentConfiguration
-
-        val advancedConfiguration = paymentSettingRepository.advancedConfiguration
-        val discountParamsConfiguration = advancedConfiguration.discountParamsConfiguration
-
-        val body = getMapFromObject(
-            InitRequest.Builder(paymentSettingRepository.publicKey)
-                .setCardWithEsc(ArrayList(escManagerBehaviour.escCardIds))
-                .setCharges(paymentConfiguration.charges)
-                .setDiscountParamsConfiguration(discountParamsConfiguration)
-                .setCheckoutFeatures(featureProvider.availableFeatures)
-                .setCheckoutPreference(checkoutPreference)
-                .setFlow(trackingRepository.flowId)
-                .build()
-        )
-
-        val preferenceId = paymentSettingRepository.checkoutPreferenceId
-        return if (preferenceId.isNotNull()) {
-            checkoutService.checkoutNew(preferenceId, paymentSettingRepository.privateKey, body)
-        } else {
-            checkoutService.checkoutNew(paymentSettingRepository.privateKey, body)
-        }
     }
 }

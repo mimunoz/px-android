@@ -11,7 +11,7 @@ interface CheckoutRepository {
 }
 
 interface CheckoutRepositoryNew {
-    fun checkout(): CheckoutResponse
+    suspend fun checkout(): CheckoutResponse
     fun configure(checkoutResponse: CheckoutResponse)
     fun sortByPrioritizedCardId(oneTap: List<OneTapItem>, cardId: String)
 }
