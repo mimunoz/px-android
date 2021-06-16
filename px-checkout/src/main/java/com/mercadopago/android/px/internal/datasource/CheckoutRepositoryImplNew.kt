@@ -15,7 +15,7 @@ import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import java.util.*
 
-internal class CheckoutRepositoryImplNew(
+internal open class CheckoutRepositoryImplNew(
     val paymentSettingRepository: PaymentSettingRepository,
     val experimentsRepository: ExperimentsRepository,
     val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,

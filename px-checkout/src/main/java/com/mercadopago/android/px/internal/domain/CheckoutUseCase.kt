@@ -14,7 +14,7 @@ import com.mercadopago.android.px.tracking.internal.MPTracker
 internal class CheckoutUseCase (
     private val checkoutRepository: CheckoutRepositoryNew,
     tracker: MPTracker,
-    override val contextProvider: CoroutineContextProvider
+    override val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
 ) : UseCase<CheckoutUseCase.CheckoutParams, CheckoutResponse>(tracker) {
     /* default */
     private var retryHandler: Handler? = null

@@ -69,6 +69,6 @@ internal class UseCaseModule(
     val checkoutUseCase: CheckoutUseCase
         get() {
             val session = Session.getInstance()
-            return CheckoutUseCase(session.checkoutRepository, session.tracker)
+            return CheckoutUseCase(session.checkoutRepositoryNew, session.tracker)
         }
 }
