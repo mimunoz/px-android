@@ -11,6 +11,7 @@ import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.core.internal.TriggerableQueue;
 import com.mercadopago.android.px.internal.base.BasePresenterWithState;
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver;
+import com.mercadopago.android.px.internal.domain.CheckoutUseCase;
 import com.mercadopago.android.px.internal.experiments.KnownExperiment;
 import com.mercadopago.android.px.internal.experiments.KnownVariant;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
@@ -90,6 +91,7 @@ import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import kotlin.Unit;
 
 /* default */ class ExpressPaymentPresenter extends BasePresenterWithState<ExpressPayment.View, ExpressPaymentState>
     implements ExpressPayment.Actions, AmountDescriptorView.OnClickListener {
@@ -114,7 +116,7 @@ import java.util.List;
     @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
     @NonNull private final ModalRepository modalRepository;
     @NonNull private final CustomOptionIdSolver customOptionIdSolver;
-    @NonNull /* default */ final CheckoutRepository checkoutRepository;
+    @NonNull /* default */ final CheckoutUseCase checkoutUseCase;
     @NonNull private final PayerCostSelectionRepository payerCostSelectionRepository;
     @NonNull private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
     @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
@@ -126,7 +128,7 @@ import java.util.List;
         @NonNull final ApplicationSelectionRepository applicationSelectionRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
-        @NonNull final CheckoutRepository checkoutRepository,
+        @NonNull final CheckoutUseCase checkoutUseCase,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final ChargeRepository chargeRepository,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
@@ -152,7 +154,7 @@ import java.util.List;
         this.applicationSelectionRepository = applicationSelectionRepository;
         this.discountRepository = discountRepository;
         this.amountRepository = amountRepository;
-        this.checkoutRepository = checkoutRepository;
+        this.checkoutUseCase = checkoutUseCase;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.chargeRepository = chargeRepository;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -160,11 +162,11 @@ import java.util.List;
         this.experimentsRepository = experimentsRepository;
         this.payerComplianceRepository = payerComplianceRepository;
         this.trackingRepository = trackingRepository;
-        this.paymentMethodDescriptorMapper = paymentMethodDescriptorMapper;
         this.customTextsRepository = customTextsRepository;
         this.summaryInfoMapper = summaryInfoMapper;
         this.elementDescriptorMapper = elementDescriptorMapper;
         this.fromApplicationToApplicationInfo = fromApplicationToApplicationInfo;
+        this.paymentMethodDescriptorMapper = paymentMethodDescriptorMapper;
         this.summaryDetailDescriptorMapper = summaryDetailDescriptorMapper;
         this.oneTapItemRepository = oneTapItemRepository;
         this.payerPaymentMethodRepository = payerPaymentMethodRepository;
@@ -548,6 +550,25 @@ import java.util.List;
         if (isViewAttached()) {
             getView().showLoading();
         }
+        checkoutUseCase.execute(
+            new CheckoutUseCase.CheckoutParams(null),
+            checkoutResponse -> {
+                if (isViewAttached()) {
+                    payerComplianceRepository.turnIFPECompliant();
+                    reload();
+                    getView().hideLoading();
+                }
+                return Unit.INSTANCE;
+            },
+            error -> {
+                if (isViewAttached()) {
+                    getView().hideLoading();
+                    onFailToRetrieveInitResponse(error.getApiException());
+                }
+                return Unit.INSTANCE;
+            });
+
+        /*
         checkoutRepository.checkout().enqueue(new Callback<CheckoutResponse>() {
             @Override
             public void success(final CheckoutResponse checkoutResponse) {
@@ -566,10 +587,21 @@ import java.util.List;
                 }
             }
         });
+         */
     }
 
     @Override
     public void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback) {
+        checkoutUseCase.execute(new CheckoutUseCase.CheckoutParams(cardId),
+            checkoutResponse -> {
+                callback.onSuccess();
+                return Unit.INSTANCE;
+            },
+            error -> {
+                callback.onError();
+                return Unit.INSTANCE;
+            });
+        /*
         checkoutRepository.refreshWithNewCard(cardId).enqueue(new Callback<CheckoutResponse>() {
             @Override
             public void success(final CheckoutResponse checkoutResponse) {
@@ -581,6 +613,7 @@ import java.util.List;
                 callback.onError();
             }
         });
+         */
     }
 
     @Override

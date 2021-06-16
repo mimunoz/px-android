@@ -6,6 +6,8 @@ import com.mercadopago.android.px.internal.base.use_case.UseCase
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.extensions.isNotNull
 import com.mercadopago.android.px.internal.repository.CheckoutRepositoryNew
+import com.mercadopago.android.px.internal.util.ApiUtil
+import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.OneTapItem
@@ -32,7 +34,7 @@ internal class CheckoutUseCase (
             }
             if (cardNotFoundOrRetryNeeded(findCardRes)) {
                 return Response.Failure(
-                    MercadoPagoError("Exceeded max retries on refresh new card", false))
+                    MercadoPagoError(ApiException(), ApiUtil.RequestOrigin.POST_INIT))
             }
             refreshRetriesAvailable = MAX_REFRESH_RETRIES
             checkoutRepository.sortByPrioritizedCardId(checkoutResponse.oneTapItems, prioritizedCardId)
