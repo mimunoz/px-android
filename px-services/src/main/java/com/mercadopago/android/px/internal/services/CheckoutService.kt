@@ -4,6 +4,7 @@ import com.mercadopago.android.px.internal.callbacks.MPCall
 import com.mercadopago.android.px.model.PaymentMethod
 import com.mercadopago.android.px.model.PaymentMethodSearch
 import com.mercadopago.android.px.model.internal.CheckoutResponse
+import com.mercadopago.android.px.model.internal.InitRequestBody
 import com.mercadopago.android.px.services.BuildConfig
 import retrofit2.http.*
 import java.math.BigDecimal
@@ -12,31 +13,16 @@ import java.math.BigDecimal
 interface CheckoutService {
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
-    fun checkout(
+    suspend fun checkout(
         @Query("access_token") privateKey: String?,
-        @Body body: Map<String, Any?>
-    ): MPCall<CheckoutResponse>
-
-    @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
-    fun checkout(
-        @Path(value = "preference_id", encoded = true) preferenceId: String?,
-        @Query("access_token") privateKey: String?,
-        @Body body: Map<String, Any?>
-    ): MPCall<CheckoutResponse>
-
-    @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
-    @JvmSuppressWildcards
-    suspend fun checkoutV2(
-        @Query("access_token") privateKey: String?,
-        @Body body: Map<String, Any>
+        @Body body: InitRequestBody
     ): CheckoutResponse
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
-    @JvmSuppressWildcards
-    suspend fun checkoutV2(
+    suspend fun checkout(
         @Path(value = "preference_id", encoded = true) preferenceId: String?,
         @Query("access_token") privateKey: String?,
-        @Body body: Map<String, Any>
+        @Body body: InitRequestBody
     ): CheckoutResponse
 
     /**

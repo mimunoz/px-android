@@ -3,14 +3,12 @@ package com.mercadopago.android.px.internal.datasource
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.callbacks.Response
-import com.mercadopago.android.px.internal.callbacks.awaitCallback
 import com.mercadopago.android.px.internal.features.FeatureProvider
+import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.services.CheckoutService
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
-import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
-import com.mercadopago.android.px.model.internal.InitRequest
 import java.util.*
 
 internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
@@ -20,23 +18,13 @@ internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
     private val featureProvider: FeatureProvider) {
 
     suspend fun get(): Response<CheckoutResponse, ApiException> {
-        val checkoutPreference = checkout.checkoutPreference
-        val paymentConfiguration = checkout.paymentConfiguration
-        val discountParamsConfiguration = checkout.advancedConfiguration.discountParamsConfiguration
-
-        val body = JsonUtil.getMapFromObject(InitRequest.Builder(checkout.publicKey)
-            .setCardWithEsc(ArrayList(escManagerBehaviour.escCardIds))
-            .setCharges(paymentConfiguration.charges)
-            .setDiscountParamsConfiguration(discountParamsConfiguration)
-            .setCheckoutFeatures(featureProvider.availableFeatures)
-            .setCheckoutPreference(checkoutPreference)
-            .setFlow(trackingRepository.flowId)
-            .build())
+        val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository)
+            .map(checkout)
 
         return checkout.preferenceId?.let {
-            checkoutService.checkout(it, checkout.privateKey, body).awaitCallback()
+            Response.Success(checkoutService.checkout(it, checkout.privateKey, body))
         } ?: run {
-            checkoutService.checkout(checkout.privateKey, body).awaitCallback()
+            Response.Success(checkoutService.checkout(checkout.privateKey, body))
         }
     }
 }

@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.internal.features.FeatureProvider
+import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
@@ -32,28 +33,14 @@ internal open class CheckoutRepositoryImpl(
     val featureProvider: FeatureProvider) : CheckoutRepository {
 
     override suspend fun checkout(): CheckoutResponse {
-        val checkoutPreference = paymentSettingRepository.checkoutPreference
-        val paymentConfiguration = paymentSettingRepository.paymentConfiguration
-
-        val advancedConfiguration = paymentSettingRepository.advancedConfiguration
-        val discountParamsConfiguration = advancedConfiguration.discountParamsConfiguration
-
-        val body = getMapFromObject(
-            InitRequest.Builder(paymentSettingRepository.publicKey)
-                .setCardWithEsc(ArrayList(escManagerBehaviour.escCardIds))
-                .setCharges(paymentConfiguration.charges)
-                .setDiscountParamsConfiguration(discountParamsConfiguration)
-                .setCheckoutFeatures(featureProvider.availableFeatures)
-                .setCheckoutPreference(checkoutPreference)
-                .setFlow(trackingRepository.flowId)
-                .build()
-        )
+        val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository)
+            .map(paymentSettingRepository)
 
         val preferenceId = paymentSettingRepository.checkoutPreferenceId
         return preferenceId?.let {
-            checkoutService.checkoutV2(preferenceId, paymentSettingRepository.privateKey, body)
+            checkoutService.checkout(preferenceId, paymentSettingRepository.privateKey, body)
         } ?: run {
-            checkoutService.checkoutV2(paymentSettingRepository.privateKey, body)
+            checkoutService.checkout(paymentSettingRepository.privateKey, body)
         }
     }
 
