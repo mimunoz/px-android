@@ -6,6 +6,7 @@ import com.mercadopago.android.px.model.PaymentMethodSearch
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.InitRequestBody
 import com.mercadopago.android.px.services.BuildConfig
+import retrofit2.Response
 import retrofit2.http.*
 import java.math.BigDecimal
 
@@ -16,14 +17,14 @@ interface CheckoutService {
     suspend fun checkout(
         @Query("access_token") privateKey: String?,
         @Body body: InitRequestBody
-    ): CheckoutResponse
+    ): Response<CheckoutResponse>
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
     suspend fun checkout(
         @Path(value = "preference_id", encoded = true) preferenceId: String?,
         @Query("access_token") privateKey: String?,
         @Body body: InitRequestBody
-    ): CheckoutResponse
+    ): Response<CheckoutResponse>
 
     /**
      * Old api call version ; used by MercadoPagoServices.
