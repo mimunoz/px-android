@@ -2,8 +2,6 @@ package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.internal.adapters.NetworkApi
-import com.mercadopago.android.px.internal.base.extensions.fold
-import com.mercadopago.android.px.internal.base.extensions.map
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
@@ -11,14 +9,11 @@ import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMe
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
-import com.mercadopago.android.px.internal.util.JsonUtil.getMapFromObject
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
-import com.mercadopago.android.px.model.internal.InitRequest
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.tracking.internal.MPTracker
-import java.util.*
 
 internal open class CheckoutRepositoryImpl(
     val paymentSettingRepository: PaymentSettingRepository,
