@@ -214,7 +214,7 @@ public final class Session extends ApplicationModule {
                 new FeatureProviderImpl(paymentSettings, BehaviourProvider.getTokenDeviceBehaviour());
             checkoutRepository = new CheckoutRepositoryImpl(paymentSettings, getExperimentsRepository(),
                 configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
-                networkModule.getRetrofitClient().create(CheckoutService.class),
+                networkModule.getNetworkApi(),
                 configurationModule.getTrackingRepository(), getTracker(),
                 getPayerPaymentMethodRepository(), getOneTapItemRepository(),
                 getPaymentMethodRepository(),
@@ -417,7 +417,7 @@ public final class Session extends ApplicationModule {
         configIds(checkout);
         final FeatureProvider featureProvider =
             new FeatureProviderImpl(checkout, BehaviourProvider.getTokenDeviceBehaviour());
-        return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(CheckoutService.class),
+        return new PrefetchInitService(checkout, networkModule.getNetworkApi(),
             getMercadoPagoESC(), configurationModule.getTrackingRepository(), featureProvider);
     }
 

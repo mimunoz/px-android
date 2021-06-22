@@ -1,6 +1,10 @@
 package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
+import com.mercadopago.android.px.internal.adapters.NetworkApi
+import com.mercadopago.android.px.internal.base.extensions.fold
+import com.mercadopago.android.px.internal.base.extensions.map
+import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
@@ -8,6 +12,7 @@ import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
 import com.mercadopago.android.px.internal.util.JsonUtil.getMapFromObject
+import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
 import com.mercadopago.android.px.model.internal.InitRequest
@@ -20,7 +25,7 @@ internal open class CheckoutRepositoryImpl(
     val experimentsRepository: ExperimentsRepository,
     val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
     val escManagerBehaviour: ESCManagerBehaviour,
-    val checkoutService: CheckoutService,
+    val networkApi: NetworkApi,
     val trackingRepository: TrackingRepository,
     val tracker: MPTracker,
     val payerPaymentMethodRepository: PayerPaymentMethodRepository,
@@ -32,15 +37,19 @@ internal open class CheckoutRepositoryImpl(
     val discountRepository: DiscountRepository,
     val featureProvider: FeatureProvider) : CheckoutRepository {
 
-    override suspend fun checkout(): CheckoutResponse {
+    override suspend fun checkout(): ApiResponse<CheckoutResponse, ApiException> {
         val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository)
             .map(paymentSettingRepository)
 
         val preferenceId = paymentSettingRepository.checkoutPreferenceId
         return preferenceId?.let {
-            checkoutService.checkout(preferenceId, paymentSettingRepository.privateKey, body)
+            networkApi.apiCallForResponse(CheckoutService::class.java) {
+                it.checkout(preferenceId, paymentSettingRepository.privateKey, body)
+            }
         } ?: run {
-            checkoutService.checkout(paymentSettingRepository.privateKey, body)
+            networkApi.apiCallForResponse(CheckoutService::class.java) {
+                it.checkout(paymentSettingRepository.privateKey, body)
+            }
         }
     }
 

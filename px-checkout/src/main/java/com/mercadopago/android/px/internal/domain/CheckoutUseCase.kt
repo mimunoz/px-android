@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.domain
 
 import com.mercadopago.android.px.internal.base.use_case.UseCase
+import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.repository.CheckoutRepository
 import com.mercadopago.android.px.internal.util.ApiUtil
@@ -20,24 +21,43 @@ internal class CheckoutUseCase (
     private var refreshRetriesAvailable = MAX_REFRESH_RETRIES
 
     override suspend fun doExecute(param: CheckoutParams): Response<CheckoutResponse, MercadoPagoError> {
-        var checkoutResponse = checkoutRepository.checkout()
-        param.prioritizedCardId?.let { prioritizedCardId ->
-            var findCardRes = findCard(checkoutResponse.oneTapItems, prioritizedCardId)
-            while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
-                delay(findCardRes.retryDelay)
-                --refreshRetriesAvailable
-                checkoutResponse = checkoutRepository.checkout()
-                findCardRes = findCard(checkoutResponse.oneTapItems, prioritizedCardId)
+        return when (val apiResponse = checkoutRepository.checkout()) {
+            is ApiResponse.Failure ->
+                Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
+            is ApiResponse.Success -> {
+                val checkoutResponse = apiResponse.result
+                param.prioritizedCardId?.let { prioritizedCardId ->
+                    val findCardRes = findCardWithRetries(checkoutResponse, prioritizedCardId)
+                    if (cardNotFoundOrRetryNeeded(findCardRes)) {
+                        return Response.Failure(
+                            MercadoPagoError(ApiException(), ApiUtil.RequestOrigin.POST_INIT)
+                        )
+                    }
+                    checkoutRepository.sortByPrioritizedCardId(checkoutResponse.oneTapItems, prioritizedCardId)
+                }
+                checkoutRepository.configure(checkoutResponse)
+                Response.Success(checkoutResponse)
             }
-            if (cardNotFoundOrRetryNeeded(findCardRes)) {
-                return Response.Failure(
-                    MercadoPagoError(ApiException(), ApiUtil.RequestOrigin.POST_INIT))
-            }
-            refreshRetriesAvailable = MAX_REFRESH_RETRIES
-            checkoutRepository.sortByPrioritizedCardId(checkoutResponse.oneTapItems, prioritizedCardId)
         }
-        checkoutRepository.configure(checkoutResponse)
-        return Response.Success(checkoutResponse)
+    }
+
+    private suspend fun findCardWithRetries(
+        checkoutResponse: CheckoutResponse,
+        prioritizedCardId: String
+    ): FindCardResult {
+        var findCardRes = findCard(checkoutResponse.oneTapItems, prioritizedCardId)
+        while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
+            delay(findCardRes.retryDelay)
+            --refreshRetriesAvailable
+            val retryResponse = checkoutRepository.checkout()
+            if (retryResponse is ApiResponse.Failure) {
+                continue
+            }
+            val retryCheckoutResponse = (retryResponse as ApiResponse.Success).result
+            findCardRes = findCard(retryCheckoutResponse.oneTapItems, prioritizedCardId)
+        }
+        refreshRetriesAvailable = MAX_REFRESH_RETRIES
+        return findCardRes
     }
 
     private fun hasRefreshRetriesAvailable(): Boolean {
