@@ -1,11 +1,13 @@
 package com.mercadopago.android.px.internal.features.express
 
+import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
-import com.mercadopago.android.px.internal.callbacks.MPCall
+import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
+import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
@@ -22,7 +24,10 @@ import com.mercadopago.android.px.mocks.SiteStub
 import com.mercadopago.android.px.model.*
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
-import com.mercadopago.android.px.model.internal.*
+import com.mercadopago.android.px.model.internal.Application
+import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
+import com.mercadopago.android.px.model.internal.OneTapItem
+import com.mercadopago.android.px.model.internal.SummaryInfo
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.AbortEvent
@@ -30,15 +35,16 @@ import com.mercadopago.android.px.tracking.internal.events.BackEvent
 import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrack
 import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 import com.mercadopago.android.px.tracking.internal.views.OneTapViewTracker
-import com.mercadopago.android.px.utils.StubFailMpCall
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.Mockito.*
-import org.mockito.kotlin.any
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
 class ExpressPaymentPresenterTest {
@@ -136,6 +142,8 @@ class ExpressPaymentPresenterTest {
     @Mock
     private lateinit var customOptionIdSolver: CustomOptionIdSolver
 
+    private lateinit var checkoutUseCase : CheckoutUseCase
+
     private lateinit var expressPaymentPresenter: ExpressPaymentPresenter
 
     @Before
@@ -144,6 +152,7 @@ class ExpressPaymentPresenterTest {
         val preference = mock(CheckoutPreference::class.java)
         val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
+        checkoutUseCase = CheckoutUseCase(checkoutRepository, tracker, TestContextProvider())
         `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())
@@ -168,8 +177,8 @@ class ExpressPaymentPresenterTest {
         `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
-            payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository, checkoutRepository,
-            amountConfigurationRepository, chargeRepository, escManagerBehaviour,
+            payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository,
+            checkoutUseCase, amountConfigurationRepository, chargeRepository, escManagerBehaviour,
             experimentsRepository, payerComplianceRepository, trackingRepository,
             mock(CustomTextsRepository::class.java),
             oneTapItemRepository, payerPaymentMethodRepository,
@@ -187,8 +196,13 @@ class ExpressPaymentPresenterTest {
 
     @Test
     fun whenFailToRetrieveCheckoutThenShowError() {
-        `when`<MPCall<CheckoutResponse>>(checkoutRepository.checkout()).thenReturn(StubFailMpCall(mock(ApiException::class.java)))
+        runBlocking {
+            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Failure(mock(ApiException::class.java)))
+        }
         expressPaymentPresenter.handleDeepLink()
+        runBlocking{
+            verify(checkoutRepository).checkout()
+        }
         verify(view).showError(any(MercadoPagoError::class.java))
     }
 
