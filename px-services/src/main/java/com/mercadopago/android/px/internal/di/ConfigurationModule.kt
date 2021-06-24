@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.di
 
 import android.content.Context
+import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.internal.core.ApplicationModule
 import com.mercadopago.android.px.internal.core.ProductIdProvider
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
@@ -9,7 +10,10 @@ import com.mercadopago.android.px.internal.tracking.TrackingRepositoryImpl
 abstract class ConfigurationModule(context: Context) : ApplicationModule(context) {
 
     val productIdProvider by lazy { ProductIdProvider(sharedPreferences) }
-    val trackingRepository: TrackingRepository by lazy { TrackingRepositoryImpl(applicationContext, sharedPreferences) }
+    val trackingRepository: TrackingRepository by lazy {
+        TrackingRepositoryImpl(
+            applicationContext, sharedPreferences, BehaviourProvider.getSecurityBehaviour(), productIdProvider)
+    }
 
     open fun reset() {
         productIdProvider.reset()
@@ -18,7 +22,9 @@ abstract class ConfigurationModule(context: Context) : ApplicationModule(context
 
     companion object {
         lateinit var INSTANCE: ConfigurationModule
-        @JvmStatic fun initialize(configurationModule: ConfigurationModule) {
+
+        @JvmStatic
+        fun initialize(configurationModule: ConfigurationModule) {
             INSTANCE = configurationModule
         }
     }

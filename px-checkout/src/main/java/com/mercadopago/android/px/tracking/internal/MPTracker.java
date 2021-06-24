@@ -26,11 +26,10 @@ public final class MPTracker {
     private static final String ATTR_SESSION_TIME = "session_time";
     private static final String ATTR_CHECKOUT_TYPE = "checkout_type";
     private static final String ATTR_SECURITY_ENABLED = "security_enabled";
+    private static final String ATTR_DEVICE_SECURED = "device_secured";
     private static final String ATTR_EXPERIMENTS = "experiments";
 
     private long initSessionTimestamp;
-
-    private boolean securityEnabled;
 
     @NonNull private List<Experiment> experiments = Collections.emptyList();
 
@@ -38,15 +37,6 @@ public final class MPTracker {
 
     public MPTracker(@NonNull final TrackingRepository trackingRepository) {
         this.trackingRepository = trackingRepository;
-    }
-
-    /**
-     * Set if the user will be challenged with security validation or not
-     *
-     * @param securityEnabled indicates if the user will be challenged with fingerprint/pin/pattern when pays
-     */
-    public void setSecurityEnabled(final boolean securityEnabled) {
-        this.securityEnabled = securityEnabled;
     }
 
     /**
@@ -80,7 +70,8 @@ public final class MPTracker {
                 value.put(ATTR_SESSION_ID, trackingRepository.getSessionId());
                 value.put(ATTR_SESSION_TIME, getSecondsAfterInit());
                 value.put(ATTR_CHECKOUT_TYPE, CheckoutType.ONE_TAP);
-                value.put(ATTR_SECURITY_ENABLED, securityEnabled);
+                value.put(ATTR_SECURITY_ENABLED, trackingRepository.getSecurityEnabled());
+                value.put(ATTR_DEVICE_SECURED, trackingRepository.getDeviceSecured());
                 value.put(ATTR_EXPERIMENTS, getExperimentsLabel());
             } catch (final ClassCastException e) {
                 // do nothing.
@@ -94,7 +85,8 @@ public final class MPTracker {
         data.put(ATTR_SESSION_ID, trackingRepository.getSessionId());
         data.put(ATTR_SESSION_TIME, getSecondsAfterInit());
         data.put(ATTR_CHECKOUT_TYPE, CheckoutType.ONE_TAP);
-        data.put(ATTR_SECURITY_ENABLED, securityEnabled);
+        data.put(ATTR_SECURITY_ENABLED, trackingRepository.getSecurityEnabled());
+        data.put(ATTR_DEVICE_SECURED, trackingRepository.getDeviceSecured());
         data.put(ATTR_EXPERIMENTS, getExperimentsLabel());
     }
 
