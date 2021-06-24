@@ -567,27 +567,6 @@ import kotlin.Unit;
                 }
                 return Unit.INSTANCE;
             });
-
-        /*
-        checkoutRepository.checkout().enqueue(new Callback<CheckoutResponse>() {
-            @Override
-            public void success(final CheckoutResponse checkoutResponse) {
-                if (isViewAttached()) {
-                    payerComplianceRepository.turnIFPECompliant();
-                    reload();
-                    getView().hideLoading();
-                }
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                if (isViewAttached()) {
-                    getView().hideLoading();
-                    onFailToRetrieveInitResponse(apiException);
-                }
-            }
-        });
-         */
     }
 
     @Override
@@ -601,19 +580,6 @@ import kotlin.Unit;
                 callback.onError();
                 return Unit.INSTANCE;
             });
-        /*
-        checkoutRepository.refreshWithNewCard(cardId).enqueue(new Callback<CheckoutResponse>() {
-            @Override
-            public void success(final CheckoutResponse checkoutResponse) {
-                callback.onSuccess();
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                callback.onError();
-            }
-        });
-         */
     }
 
     @Override

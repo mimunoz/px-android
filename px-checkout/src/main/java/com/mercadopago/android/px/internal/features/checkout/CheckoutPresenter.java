@@ -62,22 +62,6 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
                         }
                         return Unit.INSTANCE;
                     });
-                /*
-                checkoutRepository.checkout().enqueue(new Callback<CheckoutResponse>() {
-                    @Override
-                    public void success(final CheckoutResponse checkoutResponse) {
-                        showOneTap();
-                    }
-
-                    @Override
-                    public void failure(final ApiException apiException) {
-                        if (isViewAttached()) {
-                            getView().showError(
-                                new MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT));
-                        }
-                    }
-                });
-                */
             }
         } else {
             showOneTap();
@@ -148,18 +132,5 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
                 callback.onError();
                 return Unit.INSTANCE;
             });
-        /*
-        checkoutRepository.refreshWithNewCard(cardId).enqueue(new Callback<CheckoutResponse>() {
-            @Override
-            public void success(final CheckoutResponse checkoutResponse) {
-                callback.onSuccess();
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
-                callback.onError();
-            }
-        });
-         */
     }
 }
