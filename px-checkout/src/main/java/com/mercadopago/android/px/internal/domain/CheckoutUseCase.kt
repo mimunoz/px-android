@@ -25,14 +25,17 @@ internal class CheckoutUseCase (
             is ApiResponse.Failure ->
                 Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
             is ApiResponse.Success -> {
-                val checkoutResponse = apiResponse.result
+                var checkoutResponse = apiResponse.result
                 param.prioritizedCardId?.let { prioritizedCardId ->
                     val findCardRes = findCardWithRetries(checkoutResponse, prioritizedCardId)
                     if (cardNotFoundOrRetryNeeded(findCardRes)) {
-                        return Response.Failure(
-                            MercadoPagoError(ApiException(), ApiUtil.RequestOrigin.POST_INIT)
+                        return Response.Failure(MercadoPagoError(ApiException().apply { message =
+                            "Card not found or retry needed and no retries available" },
+                            ApiUtil.RequestOrigin.POST_INIT)
                         )
                     }
+                    // Update checkoutResponse with the last retry made (if we retried)
+                    checkoutResponse = findCardRes.retriedCheckoutResponse ?: checkoutResponse
                     checkoutRepository.sortByPrioritizedCardId(checkoutResponse.oneTapItems, prioritizedCardId)
                 }
                 checkoutRepository.configure(checkoutResponse)
@@ -46,6 +49,7 @@ internal class CheckoutUseCase (
         prioritizedCardId: String
     ): FindCardResult {
         var findCardRes = findCard(checkoutResponse.oneTapItems, prioritizedCardId)
+        var retriedCheckoutResponse : CheckoutResponse? = null
         while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
             delay(findCardRes.retryDelay)
             --refreshRetriesAvailable
@@ -53,10 +57,11 @@ internal class CheckoutUseCase (
             if (retryResponse is ApiResponse.Failure) {
                 continue
             }
-            val retryCheckoutResponse = (retryResponse as ApiResponse.Success).result
-            findCardRes = findCard(retryCheckoutResponse.oneTapItems, prioritizedCardId)
+            retriedCheckoutResponse = (retryResponse as ApiResponse.Success).result
+            findCardRes = findCard(retriedCheckoutResponse.oneTapItems, prioritizedCardId)
         }
         refreshRetriesAvailable = MAX_REFRESH_RETRIES
+        findCardRes.retriedCheckoutResponse = retriedCheckoutResponse
         return findCardRes
     }
 
@@ -88,7 +93,8 @@ internal class CheckoutUseCase (
     private data class FindCardResult(
         val cardFound: Boolean,
         val retryNeeded: Boolean,
-        val retryDelay: Long = if (retryNeeded) LONG_RETRY_DELAY else DEFAULT_RETRY_DELAY
+        val retryDelay: Long = if (retryNeeded) LONG_RETRY_DELAY else DEFAULT_RETRY_DELAY,
+        var retriedCheckoutResponse : CheckoutResponse? = null
     )
 
     companion object {
