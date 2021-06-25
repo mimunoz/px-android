@@ -20,6 +20,16 @@ class NetworkApi(
     private val connectionHelper: ConnectionHelper,
     private val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
 ) {
+    suspend fun <D : Any, T> apiCallForResponse(
+        apiServiceClass: Class<T>,
+        apiCall: suspend (api: T) -> Response<D>
+    ): ApiResponseCallback<D> {
+        return withContext(contextProvider.ioDispatcher) {
+            if (connectionHelper.hasConnection()) {
+                apiCallWithRetries(apiServiceClass, apiCall)
+            } else Failure(ExceptionFactory.connectionError())
+        }
+    }
 
     private fun <D : Any> resolveCallBackResponse(response: Response<D>): ApiResponseCallback<D> {
         return runCatching {
@@ -35,17 +45,6 @@ class NetworkApi(
                 failure
             }
         }.getOrElse { Failure(ExceptionParser.parse(it)) }
-    }
-
-    suspend fun <D : Any, T> apiCallForResponse(
-        apiServiceClass: Class<T>,
-        apiCall: suspend (api: T) -> Response<D>
-    ): ApiResponseCallback<D> {
-        return withContext(contextProvider.ioDispatcher) {
-            if (connectionHelper.hasConnection()) {
-                apiCallWithRetries(apiServiceClass, apiCall)
-            } else Failure(ExceptionFactory.connectionError())
-        }
     }
 
     private suspend fun <D : Any, T> apiCallWithRetries(
