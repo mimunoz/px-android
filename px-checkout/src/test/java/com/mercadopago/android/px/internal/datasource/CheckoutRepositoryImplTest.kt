@@ -9,25 +9,23 @@ import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.features.FeatureProvider
+import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
-import com.mercadopago.android.px.model.ApiExceptionTest
 import com.mercadopago.android.px.model.CardMetadata
 import com.mercadopago.android.px.model.PaymentTypes
 import com.mercadopago.android.px.model.Site
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule.Companion.createChargeFreeRule
 import com.mercadopago.android.px.model.exceptions.ApiException
-import com.mercadopago.android.px.model.internal.Application
-import com.mercadopago.android.px.model.internal.CheckoutFeatures
-import com.mercadopago.android.px.model.internal.CheckoutResponse
-import com.mercadopago.android.px.model.internal.OneTapItem
+import com.mercadopago.android.px.model.internal.*
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -103,27 +101,14 @@ class CheckoutRepositoryImplTest {
 
     @Mock
     private lateinit var accountMoneyOneTapItem: OneTapItem
-//
-//    @Mock
-//    private lateinit var configurationProvider: ConfigurationProvider
-//
-//    @Mock
-//    private lateinit var tokenDeviceBehaviour: TokenDeviceBehaviour
-//
-//    @Mock
-//    private lateinit var checkoutService: CheckoutService
 
     @Mock
     private lateinit var checkoutResponse: CheckoutResponse
 
+    private val accountMoneyCustomOptionId = "account_money"
+
     @Before
     fun setUp() {
-//        Dispatchers.setMain(testDispatcher)
-        val site: Site = mock {
-            on { id }.thenReturn("MLA")
-        }
-        whenever(paymentSettingRepository.currency).thenReturn(mock())
-        whenever(paymentSettingRepository.site).thenReturn(site)
         whenever(paymentSettingRepository.publicKey).thenReturn("987654321")
         whenever(paymentSettingRepository.checkoutPreferenceId).thenReturn("123456789")
         whenever(paymentSettingRepository.checkoutPreference).thenReturn(
@@ -176,13 +161,13 @@ class CheckoutRepositoryImplTest {
         )
     }
 
-
     @Test
-    fun testCheckout() {
+    fun testCheckoutWithPreferenceIdResultSuccess() {
         runBlocking {
             val checkoutResponse = CheckoutResponseStub.FULL.get()
             val apiResponse = ApiResponse.Success(checkoutResponse)
-            val captor = argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+            val captor =
+                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
             whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
             assertTrue(ReflectionEquals(apiResponse).matches(response))
@@ -190,13 +175,45 @@ class CheckoutRepositoryImplTest {
     }
 
     @Test
-    fun testCheckoutWithoutPreferenceId() {
+    fun testCheckoutWithPreferenceIdResultFailure() {
+        val apiExceptionMsg = "test message"
+        val apiException = ApiException().apply { message = apiExceptionMsg }
+
         runBlocking {
-            whenever(paymentSettingRepository.checkoutPreferenceId).thenReturn(null)
-            whenever(networkApi.apiCallForResponse(CheckoutService::class.java){
-                it.checkout(paymentSettingRepository.checkoutPreferenceId, paymentSettingRepository.privateKey, any())
-            }).thenReturn(mock())
-            checkoutRepository.checkout()
+            val apiResponse = ApiResponse.Failure(apiException)
+            val captor =
+                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            val response = checkoutRepository.checkout()
+            assertTrue(ReflectionEquals(apiResponse).matches(response))
+        }
+    }
+
+    @Test
+    fun testCheckoutWithoutPreferenceIdResultSuccess() {
+        runBlocking {
+            val checkoutResponse = CheckoutResponseStub.FULL.get()
+            val apiResponse = ApiResponse.Success(checkoutResponse)
+            val captor =
+                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            val response = checkoutRepository.checkout()
+            assertTrue(ReflectionEquals(apiResponse).matches(response))
+        }
+    }
+
+    @Test
+    fun testCheckoutWithoutPreferenceIdFailure() {
+        val apiExceptionMsg = "test message"
+        val apiException = ApiException().apply { message = apiExceptionMsg }
+
+        runBlocking {
+            val apiResponse = ApiResponse.Failure(apiException)
+            val captor =
+                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            val response = checkoutRepository.checkout()
+            assertTrue(ReflectionEquals(apiResponse).matches(response))
         }
     }
 
@@ -204,35 +221,48 @@ class CheckoutRepositoryImplTest {
     fun testConfigureWithoutPreferenceId() {
         runBlocking {
             checkoutRepository.configure(mock())
+
+            verify(paymentSettingRepository).configure(checkoutResponse.site)
+            verify(paymentSettingRepository).configure(checkoutResponse.currency)
+            verify(paymentSettingRepository).configure(checkoutResponse.configuration)
+            verify(experimentsRepository).configure(checkoutResponse.experiments)
+            verify(payerPaymentMethodRepository).configure(checkoutResponse.payerPaymentMethods)
+            verify(oneTapItemRepository).configure(checkoutResponse.oneTapItems)
+            verify(paymentMethodRepository).configure(checkoutResponse.availablePaymentMethods)
+            verify(modalRepository).configure(checkoutResponse.modals)
+            verify(payerComplianceRepository).configure(checkoutResponse.payerCompliance)
+            verify(amountConfigurationRepository).configure(checkoutResponse.defaultAmountConfiguration)
+            verify(discountRepository).configure(checkoutResponse.discountsConfigurations)
+            verify(disabledPaymentMethodRepository).configure(OneTapItemToDisabledPaymentMethodMapper().map(checkoutResponse.oneTapItems))
+            verify(tracker).setExperiments(experimentsRepository.experiments)
         }
     }
 
     @Test
-    fun testConfigure() {
+    fun testConfigureWithPreferenceId() {
         runBlocking {
             whenever(checkoutResponse.preference).thenReturn(Mockito.mock(CheckoutPreference::class.java))
             checkoutRepository.configure(checkoutResponse)
+
+            verify(paymentSettingRepository).configure(checkoutResponse.preference)
+            verify(paymentSettingRepository).configure(checkoutResponse.site)
+            verify(paymentSettingRepository).configure(checkoutResponse.currency)
+            verify(paymentSettingRepository).configure(checkoutResponse.configuration)
+            verify(experimentsRepository).configure(checkoutResponse.experiments)
+            verify(payerPaymentMethodRepository).configure(checkoutResponse.payerPaymentMethods)
+            verify(oneTapItemRepository).configure(checkoutResponse.oneTapItems)
+            verify(paymentMethodRepository).configure(checkoutResponse.availablePaymentMethods)
+            verify(modalRepository).configure(checkoutResponse.modals)
+            verify(payerComplianceRepository).configure(checkoutResponse.payerCompliance)
+            verify(amountConfigurationRepository).configure(checkoutResponse.defaultAmountConfiguration)
+            verify(discountRepository).configure(checkoutResponse.discountsConfigurations)
+            verify(disabledPaymentMethodRepository).configure(OneTapItemToDisabledPaymentMethodMapper().map(checkoutResponse.oneTapItems))
+            verify(tracker).setExperiments(experimentsRepository.experiments)
         }
     }
 
     @Test
     fun testSortByPrioritizedCardId() {
-        var oneTapItems: List<OneTapItem> = listOf(accountMoneyOneTapItem, cardOneTapItem)
-        val cardCustomOptionId = "visa"
-        val accountMoneyCustomOptionId = "account_money"
-
-        val card: CardMetadata = mock {
-            on { id }.thenReturn(cardCustomOptionId)
-        }
-
-        val cardPaymentMethod: Application.PaymentMethod = mock {
-            on { type }.thenReturn("credit_card")
-        }
-
-        val cardApplication: Application = mock {
-            on { this.paymentMethod }.thenReturn(cardPaymentMethod)
-        }
-
         val accountMoneyPaymentMethod: Application.PaymentMethod = mock {
             on { id }.thenReturn(accountMoneyCustomOptionId)
             on { type }.thenReturn(accountMoneyCustomOptionId)
@@ -242,14 +272,28 @@ class CheckoutRepositoryImplTest {
             on { this.paymentMethod }.thenReturn(accountMoneyPaymentMethod)
         }
 
-        whenever(cardOneTapItem.isCard).thenReturn(true)
-        whenever(cardOneTapItem.card).thenReturn(card)
-        whenever(cardOneTapItem.getApplications()).thenReturn(listOf(cardApplication))
-        whenever(accountMoneyOneTapItem.paymentMethodId).thenReturn(accountMoneyCustomOptionId)
         whenever(accountMoneyOneTapItem.getApplications()).thenReturn(listOf(accountMoneyApplication))
 
+        val card: CardMetadata = mock {
+            on { id }.thenReturn("master")
+        }
+
+        val disablePaymentMethod: DisabledPaymentMethod = mock()
+
+        whenever(disabledPaymentMethodRepository.value).thenReturn(mutableMapOf(
+            PayerPaymentMethodKey("master", "credit_card") to disablePaymentMethod
+        ))
+
+        val disableItem: OneTapItem = mock {
+            on { isCard }.thenReturn(true)
+            on { this.card }.thenReturn(card)
+        }
+
+        val actual = mutableListOf(accountMoneyOneTapItem, cardOneTapItem, disableItem)
+
         runBlocking {
-            checkoutRepository.sortByPrioritizedCardId(oneTapItems, "1234567890")
+            checkoutRepository.sortByPrioritizedCardId(actual, card.id)
+            assertTrue(actual.first().card.id == card.id)
         }
     }
 }
