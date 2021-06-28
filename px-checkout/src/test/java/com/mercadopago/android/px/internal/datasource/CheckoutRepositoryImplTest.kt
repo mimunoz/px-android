@@ -1,26 +1,32 @@
 package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
+import com.mercadopago.android.px.assertEquals
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DiscountParamsConfiguration
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi
+import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
+import com.mercadopago.android.px.mocks.CheckoutResponseStub
+import com.mercadopago.android.px.model.ApiExceptionTest
 import com.mercadopago.android.px.model.CardMetadata
 import com.mercadopago.android.px.model.PaymentTypes
 import com.mercadopago.android.px.model.Site
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule.Companion.createChargeFreeRule
+import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.CheckoutFeatures
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.MPTracker
+import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -28,10 +34,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Spy
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
+import retrofit2.Response
 import java.math.BigDecimal
 import java.util.*
 
@@ -171,18 +177,15 @@ class CheckoutRepositoryImplTest {
     }
 
 
-    @Test()
+    @Test
     fun testCheckout() {
         runBlocking {
-
-            whenever(networkApi.apiCallForResponse(CheckoutService::class.java){
-                it.checkout(paymentSettingRepository.checkoutPreferenceId, paymentSettingRepository.privateKey, any())
-            }).thenReturn(mock())
+            val checkoutResponse = CheckoutResponseStub.FULL.get()
+            val apiResponse = ApiResponse.Success(checkoutResponse)
+            val captor = argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
-
-//            assertEquals(ApiResponse.Success<CheckoutRespo)
-////            verify(networkApi).apiCallForResponse(CheckoutService::class.java){
-////                it.checkout(paymentSettingRepository.checkoutPreferenceId, paymentSettingRepository.privateKey, any())}
+            assertTrue(ReflectionEquals(apiResponse).matches(response))
         }
     }
 
