@@ -50,15 +50,16 @@ internal class CheckoutUseCase (
     ): FindCardResult {
         var findCardRes = findCard(checkoutResponse.oneTapItems, prioritizedCardId)
         var retriedCheckoutResponse : CheckoutResponse? = null
-        while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
+        loop@ while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
             delay(findCardRes.retryDelay)
             --refreshRetriesAvailable
-            val retryResponse = checkoutRepository.checkout()
-            if (retryResponse is ApiResponse.Failure) {
-                continue
+            when (val retryResponse = checkoutRepository.checkout()) {
+                is ApiResponse.Failure -> continue@loop
+                is ApiResponse.Success -> {
+                    retriedCheckoutResponse = retryResponse.result
+                    findCardRes = findCard(retriedCheckoutResponse.oneTapItems, prioritizedCardId)
+                }
             }
-            retriedCheckoutResponse = (retryResponse as ApiResponse.Success).result
-            findCardRes = findCard(retriedCheckoutResponse.oneTapItems, prioritizedCardId)
         }
         refreshRetriesAvailable = MAX_REFRESH_RETRIES
         findCardRes.retriedCheckoutResponse = retriedCheckoutResponse
