@@ -5,6 +5,7 @@ import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.repository.CheckoutRepository
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.exceptions.ApiException
@@ -51,7 +52,7 @@ class CheckoutUseCaseTest {
             whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Success(checkoutResponse))
         }
         checkoutUseCase.execute(
-            CheckoutUseCase.CheckoutParams(null),
+            Unit,
             success::invoke,
             failure::invoke
         )
@@ -65,7 +66,7 @@ class CheckoutUseCaseTest {
             whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Success(checkoutResponse))
         }
         checkoutUseCase.execute(
-            CheckoutUseCase.CheckoutParams(null),
+            Unit,
             success::invoke,
             failure::invoke
         )
@@ -74,82 +75,6 @@ class CheckoutUseCaseTest {
         }
         verify(checkoutRepository).configure(checkoutResponse)
         verifyNoMoreInteractions(checkoutRepository)
-    }
-
-    @Test
-    fun whenApiReturnsSuccessAndCardIdProvidedThenItShouldCallSort() {
-        val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
-        val oneTapItem = checkoutResponse.oneTapItems.first { it.isCard }
-        runBlocking {
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Success(checkoutResponse))
-        }
-        checkoutUseCase.execute(
-            CheckoutUseCase.CheckoutParams(oneTapItem.card.id),
-            success::invoke,
-            failure::invoke
-        )
-        runBlocking {
-            verify(checkoutRepository).checkout()
-        }
-        verify(checkoutRepository).sortByPrioritizedCardId(any(), argThat { this == oneTapItem.card.id })
-    }
-
-    @Test
-    fun whenApiResponseDoesNotHaveCardThenItShouldRetryAndReturnRecoverableMPError() {
-        runBlocking {
-            // This is needed because if we don't use the same context on runBlocking and on UseCase
-            // then when we use delay the test fails.
-            val newCheckoutUseCase = CheckoutUseCase(
-                checkoutRepository, tracker,
-                TestContextProvider(coroutineContext, coroutineContext)
-            )
-            whenever(checkoutRepository.checkout()).thenReturn(
-                ApiResponse.Success(CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get())
-            )
-            newCheckoutUseCase.execute(
-                CheckoutUseCase.CheckoutParams("123"),
-                success::invoke,
-                failure::invoke
-            )
-        }
-        runBlocking {
-            verify(checkoutRepository, atLeast(2)).checkout()
-        }
-        verifyNoMoreInteractions(checkoutRepository)
-        verify(failure).invoke(
-            argThat { this.apiException.message.contains("Card not found") && this.isRecoverable }
-        )
-    }
-
-    @Test
-    fun whenApiResponseHaveCardWithRetryAndOnSecondCallNoRetryNeededThenItShouldRetryAndReturnSuccess() {
-        val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
-        val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
-        val cardFoundWithRetryId = checkoutResponse.oneTapItems.first().card.id
-
-        runBlocking {
-            // This is needed because if we don't use the same context on runBlocking and on UseCase
-            // then when we use delay the test fails.
-            val newCheckoutUseCase = CheckoutUseCase(
-                checkoutRepository, tracker,
-                TestContextProvider(coroutineContext, coroutineContext)
-            )
-            whenever(checkoutRepository.checkout()).thenReturn(
-                ApiResponse.Success(retryCheckoutResponse),
-                ApiResponse.Success(checkoutResponse)
-            )
-            newCheckoutUseCase.execute(
-                CheckoutUseCase.CheckoutParams(cardFoundWithRetryId),
-                success::invoke,
-                failure::invoke
-            )
-        }
-        runBlocking {
-            verify(checkoutRepository, times(2)).checkout()
-        }
-        verify(checkoutRepository).sortByPrioritizedCardId(any(), any())
-        verify(checkoutRepository).configure(checkoutResponse)
-        verify(success).invoke(argThat { ReflectionEquals(checkoutResponse).matches(this) })
     }
 
     @Test
@@ -160,7 +85,7 @@ class CheckoutUseCaseTest {
             whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Failure(apiException))
         }
         checkoutUseCase.execute(
-            CheckoutUseCase.CheckoutParams(null),
+            Unit,
             success::invoke,
             failure::invoke
         )
@@ -182,7 +107,7 @@ class CheckoutUseCaseTest {
             whenever(checkoutRepository.checkout()).thenThrow(exception)
         }
         checkoutUseCase.execute(
-            CheckoutUseCase.CheckoutParams(null),
+            Unit,
             success::invoke,
             failure::invoke
         )
@@ -192,35 +117,5 @@ class CheckoutUseCaseTest {
         }
         verifyZeroInteractions(success)
         verify(failure).invoke(argThat { this.apiException.message == exceptionMsg && !this.isRecoverable })
-    }
-
-
-    @Test
-    fun whenApiResponseHaveCardWithRetryAndOnSubsequentCallsApiFailsItShouldReturnRecoverableMPError() {
-        val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
-        val cardFoundWithRetryId = retryCheckoutResponse.oneTapItems.first().card.id
-        val exMsg = "Test exception msg"
-
-        runBlocking {
-            // This is needed because if we don't use the same context on runBlocking and on UseCase
-            // then when we use delay the test fails.
-            val newCheckoutUseCase = CheckoutUseCase(
-                checkoutRepository, tracker,
-                TestContextProvider(coroutineContext, coroutineContext)
-            )
-            whenever(checkoutRepository.checkout()).thenReturn(
-                ApiResponse.Success(retryCheckoutResponse),
-                ApiResponse.Failure(ApiException().apply { message = exMsg })
-            )
-            newCheckoutUseCase.execute(
-                CheckoutUseCase.CheckoutParams(cardFoundWithRetryId),
-                success::invoke,
-                failure::invoke
-            )
-        }
-        runBlocking {
-            verify(checkoutRepository, atLeast(2)).checkout()
-        }
-        verify(failure).invoke(argThat { this.apiException.message == exMsg && this.isRecoverable })
     }
 }

@@ -8,6 +8,7 @@ import com.mercadopago.android.px.core.DynamicDialogCreator
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
@@ -143,6 +144,7 @@ class ExpressPaymentPresenterTest {
     private lateinit var customOptionIdSolver: CustomOptionIdSolver
 
     private lateinit var checkoutUseCase : CheckoutUseCase
+    private lateinit var checkoutWithNewCardUseCase : CheckoutWithNewCardUseCase
 
     private lateinit var expressPaymentPresenter: ExpressPaymentPresenter
 
@@ -153,6 +155,7 @@ class ExpressPaymentPresenterTest {
         val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
         checkoutUseCase = CheckoutUseCase(checkoutRepository, tracker, TestContextProvider())
+        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, TestContextProvider())
         `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())
@@ -178,7 +181,7 @@ class ExpressPaymentPresenterTest {
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
         expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
             payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository,
-            checkoutUseCase, amountConfigurationRepository, chargeRepository, escManagerBehaviour,
+            checkoutUseCase, checkoutWithNewCardUseCase, amountConfigurationRepository, chargeRepository, escManagerBehaviour,
             experimentsRepository, payerComplianceRepository, trackingRepository,
             mock(CustomTextsRepository::class.java),
             oneTapItemRepository, payerPaymentMethodRepository,

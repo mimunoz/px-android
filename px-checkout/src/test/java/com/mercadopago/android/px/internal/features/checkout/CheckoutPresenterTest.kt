@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.features.checkout
 import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.experiments.Variant
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
@@ -55,6 +56,7 @@ class CheckoutPresenterTest {
     private lateinit var postPaymentUrlsResponse: PostPaymentUrlsMapper.Response
 
     private lateinit var checkoutUseCase: CheckoutUseCase
+    private lateinit var checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
     private lateinit var presenter: CheckoutPresenter
 
     @Before
@@ -71,6 +73,8 @@ class CheckoutPresenterTest {
             .thenReturn(postPaymentUrlsResponse)
         checkoutUseCase =
             CheckoutUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
+        checkoutWithNewCardUseCase =
+            CheckoutWithNewCardUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
         presenter = getPresenter()
     }
 
@@ -163,7 +167,7 @@ class CheckoutPresenterTest {
     private fun getBasePresenter(view: Checkout.View?): CheckoutPresenter {
         presenter = CheckoutPresenter(
             paymentSettingRepository, userSelectionRepository,
-            checkoutUseCase, paymentRepository, experimentsRepository, postPaymentUrlsMapper, Mockito.mock(
+            checkoutUseCase, checkoutWithNewCardUseCase, paymentRepository, experimentsRepository, postPaymentUrlsMapper, Mockito.mock(
                 MPTracker::class.java
             ),
             false
