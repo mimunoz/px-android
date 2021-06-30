@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.base.exception
 
 import com.mercadopago.android.px.internal.util.ApiUtil
+import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
 import retrofit2.HttpException
 import retrofit2.Response
@@ -17,9 +18,9 @@ internal object ExceptionParser {
     fun parse(throwable: Throwable): ApiException {
         return runCatching {
             when (throwable) {
-                is HttpException -> ApiUtil.getApiException(throwable)
+                is HttpException -> ExceptionFactory.httpError(throwable)
                 is UnknownHostException -> ExceptionFactory.connectionError()
-                is SocketTimeoutException -> ApiUtil.getApiException(throwable) as SocketTimeoutApiException
+                is SocketTimeoutException -> ExceptionFactory.socketTimeoutError(throwable.message)
                 else -> ExceptionFactory.genericError(throwable.localizedMessage.orEmpty())
             }
         }.getOrDefault(ExceptionFactory.genericError())

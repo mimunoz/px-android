@@ -50,13 +50,14 @@ class NetworkApi(
     private suspend fun <D : Any, T> apiCallWithRetries(
         apiServiceClass: Class<T>,
         apiCall: suspend (api: T) -> Response<D>
-    ) : ApiResponseCallback<D> {
+    ): ApiResponseCallback<D> {
         var currAttempt = 1
         var apiResponse = getApiResponse(apiCall, apiServiceClass)
-        while (currAttempt <= MAX_RETRIES && apiResponse is Failure &&
-            apiResponse.exception !is SocketTimeoutApiException) {
-                apiResponse = getApiResponse(apiCall, apiServiceClass)
-                currAttempt++
+        while (apiResponse is Failure && currAttempt <= MAX_RETRIES &&
+            apiResponse.exception !is SocketTimeoutApiException
+        ) {
+            apiResponse = getApiResponse(apiCall, apiServiceClass)
+            currAttempt++
         }
         return apiResponse
     }
