@@ -4,6 +4,7 @@ import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.internal.audio.PlaySoundUseCase
 import com.mercadopago.android.px.internal.base.use_case.TokenizeUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
 import com.mercadopago.android.px.internal.features.validation_program.AuthenticateUseCase
@@ -70,5 +71,11 @@ internal class UseCaseModule(
         get() {
             val session = Session.getInstance()
             return CheckoutUseCase(session.checkoutRepository, session.tracker)
+        }
+
+    val checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
+        get() {
+            val session = Session.getInstance()
+            return CheckoutWithNewCardUseCase(session.checkoutRepository, session.tracker)
         }
 }

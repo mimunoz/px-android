@@ -24,7 +24,7 @@ class NetworkApi(
         apiServiceClass: Class<T>,
         apiCall: suspend (api: T) -> Response<D>
     ): ApiResponseCallback<D> {
-        return withContext(contextProvider.ioDispatcher) {
+        return withContext(contextProvider.IO) {
             if (connectionHelper.hasConnection()) {
                 apiCallWithRetries(apiServiceClass, apiCall)
             } else Failure(ExceptionFactory.connectionError())
