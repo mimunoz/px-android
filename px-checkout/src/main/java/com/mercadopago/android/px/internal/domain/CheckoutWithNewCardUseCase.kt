@@ -14,7 +14,7 @@ import com.mercadopago.android.px.tracking.internal.MPTracker
 import kotlinx.coroutines.delay
 
 
-internal class CheckoutWithNewCardUseCase (
+internal class CheckoutWithNewCardUseCase(
     private val checkoutRepository: CheckoutRepository,
     tracker: MPTracker,
     override val contextProvider: CoroutineContextProvider = CoroutineContextProvider()
@@ -29,18 +29,15 @@ internal class CheckoutWithNewCardUseCase (
             is ApiResponse.Success -> {
                 var checkoutResponse = apiResponse.result
                 val findCardRes = findCardWithRetries(checkoutResponse, param)
-                if (cardNotFoundOrRetryNeeded(findCardRes)) {
+                if (!findCardRes.cardFound) {
                     return Response.Failure(
                         MercadoPagoError(
-                            ApiException().apply {
-                                message =
-                                    "Card not found or retry needed and no retries available"
-                            },
+                            ApiException().also { it.message = "Card not found" },
                             ApiUtil.RequestOrigin.POST_INIT
                         )
                     )
                 }
-                // Update checkoutResponse with the last retry made (if we retried)
+                // Update checkoutResponse with the last retry made (if we retried with success)
                 checkoutResponse = findCardRes.retriedCheckoutResponse ?: checkoutResponse
                 checkoutRepository.sortByPrioritizedCardId(checkoutResponse.oneTapItems, param)
                 checkoutRepository.configure(checkoutResponse)

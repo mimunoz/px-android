@@ -15,7 +15,7 @@ class ConnectionHelper {
     }
 
     fun hasConnection(): Boolean {
-        return context?.let { ctx ->
+        return context.let { ctx ->
             runCatching {
                 val cm = (ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
 

@@ -123,8 +123,7 @@ class CheckoutWithNewCardUseCaseTest {
     }
 
     @Test
-    @Ignore
-    fun whenApiResponseHaveCardWithRetryAndOnSubsequentCallsApiFailsItShouldReturnRecoverableMPError() {
+    fun whenApiResponseHaveCardWithRetryAndOnSubsequentCallsApiFailsItShouldReturnSuccessWithCheckoutResponse() {
         val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
         val cardFoundWithRetryId = retryCheckoutResponse.oneTapItems.first().card.id
         val exMsg = "Test exception msg"
@@ -149,6 +148,6 @@ class CheckoutWithNewCardUseCaseTest {
         runBlocking {
             verify(checkoutRepository, atLeast(2)).checkout()
         }
-        verify(failure).invoke(argThat { this.apiException.message == exMsg && this.isRecoverable })
+        verify(success).invoke(argThat { ReflectionEquals(retryCheckoutResponse).matches(this) })
     }
 }
