@@ -1,3 +1,7 @@
+## VERSION 4.82.0
+_24_06_2021_
+* ENHANCEMENT - Adds device security flag in all tracks.
+
 ## VERSION 4.81.1
 _11_06_2021_
 * FIX - BusinessResult crash.
