@@ -12,6 +12,7 @@ import com.mercadopago.android.px.core.internal.TriggerableQueue;
 import com.mercadopago.android.px.internal.base.BasePresenterWithState;
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver;
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase;
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase;
 import com.mercadopago.android.px.internal.experiments.KnownExperiment;
 import com.mercadopago.android.px.internal.experiments.KnownVariant;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
@@ -116,7 +117,8 @@ import kotlin.Unit;
     @NonNull private final PayerPaymentMethodRepository payerPaymentMethodRepository;
     @NonNull private final ModalRepository modalRepository;
     @NonNull private final CustomOptionIdSolver customOptionIdSolver;
-    @NonNull /* default */ final CheckoutUseCase checkoutUseCase;
+    @NonNull private final CheckoutUseCase checkoutUseCase;
+    @NonNull private final CheckoutWithNewCardUseCase checkoutWithNewCardUseCase;
     @NonNull private final PayerCostSelectionRepository payerCostSelectionRepository;
     @NonNull private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
     @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
@@ -129,6 +131,7 @@ import kotlin.Unit;
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
         @NonNull final CheckoutUseCase checkoutUseCase,
+        @NonNull final CheckoutWithNewCardUseCase checkoutWithNewCardUseCase,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final ChargeRepository chargeRepository,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
@@ -155,6 +158,7 @@ import kotlin.Unit;
         this.discountRepository = discountRepository;
         this.amountRepository = amountRepository;
         this.checkoutUseCase = checkoutUseCase;
+        this.checkoutWithNewCardUseCase = checkoutWithNewCardUseCase;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.chargeRepository = chargeRepository;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -551,7 +555,7 @@ import kotlin.Unit;
             getView().showLoading();
         }
         checkoutUseCase.execute(
-            new CheckoutUseCase.CheckoutParams(null),
+            Unit.INSTANCE,
             checkoutResponse -> {
                 if (isViewAttached()) {
                     payerComplianceRepository.turnIFPECompliant();
@@ -571,7 +575,7 @@ import kotlin.Unit;
 
     @Override
     public void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback) {
-        checkoutUseCase.execute(new CheckoutUseCase.CheckoutParams(cardId),
+        checkoutWithNewCardUseCase.execute(cardId,
             checkoutResponse -> {
                 callback.onSuccess();
                 return Unit.INSTANCE;

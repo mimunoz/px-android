@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase;
+import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase;
 import com.mercadopago.android.px.internal.experiments.KnownVariant;
 import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -23,6 +24,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     @NonNull /* default */ final PaymentSettingRepository paymentSettingRepository;
     @NonNull /* default */ final UserSelectionRepository userSelectionRepository;
     @NonNull private final CheckoutUseCase checkoutUseCase;
+    @NonNull private final CheckoutWithNewCardUseCase checkoutWithNewCardUseCase;
     @NonNull private final PostPaymentUrlsMapper postPaymentUrlsMapper;
     @NonNull /* default */ ExperimentsRepository experimentsRepository;
     private final boolean withPrefetch;
@@ -30,6 +32,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     /* default */ CheckoutPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
         @NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final CheckoutUseCase checkoutUseCase,
+        @NonNull final CheckoutWithNewCardUseCase checkoutWithNewCardUseCase,
         @NonNull final PaymentRepository paymentRepository,
         @NonNull final ExperimentsRepository experimentsRepository,
         @NonNull final PostPaymentUrlsMapper postPaymentUrlsMapper,
@@ -39,6 +42,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
         this.paymentSettingRepository = paymentSettingRepository;
         this.userSelectionRepository = userSelectionRepository;
         this.checkoutUseCase = checkoutUseCase;
+        this.checkoutWithNewCardUseCase = checkoutWithNewCardUseCase;
         this.paymentRepository = paymentRepository;
         this.experimentsRepository = experimentsRepository;
         this.postPaymentUrlsMapper = postPaymentUrlsMapper;
@@ -51,7 +55,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
             getView().showProgress();
             if (isViewAttached()) {
                 checkoutUseCase.execute(
-                    new CheckoutUseCase.CheckoutParams(null),
+                    Unit.INSTANCE,
                     checkoutResponse -> {
                         showOneTap();
                         return Unit.INSTANCE;
@@ -123,7 +127,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
 
     @Override
     public void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback) {
-        checkoutUseCase.execute(new CheckoutUseCase.CheckoutParams(cardId),
+        checkoutWithNewCardUseCase.execute(cardId,
             checkoutResponse -> {
                 callback.onSuccess();
                 return Unit.INSTANCE;

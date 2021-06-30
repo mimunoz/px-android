@@ -375,6 +375,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             session.getDiscountRepository(),
             session.getAmountRepository(),
             session.getUseCaseModule().getCheckoutUseCase(),
+            session.getUseCaseModule().getCheckoutWithNewCardUseCase(),
             session.getAmountConfigurationRepository(),
             session.getConfigurationModule().getChargeRepository(),
             session.getMercadoPagoESC(),
