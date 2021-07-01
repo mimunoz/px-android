@@ -12,7 +12,7 @@ public enum CheckoutPreferenceStub implements JsonInjectable<CheckoutPreference>
     @NonNull
     @Override
     public CheckoutPreference get() {
-        return StubCheckoutPreferenceUtils.stubBuilderOneItemAndPayer().build();
+        return stubBuilderOneItemAndPayer().build();
     }
 
     @NonNull

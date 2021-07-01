@@ -3,9 +3,7 @@ package com.mercadopago.android.px.internal.usecases
 import com.mercadopago.android.px.CallbackTest
 import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
-import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
-import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.repository.CheckoutRepository
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.exceptions.ApiException

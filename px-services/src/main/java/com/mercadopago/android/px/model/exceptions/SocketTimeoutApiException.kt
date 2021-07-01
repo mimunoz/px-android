@@ -1,8 +1,7 @@
-package com.mercadopago.android.px.internal.base.exception
+package com.mercadopago.android.px.model.exceptions
 
-import com.mercadopago.android.px.model.exceptions.ApiException
 
-internal class SocketTimeoutApiException(message: String) : ApiException() {
+class SocketTimeoutApiException(message: String) : ApiException() {
     init {
         this.message = message
     }
