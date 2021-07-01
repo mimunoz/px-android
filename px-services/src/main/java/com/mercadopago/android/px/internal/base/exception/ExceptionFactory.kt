@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.base.exception
 import com.mercadopago.android.px.internal.core.extensions.orIfEmpty
 import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
+import com.mercadopago.android.px.model.exceptions.SocketTimeoutApiException
 import retrofit2.HttpException
 
 internal object ExceptionFactory {
@@ -12,7 +13,7 @@ internal object ExceptionFactory {
     fun genericError(message: String? = null) = ApiException().also { it.message = message.orEmpty() }
 
     fun httpError(throwable: HttpException) = JsonUtil.fromJson(
-        throwable.response()?.errorBody().toString(),
+        throwable.response()?.errorBody()?.string(),
         ApiException::class.java
     )!!
 

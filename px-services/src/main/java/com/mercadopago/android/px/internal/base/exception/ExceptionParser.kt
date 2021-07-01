@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.base.exception
 
 import com.mercadopago.android.px.internal.util.ApiUtil
-import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
 import retrofit2.HttpException
 import retrofit2.Response
