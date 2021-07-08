@@ -1,3 +1,7 @@
+## VERSION 4.83.0
+_08_07_2021_
+* ENHANCEMENT - Sends paymentTypeId to congrats endpoint.
+
 ## VERSION 4.82.0
 _24_06_2021_
 * ENHANCEMENT - Adds device security flag in all tracks.
