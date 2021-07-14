@@ -101,6 +101,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         super.onSaveInstanceState(outState);
         outState.putString(EXTRA_PRIVATE_KEY, privateKey);
         outState.putString(EXTRA_PUBLIC_KEY, merchantPublicKey);
+        presenter.storeInBundle(outState);
     }
 
     @Override
@@ -121,7 +122,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         privateKey = savedInstanceState.getString(EXTRA_PRIVATE_KEY);
         merchantPublicKey = savedInstanceState.getString(EXTRA_PUBLIC_KEY);
         presenter.attachView(this);
-        presenter.onRestore();
+        presenter.onRestore(savedInstanceState);
     }
 
     @Override
