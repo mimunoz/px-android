@@ -86,9 +86,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
 
     @Override
     public void onRestore() {
-        if (paymentSettingRepository.getCheckoutPreference() != null) {
-            showOneTap();
-        }
+        showOneTap();
     }
 
     @Override

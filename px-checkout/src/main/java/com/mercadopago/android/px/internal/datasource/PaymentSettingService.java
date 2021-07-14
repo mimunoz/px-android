@@ -39,6 +39,7 @@ public class PaymentSettingService implements PaymentSettingRepository {
     private static final String PREF_ONE_TAP_ENABLED = "PREF_ONE_TAP_ENABLED";
     private static final String PREF_CUSTOM_STRINGS = "PREF_CUSTOM_STRINGS";
     private static final String PREF_CONFIGURATION = "PREF_CONFIGURATION";
+    private static final String PREF_FLOW_ERROR = "pref_flow_error";
     private static final String FILE_PAYMENT_CONFIG = "px_payment_config";
 
     @NonNull private final SharedPreferences sharedPreferences;
@@ -269,5 +270,17 @@ public class PaymentSettingService implements PaymentSettingRepository {
     @Override
     public String getPrivateKey() {
         return sharedPreferences.getString(PREF_PRIVATE_KEY, null);
+    }
+
+    @Override
+    public boolean getFlowError() {
+        return sharedPreferences.getBoolean(PREF_FLOW_ERROR, false);
+    }
+
+    @Override
+    public void configureFlowError(boolean error) {
+        final SharedPreferences.Editor edit = sharedPreferences.edit();
+        edit.putBoolean(PREF_FLOW_ERROR, error);
+        edit.apply();
     }
 }

@@ -23,6 +23,7 @@ internal interface PaymentSettingRepository : ConfigurationProvider {
     val token: Token?
     val securityType: SecurityType
     val chargeRules: List<PaymentTypeChargeRule>
+    val flowError: Boolean
     fun hasToken(): Boolean
     fun configure(advancedConfiguration: AdvancedConfiguration)
     fun configure(publicKey: String)
@@ -35,6 +36,7 @@ internal interface PaymentSettingRepository : ConfigurationProvider {
     fun configure(secondFactor: SecurityType)
     fun configurePreferenceId(preferenceId: String?)
     fun configurePrivateKey(privateKey: String?)
+    fun configureFlowError(error: Boolean)
     fun clearToken()
     fun reset()
 }

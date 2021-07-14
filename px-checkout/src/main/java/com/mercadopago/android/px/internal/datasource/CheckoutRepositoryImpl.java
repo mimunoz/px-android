@@ -152,11 +152,13 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
                     public void success(final CheckoutResponse checkoutResponse) {
                         postResponse.call(checkoutResponse);
                         callback.success(checkoutResponse);
+                        paymentSettingRepository.configureFlowError(false);
                     }
 
                     @Override
                     public void failure(final ApiException apiException) {
                         callback.failure(apiException);
+                        paymentSettingRepository.configureFlowError(true);
                     }
                 };
             }

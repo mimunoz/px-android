@@ -121,6 +121,13 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         privateKey = savedInstanceState.getString(EXTRA_PRIVATE_KEY);
         merchantPublicKey = savedInstanceState.getString(EXTRA_PUBLIC_KEY);
         presenter.attachView(this);
+
+        if (presenter.paymentSettingRepository.getFlowError()) {
+            // TODO implementation track/log with error
+            // ....
+            return;
+        }
+
         presenter.onRestore();
     }
 
