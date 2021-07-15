@@ -150,6 +150,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
             }
 
             super.onBackPressed();
+            overrideTransitionOut();
         }
     }
 
