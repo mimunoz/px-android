@@ -1,3 +1,8 @@
+## VERSION 4.84.0
+_15_07_2021_
+* FIX - Crash on restoring one tap after a error.
+* FIX - Exit transition on back pressed.
+
 ## VERSION 4.83.0
 _08_07_2021_
 * ENHANCEMENT - Sends paymentTypeId to congrats endpoint.
