@@ -256,7 +256,8 @@ public final class Session extends ApplicationModule {
     public AmountRepository getAmountRepository() {
         if (amountRepository == null) {
             amountRepository = new AmountService(configurationModule.getPaymentSettings(),
-                configurationModule.getChargeRepository(), getDiscountRepository());
+                configurationModule.getChargeRepository(), getDiscountRepository(),
+                configurationModule.getUserSelectionRepository());
         }
         return amountRepository;
     }
@@ -296,14 +297,15 @@ public final class Session extends ApplicationModule {
                 getApplicationContext(),
                 getEscPaymentManager(),
                 getMercadoPagoESC(),
-                getTokenRepository(),
                 getAmountConfigurationRepository(),
                 getCongratsRepository(),
                 getFileManager(),
                 MapperProvider.INSTANCE.getFromPayerPaymentMethodToCardMapper(),
                 MapperProvider.INSTANCE.getPaymentMethodMapper(),
                 getPaymentMethodRepository(),
-                getUseCaseModule().getValidationProgramUseCase());
+                getUseCaseModule().getValidationProgramUseCase(),
+                getUseCaseModule().getTokenizeWithEscUseCase(),
+                getUseCaseModule().getTokenizeWithoutCvvUseCase());
         }
 
         return paymentRepository;
@@ -318,7 +320,7 @@ public final class Session extends ApplicationModule {
     }
 
     @NonNull
-    private TokenRepository getTokenRepository() {
+    public TokenRepository getTokenRepository() {
         return new TokenizeService(networkModule.getRetrofitClient().create(GatewayService.class),
             getConfigurationModule().getPaymentSettings(), getMercadoPagoESC(), getDevice(), getTracker());
     }

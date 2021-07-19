@@ -2,10 +2,11 @@ package com.mercadopago.android.px.internal.util
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.addons.model.EscDeleteReason
-import com.mercadopago.android.px.internal.callbacks.awaitTaggedCallback
-import com.mercadopago.android.px.internal.extensions.isNotNullNorEmpty
-import com.mercadopago.android.px.internal.repository.CardTokenRepository
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithCvvUseCase
 import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.internal.extensions.isNotNullNorEmpty
+import com.mercadopago.android.px.internal.helper.SecurityCodeHelper
+import com.mercadopago.android.px.internal.repository.CardTokenRepository
 import com.mercadopago.android.px.model.*
 import com.mercadopago.android.px.model.exceptions.CardTokenException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
@@ -13,21 +14,13 @@ import com.mercadopago.android.px.tracking.internal.model.Reason
 
 internal class TokenCreationWrapper private constructor(builder: Builder) {
 
-    private val cardTokenRepository: CardTokenRepository
-    private val escManagerBehaviour: ESCManagerBehaviour
-    private val card: Card?
-    private val token: Token?
-    private val paymentMethod: PaymentMethod
-    private val reason: Reason
-
-    init {
-        cardTokenRepository = builder.cardTokenRepository
-        escManagerBehaviour = builder.escManagerBehaviour
-        card = builder.card
-        token = builder.token
-        paymentMethod = builder.paymentMethod!!
-        reason = builder.reason!!
-    }
+    private val cardTokenRepository: CardTokenRepository = builder.cardTokenRepository
+    private val escManagerBehaviour: ESCManagerBehaviour = builder.escManagerBehaviour
+    private val tokenizeWithCvvUseCase: TokenizeWithCvvUseCase = builder.tokenizeWithCvvUseCase
+    private val card: Card? = builder.card
+    private val token: Token? = builder.token
+    private val paymentMethod: PaymentMethod = builder.paymentMethod!!
+    private val reason: Reason = builder.reason!!
 
     suspend fun createToken(cvv: String): Response<Token, MercadoPagoError> {
         return if (escManagerBehaviour.isESCEnabled) {
@@ -39,30 +32,21 @@ internal class TokenCreationWrapper private constructor(builder: Builder) {
 
     suspend fun createTokenWithEsc(cvv: String): Response<Token, MercadoPagoError> {
         return if (card != null) {
-            SavedESCCardToken.createWithSecurityCode(card.id!!, cvv).run {
-                validateSecurityCode(card)
-                createESCToken(this).apply {
-                    resolve(success = { token -> token.lastFourDigits = card.lastFourDigits })
-                }
+            SecurityCodeHelper.validate(card, cvv)
+            createESCToken(card.id!!, cvv).apply {
+                resolve(success = { token -> token.lastFourDigits = card.lastFourDigits })
             }
         } else {
-            SavedESCCardToken.createWithSecurityCode(token!!.cardId, cvv).run {
-                validateCVVFromToken(cvv)
-                createESCToken(this)
-            }
+            validateCVVFromToken(cvv)
+            createESCToken(token!!.cardId, cvv)
         }
     }
 
-    suspend fun createTokenWithoutEsc(cvv: String) = SavedCardToken(card!!.id, cvv).run {
-            validateSecurityCode(card)
-            createToken(this).apply {
-                resolve(success = { token -> token.lastFourDigits = card.lastFourDigits })
-            }
+    suspend fun createTokenWithoutEsc(cvv: String) = run {
+        SecurityCodeHelper.validate(card!!, cvv)
+        createToken(card.id!!, cvv).apply {
+            resolve(success = { token -> token.lastFourDigits = card.lastFourDigits })
         }
-
-    suspend fun cloneToken(cvv: String) = when (val response = doCloneToken()) {
-        is Response.Success -> putCVV(cvv, response.result.id)
-        is Response.Failure -> response
     }
 
     @Throws(CardTokenException::class)
@@ -75,30 +59,24 @@ internal class TokenCreationWrapper private constructor(builder: Builder) {
         return true
     }
 
-    private suspend fun createESCToken(savedESCCardToken: SavedESCCardToken) = cardTokenRepository
-        .createToken(savedESCCardToken)
-        .awaitTaggedCallback(ApiUtil.RequestOrigin.CREATE_TOKEN).apply {
+    private suspend fun createESCToken(cardId: String, cvv: String) = tokenizeWithCvvUseCase
+        .suspendExecute(TokenizeWithCvvUseCase.Params(cardId, cvv, true)).apply {
             resolve(success = {
                 if (Reason.ESC_CAP == reason) { // Remove previous esc for tracking purpose
-                    escManagerBehaviour.deleteESCWith(savedESCCardToken.cardId, EscDeleteReason.ESC_CAP, null)
+                    escManagerBehaviour.deleteESCWith(cardId, EscDeleteReason.ESC_CAP, null)
                 }
-                cardTokenRepository.clearCap(savedESCCardToken.cardId) {}
+                cardTokenRepository.clearCap(cardId) {}
             })
         }
 
-    private suspend fun createToken(savedCardToken: SavedCardToken) = cardTokenRepository
-        .createToken(savedCardToken)
-        .awaitTaggedCallback(ApiUtil.RequestOrigin.CREATE_TOKEN)
+    private suspend fun createToken(cardId: String, cvv: String) = tokenizeWithCvvUseCase
+        .suspendExecute(TokenizeWithCvvUseCase.Params(cardId, cvv, false))
 
-    private suspend fun doCloneToken() = cardTokenRepository
-        .cloneToken(token!!.id)
-        .awaitTaggedCallback(ApiUtil.RequestOrigin.CREATE_TOKEN)
+    class Builder(
+        val cardTokenRepository: CardTokenRepository,
+        val escManagerBehaviour: ESCManagerBehaviour,
+        val tokenizeWithCvvUseCase: TokenizeWithCvvUseCase) {
 
-    private suspend fun putCVV(cvv: String, tokenId: String) = cardTokenRepository
-        .putSecurityCode(cvv, tokenId)
-        .awaitTaggedCallback(ApiUtil.RequestOrigin.CREATE_TOKEN)
-
-    class Builder(val cardTokenRepository: CardTokenRepository, val escManagerBehaviour: ESCManagerBehaviour) {
         var card: Card? = null
             private set
 

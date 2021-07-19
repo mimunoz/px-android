@@ -13,6 +13,7 @@ import com.mercadopago.android.px.model.Token
 import com.mercadopago.android.px.tracking.internal.MPTracker
 
 internal class TokenizeUseCase(
+    private val tokenizeWithCvvUseCase: TokenizeWithCvvUseCase,
     private val cardTokenRepository: CardTokenRepository,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val paymentSettingRepository: PaymentSettingRepository,
@@ -22,10 +23,10 @@ internal class TokenizeUseCase(
 
     override suspend fun doExecute(param: TokenizeParams) = run {
         param.paymentRecovery.runIfNotNull {
-            CVVRecoveryWrapper(cardTokenRepository, escManagerBehaviour, it, tracker).recoverWithCVV(param.securityCode)
+            CVVRecoveryWrapper(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase, it, tracker).recoverWithCVV(param.securityCode)
         } ?: notNull(param.card).let {
             TokenCreationWrapper
-                .Builder(cardTokenRepository, escManagerBehaviour)
+                .Builder(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase)
                 .with(it)
                 .with(it.paymentMethod!!)
                 .build()

@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.core.internal.PaymentWrapper;
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithEscUseCase;
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithoutCvvUseCase;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceEventHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.core.FileManager;
@@ -23,7 +25,6 @@ import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
-import com.mercadopago.android.px.internal.repository.TokenRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.util.TokenErrorWrapper;
 import com.mercadopago.android.px.model.AmountConfiguration;
@@ -40,11 +41,9 @@ import com.mercadopago.android.px.model.PaymentResult;
 import com.mercadopago.android.px.model.PaymentTypes;
 import com.mercadopago.android.px.model.Split;
 import com.mercadopago.android.px.model.Token;
-import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
-import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.model.Reason;
 import java.io.File;
 import java.math.BigDecimal;
@@ -62,7 +61,6 @@ public class PaymentService implements PaymentRepository {
     @NonNull private final DiscountRepository discountRepository;
     @NonNull private final AmountRepository amountRepository;
     @NonNull private final Context context;
-    @NonNull private final TokenRepository tokenRepository;
     @NonNull private final FileManager fileManager;
     @NonNull private final EscPaymentManager escPaymentManager;
     @NonNull private final ESCManagerBehaviour escManagerBehaviour;
@@ -77,6 +75,8 @@ public class PaymentService implements PaymentRepository {
     @NonNull private final PaymentMethodMapper paymentMethodMapper;
     @NonNull private final PaymentMethodRepository paymentMethodRepository;
     @NonNull private final ValidationProgramUseCase validationProgramUseCase;
+    @NonNull private final TokenizeWithEscUseCase tokenizeWithEscUseCase;
+    @NonNull private final TokenizeWithoutCvvUseCase tokenizeWithoutCvvUseCase;
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -86,14 +86,15 @@ public class PaymentService implements PaymentRepository {
         @NonNull final Context context,
         @NonNull final EscPaymentManager escPaymentManager,
         @NonNull final ESCManagerBehaviour escManagerBehaviour,
-        @NonNull final TokenRepository tokenRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final CongratsRepository congratsRepository,
         @NonNull final FileManager fileManager,
         @NonNull final FromPayerPaymentMethodToCardMapper fromPayerPaymentMethodToCardMapper,
         @NonNull final PaymentMethodMapper paymentMethodMapper,
         @NonNull final PaymentMethodRepository paymentMethodRepository,
-        @NonNull final ValidationProgramUseCase validationProgramUseCase) {
+        @NonNull final ValidationProgramUseCase validationProgramUseCase,
+        @NonNull final TokenizeWithEscUseCase tokenizeWithEscUseCase,
+        @NonNull final TokenizeWithoutCvvUseCase tokenizeWithoutCvvUseCase) {
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.escPaymentManager = escPaymentManager;
         this.escManagerBehaviour = escManagerBehaviour;
@@ -102,9 +103,10 @@ public class PaymentService implements PaymentRepository {
         this.discountRepository = discountRepository;
         this.amountRepository = amountRepository;
         this.context = context;
-        this.tokenRepository = tokenRepository;
         this.fileManager = fileManager;
         this.validationProgramUseCase = validationProgramUseCase;
+        this.tokenizeWithEscUseCase = tokenizeWithEscUseCase;
+        this.tokenizeWithoutCvvUseCase = tokenizeWithoutCvvUseCase;
 
         paymentFile = fileManager.create(FILE_PAYMENT);
         this.fromPayerPaymentMethodToCardMapper = fromPayerPaymentMethodToCardMapper;
@@ -221,19 +223,19 @@ public class PaymentService implements PaymentRepository {
     }
 
     private void payWithoutCvv(@NonNull final Card card) {
-        tokenRepository.createTokenWithoutCvv(card).enqueue(new Callback<Token>() {
-            @Override
-            public void success(final Token token) {
+        tokenizeWithoutCvvUseCase.execute(
+            card,
+            token -> {
                 pay();
-            }
-
-            @Override
-            public void failure(final ApiException apiException) {
+                return null;
+            },
+            mercadoPagoError -> {
                 // No start CVV screen if fail
-                final String tokenError = new TokenErrorWrapper(apiException).getValue();
+                final String tokenError = new TokenErrorWrapper(mercadoPagoError.getApiException()).getValue();
                 handlerWrapper.onPaymentError(MercadoPagoError.createRecoverable(tokenError));
+                return null;
             }
-        });
+        );
     }
 
     private void payWithCard() {
@@ -264,18 +266,17 @@ public class PaymentService implements PaymentRepository {
         final boolean shouldInvalidateEsc = shouldInvalidateEsc(card.getEscStatus());
         if (escManagerBehaviour.isESCEnabled() && escPaymentManager.hasEsc(card) && !shouldInvalidateEsc) {
             //Saved card has ESC - Try to tokenize
-            tokenRepository.createToken(card).enqueue(new Callback<Token>() {
-                @Override
-                public void success(final Token token) {
+            tokenizeWithEscUseCase.execute(
+                card,
+                token -> {
                     processPaymentMethod();
-                }
-
-                @Override
-                public void failure(final ApiException apiException) {
+                    return null;
+                }, mercadoPagoError -> {
                     //Start CVV screen if fail
-                    handlerWrapper.onCvvRequired(card, new TokenErrorWrapper(apiException).toReason());
-                }
-            });
+                    handlerWrapper
+                        .onCvvRequired(card, new TokenErrorWrapper(mercadoPagoError.getApiException()).toReason());
+                    return null;
+                });
         } else {
             final Reason reason =
                 escManagerBehaviour.isESCEnabled() ? (shouldInvalidateEsc ? Reason.ESC_CAP : Reason.SAVED_CARD)

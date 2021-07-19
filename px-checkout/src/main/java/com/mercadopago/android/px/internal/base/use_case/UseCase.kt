@@ -43,7 +43,14 @@ abstract class UseCase<in P, out R>(protected val tracker: MPTracker) {
         }
     }
 
+    suspend fun suspendExecute(param: P) = withContext(contextProvider.Default) {
+        runCatching {
+            doExecute(param).also { response -> withContext(contextProvider.Default) { response } }
+        }.getOrElse { withContext(contextProvider.Main) { Response.Failure(MercadoPagoError(it.message.orEmpty(), false)) } }
+    }
+
     open class CoroutineContextProvider {
+        open val Default: CoroutineContext by lazy { Dispatchers.Default }
         open val Main: CoroutineContext by lazy { Dispatchers.Main }
         open val IO: CoroutineContext by lazy { Dispatchers.IO }
     }

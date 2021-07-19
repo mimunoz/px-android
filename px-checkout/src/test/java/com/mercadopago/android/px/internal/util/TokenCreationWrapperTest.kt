@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.util
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithCvvUseCase
 import com.mercadopago.android.px.internal.repository.CardTokenRepository
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PaymentMethod
@@ -19,12 +20,13 @@ class TokenCreationWrapperTest {
 
     @Mock private lateinit var cardTokenRepository: CardTokenRepository
     @Mock private lateinit var escManagerBehaviour: ESCManagerBehaviour
+    @Mock private lateinit var tokenizeWithCvvUseCase: TokenizeWithCvvUseCase
     @Mock private lateinit var card: Card
     @Mock private lateinit var paymentMethod: PaymentMethod
 
     @Before
     fun setUp() {
-        tokenCreationWrapper = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
+        tokenCreationWrapper = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase)
             .with(card)
             .with(paymentMethod).build()
     }

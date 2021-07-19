@@ -1,8 +1,11 @@
 package com.mercadopago.android.px.internal.datasource;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
+import com.mercadopago.android.px.internal.model.CardTokenBody;
+import com.mercadopago.android.px.internal.model.RemotePaymentToken;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.TokenRepository;
 import com.mercadopago.android.px.internal.services.GatewayService;
@@ -10,8 +13,6 @@ import com.mercadopago.android.px.internal.util.TokenErrorWrapper;
 import com.mercadopago.android.px.model.Card;
 import com.mercadopago.android.px.model.CardInformation;
 import com.mercadopago.android.px.model.Device;
-import com.mercadopago.android.px.model.SavedCardToken;
-import com.mercadopago.android.px.model.SavedESCCardToken;
 import com.mercadopago.android.px.model.Token;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.services.Callback;
@@ -41,28 +42,30 @@ public class TokenizeService implements TokenRepository {
     }
 
     @Override
-    public MPCall<Token> createToken(@NonNull final Card card) {
+    public MPCall<Token> createToken(@NonNull final Card card,
+        @Nullable final RemotePaymentToken remotePaymentToken) {
         return callback -> {
             final String cardId = Objects.requireNonNull(card.getId());
             final String esc = escManagerBehaviour.getESC(cardId, card.getFirstSixDigits(), card.getLastFourDigits());
-
+            final CardTokenBody body = new CardTokenBody(cardId, device, true, "", esc, remotePaymentToken);
             gatewayService.createToken(
                 paymentSettingRepository.getPublicKey(),
                 paymentSettingRepository.getPrivateKey(),
-                SavedESCCardToken.createWithEsc(cardId, esc, device)).enqueue(wrap(card, esc, callback));
+                body).enqueue(wrap(card, esc, callback));
         };
     }
 
     @Override
-    public MPCall<Token> createTokenWithoutCvv(@NonNull final Card card) {
+    public MPCall<Token> createTokenWithoutCvv(
+        @NonNull final Card card, @Nullable final RemotePaymentToken remotePaymentToken) {
         return callback -> {
-            final SavedCardToken savedCardToken = new SavedCardToken(Objects.requireNonNull(card.getId()));
-            savedCardToken.setDevice(device);
+            final CardTokenBody body =
+                new CardTokenBody(Objects.requireNonNull(card.getId()), device, remotePaymentToken);
 
             gatewayService.createToken(
                 paymentSettingRepository.getPublicKey(),
                 paymentSettingRepository.getPrivateKey(),
-                savedCardToken).enqueue(wrap(card, callback));
+                body).enqueue(wrap(card, callback));
         };
     }
 

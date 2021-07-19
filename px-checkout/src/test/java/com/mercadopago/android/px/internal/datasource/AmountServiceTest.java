@@ -38,7 +38,8 @@ public class AmountServiceTest {
 
     @Before
     public void setUp() {
-        amountService = new AmountService(paymentSettingRepository, chargeRepository, discountRepository);
+        amountService =
+            new AmountService(paymentSettingRepository, chargeRepository, discountRepository, userSelectionRepository);
         when(paymentSettingRepository.getCheckoutPreference()).thenReturn(checkoutPreference);
         when(checkoutPreference.getTotalAmount()).thenReturn(BigDecimal.TEN);
         when(discountRepository.getCurrentConfiguration()).thenReturn(discountModel);

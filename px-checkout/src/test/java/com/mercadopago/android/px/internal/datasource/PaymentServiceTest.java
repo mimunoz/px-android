@@ -8,7 +8,8 @@ import androidx.lifecycle.Observer;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.core.internal.PaymentWrapper;
-import com.mercadopago.android.px.internal.callbacks.MPCall;
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithEscUseCase;
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithoutCvvUseCase;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper;
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase;
@@ -25,7 +26,6 @@ import com.mercadopago.android.px.internal.repository.PayerCostSelectionReposito
 import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey;
 import com.mercadopago.android.px.internal.repository.PaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
-import com.mercadopago.android.px.internal.repository.TokenRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.mocks.CheckoutResponseStub;
@@ -49,7 +49,6 @@ import com.mercadopago.android.px.model.internal.OneTapItem;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.tracking.internal.model.Reason;
-import com.mercadopago.android.px.utils.StubFailMpCall;
 import java.util.List;
 import kotlin.Pair;
 import kotlin.Unit;
@@ -70,6 +69,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -94,7 +94,6 @@ public class PaymentServiceTest {
     @Mock private Context context;
     @Mock private EscPaymentManager escPaymentManager;
     @Mock private ESCManagerBehaviour escManagerBehaviour;
-    @Mock private TokenRepository tokenRepository;
     @Mock private AmountConfigurationRepository amountConfigurationRepository;
     @Mock private CongratsRepository congratsRepository;
     @Mock private SplitSelectionState splitSelectionState;
@@ -110,6 +109,8 @@ public class PaymentServiceTest {
     @Mock private PaymentMethodMapper paymentMethodMapper;
     @Mock private PaymentMethodRepository paymentMethodRepository;
     @Mock private ValidationProgramUseCase validationProgramUseCase;
+    @Mock private TokenizeWithEscUseCase tokenizeWithEscUseCase;
+    @Mock private TokenizeWithoutCvvUseCase tokenizeWithoutCvvUseCase;
     @Mock private CustomOptionIdSolver customOptionIdSolver;
 
     private PaymentService paymentService;
@@ -127,14 +128,15 @@ public class PaymentServiceTest {
             context,
             escPaymentManager,
             escManagerBehaviour,
-            tokenRepository,
             amountConfigurationRepository,
             congratsRepository,
             fileManager,
             fromPayerPaymentMethodToCardMapper,
             paymentMethodMapper,
             paymentMethodRepository,
-            validationProgramUseCase
+            validationProgramUseCase,
+            tokenizeWithEscUseCase,
+            tokenizeWithoutCvvUseCase
         );
 
         application = mock(Application.class);
@@ -212,7 +214,6 @@ public class PaymentServiceTest {
         final Observer<Pair<Card, Reason>> cvvRequiredObserver = mock(Observer.class);
         final Card card = savedCreditCardOneTapPresent(CARD_ID_ESC_APPROVED);
         when(escPaymentManager.hasEsc(card)).thenReturn(true);
-        when(tokenRepository.createToken(card)).thenReturn(new StubFailMpCall(mock(ApiException.class)));
         when(escManagerBehaviour.isESCEnabled()).thenReturn(true);
 
         paymentService.startExpressPayment(mockPaymentConfiguration(node, payerCost));
@@ -220,8 +221,13 @@ public class PaymentServiceTest {
         verify(escPaymentManager).hasEsc(card);
         verifyNoMoreInteractions(escPaymentManager);
 
-        verify(tokenRepository).createToken(card);
-        verifyNoMoreInteractions(tokenRepository);
+        final ArgumentCaptor<Function1> successCaptor = ArgumentCaptor.forClass(Function1.class);
+        final ArgumentCaptor<Function1> failureCaptor = ArgumentCaptor.forClass(Function1.class);
+        verify(tokenizeWithEscUseCase).execute(eq(card), successCaptor.capture(), failureCaptor.capture());
+        final MercadoPagoError mercadoPagoError = mock(MercadoPagoError.class);
+        when(mercadoPagoError.getApiException()).thenReturn(mock(ApiException.class));
+        failureCaptor.getValue().invoke(mercadoPagoError);
+        verifyNoMoreInteractions(tokenizeWithEscUseCase);
 
         // if api call to tokenize fails, then ask for CVV.
         verify(cvvRequiredObserver).onChanged(any(Pair.class));
@@ -232,16 +238,19 @@ public class PaymentServiceTest {
     public void whenOneTapPaymentWhenSavedCardAndESCSavedThenAskTokenSuccess() {
         final Card card = savedCreditCardOneTapPresent(CARD_ID_ESC_APPROVED);
         when(escPaymentManager.hasEsc(card)).thenReturn(true);
-        final MPCall<Token> tokenMPCall = mock(MPCall.class);
-        when(tokenRepository.createToken(card)).thenReturn(tokenMPCall);
         when(escManagerBehaviour.isESCEnabled()).thenReturn(true);
+        when(paymentSettingRepository.getSecurityType()).thenReturn(SecurityType.SECOND_FACTOR);
+        when(amountConfigurationRepository.getCurrentConfiguration()).thenReturn(mock(AmountConfiguration.class));
 
         paymentService.startExpressPayment(mockPaymentConfiguration(node, payerCost));
-
         verify(escPaymentManager).hasEsc(card);
         verifyNoMoreInteractions(escPaymentManager);
-        verify(tokenRepository).createToken(card);
-        verifyNoMoreInteractions(tokenRepository);
+        final ArgumentCaptor<Function1> successCaptor = ArgumentCaptor.forClass(Function1.class);
+        final ArgumentCaptor<Function1> failureCaptor = ArgumentCaptor.forClass(Function1.class);
+        verify(tokenizeWithEscUseCase).execute(eq(card), successCaptor.capture(), failureCaptor.capture());
+        when(paymentSettingRepository.hasToken()).thenReturn(true);
+        successCaptor.getValue().invoke(mock(Token.class));
+        verifyNoMoreInteractions(tokenizeWithEscUseCase);
     }
 
     @Test
@@ -254,7 +263,7 @@ public class PaymentServiceTest {
 
         verify(escPaymentManager).hasEsc(card);
         verifyNoMoreInteractions(escPaymentManager);
-        verifyNoMoreInteractions(tokenRepository);
+        verifyNoMoreInteractions(tokenizeWithEscUseCase);
     }
 
     @Test
@@ -271,22 +280,26 @@ public class PaymentServiceTest {
         verify(cvvRequiredObserver).onChanged(any(Pair.class));
         verifyNoMoreInteractions(cvvRequiredObserver);
         verifyNoMoreInteractions(escPaymentManager);
-        verifyNoMoreInteractions(tokenRepository);
+        verifyNoMoreInteractions(tokenizeWithEscUseCase);
     }
 
     @Test
     public void whenOneTapPaymentWhenCapNotExceededAndNotApproved() {
         final Card card = savedCreditCardOneTapPresent(CARD_ID_ESC_NOT_AVAILABLE);
-        final MPCall<Token> tokenMPCall = mock(MPCall.class);
-        when(tokenRepository.createToken(card)).thenReturn(tokenMPCall);
         when(escPaymentManager.hasEsc(card)).thenReturn(true);
         when(escManagerBehaviour.isESCEnabled()).thenReturn(true);
+        when(paymentSettingRepository.getSecurityType()).thenReturn(SecurityType.SECOND_FACTOR);
+        when(amountConfigurationRepository.getCurrentConfiguration()).thenReturn(mock(AmountConfiguration.class));
 
         paymentService.startExpressPayment(mockPaymentConfiguration(node, payerCost));
         verify(escPaymentManager).hasEsc(card);
         verifyNoMoreInteractions(escPaymentManager);
-        verify(tokenRepository).createToken(card);
-        verifyNoMoreInteractions(tokenRepository);
+        final ArgumentCaptor<Function1> successCaptor = ArgumentCaptor.forClass(Function1.class);
+        final ArgumentCaptor<Function1> failureCaptor = ArgumentCaptor.forClass(Function1.class);
+        verify(tokenizeWithEscUseCase).execute(eq(card), successCaptor.capture(), failureCaptor.capture());
+        when(paymentSettingRepository.hasToken()).thenReturn(true);
+        successCaptor.getValue().invoke(mock(Token.class));
+        verifyNoMoreInteractions(tokenizeWithEscUseCase);
     }
 
     @Test
