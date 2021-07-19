@@ -66,11 +66,12 @@ internal class CongratsRepositoryImpl(
             val joinedPaymentIds = TextUtil.join(payment.paymentIds)
             val joinedPaymentMethodsIds = paymentResult.paymentDataList
                 .joinToString(TextUtil.CSV_DELIMITER) { p -> (p.paymentMethod.id) }
-            val campaignId = paymentResult.paymentData.campaign?.run { id } ?: ""
+            val campaignId = paymentResult.paymentData.campaign?.id.orEmpty()
+            val paymentTypeId = paymentResult.paymentData.paymentMethod.paymentTypeId
             with(paymentSettingRepository) {
                 congratsService.getCongrats(PermissionHelper.instance.isLocationGranted(),
                     privateKey!!, publicKey, joinedPaymentIds, platform, campaignId,
-                    payerComplianceRepository.turnedIFPECompliant(), joinedPaymentMethodsIds,
+                    payerComplianceRepository.turnedIFPECompliant(), joinedPaymentMethodsIds, paymentTypeId,
                     trackingRepository.flowId, checkoutPreference?.merchantOrderId, checkoutPreference?.id)
             }
         } catch (e: Exception) {

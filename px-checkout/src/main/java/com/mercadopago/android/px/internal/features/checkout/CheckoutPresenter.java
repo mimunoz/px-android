@@ -1,12 +1,13 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
+import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.experiments.KnownVariant;
-import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
 import com.mercadopago.android.px.internal.repository.CheckoutRepository;
+import com.mercadopago.android.px.internal.repository.ExperimentsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
@@ -22,6 +23,8 @@ import com.mercadopago.android.px.tracking.internal.MPTracker;
 
 public class CheckoutPresenter extends BasePresenter<Checkout.View> implements Checkout.Actions {
 
+    private static final String EXTRA_SHOWING_ONE_TAP = "showing_one_tap";
+
     @NonNull /* default */ final PaymentRepository paymentRepository;
     @NonNull /* default */ final PaymentSettingRepository paymentSettingRepository;
     @NonNull /* default */ final UserSelectionRepository userSelectionRepository;
@@ -29,6 +32,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     @NonNull private final PostPaymentUrlsMapper postPaymentUrlsMapper;
     @NonNull /* default */ ExperimentsRepository experimentsRepository;
     private final boolean withPrefetch;
+    /* default */ boolean showingOneTap = false;
 
     /* default */ CheckoutPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
         @NonNull final UserSelectionRepository userSelectionRepository,
@@ -75,6 +79,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
 
     /* default */ void showOneTap() {
         if (isViewAttached()) {
+            showingOneTap = true;
             getView().hideProgress();
             getView().showOneTap(ExperimentHelper.INSTANCE.getVariantFrom(
                 experimentsRepository.getExperiments(), KnownVariant.SCROLLED));
@@ -82,8 +87,16 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     }
 
     @Override
-    public void onRestore() {
-        showOneTap();
+    public void onRestore(@NonNull final Bundle bundle) {
+        showingOneTap = bundle.getBoolean(EXTRA_SHOWING_ONE_TAP);
+        if (showingOneTap) {
+            showOneTap();
+        }
+    }
+
+    @Override
+    public void storeInBundle(@NonNull final Bundle bundle) {
+        bundle.putBoolean(EXTRA_SHOWING_ONE_TAP, showingOneTap);
     }
 
     @Override

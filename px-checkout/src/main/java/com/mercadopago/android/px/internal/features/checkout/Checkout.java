@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
+import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
@@ -40,6 +41,8 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
         void onCardAdded(@NonNull final String cardId, @NonNull final LifecycleListener.Callback callback);
 
-        void onRestore();
+        void onRestore(@NonNull final Bundle bundle);
+
+        void storeInBundle(@NonNull final Bundle bundle);
     }
 }
