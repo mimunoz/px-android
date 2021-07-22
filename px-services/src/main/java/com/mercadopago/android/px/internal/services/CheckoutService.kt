@@ -10,7 +10,6 @@ import retrofit2.Response
 import retrofit2.http.*
 import java.math.BigDecimal
 
-
 interface CheckoutService {
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
@@ -21,7 +20,7 @@ interface CheckoutService {
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
     suspend fun checkout(
-        @Path(value = "preference_id", encoded = true) preferenceId: String?,
+        @Path(value = "preference_id", encoded = true) preferenceId: String,
         @Query("access_token") privateKey: String?,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
