@@ -13,11 +13,13 @@ import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.InitRequestBody
 
-internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
+internal class PrefetchInitService(
+    private val checkout: MercadoPagoCheckout,
     private val networkApi: NetworkApi,
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val trackingRepository: TrackingRepository,
-    private val featureProvider: FeatureProvider) {
+    private val featureProvider: FeatureProvider
+) {
 
     suspend fun get(): Response<CheckoutResponse, ApiException> {
         val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository).map(checkout)
@@ -28,12 +30,14 @@ internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
         }
     }
 
-    private suspend fun getApiResponse(body: InitRequestBody) : ApiResponse<CheckoutResponse, ApiException> {
+    private suspend fun getApiResponse(body: InitRequestBody): ApiResponse<CheckoutResponse, ApiException> {
+        val preferenceId = checkout.preferenceId
+        val privateKey = checkout.privateKey
         return networkApi.apiCallForResponse(CheckoutService::class.java) {
-            checkout.preferenceId?.let { prefId ->
-                it.checkout(prefId, checkout.privateKey, body)
-            } ?: run {
-                it.checkout(checkout.privateKey, body)
+            if (preferenceId != null) {
+                it.checkout(preferenceId, privateKey, body)
+            } else {
+                it.checkout(privateKey, body)
             }
         }
     }

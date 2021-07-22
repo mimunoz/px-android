@@ -15,6 +15,8 @@ import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.tracking.internal.MPTracker
 
+internal typealias ApiResponseCallback<R> = ApiResponse<R, ApiException>
+
 internal open class CheckoutRepositoryImpl(
     val paymentSettingRepository: PaymentSettingRepository,
     val experimentsRepository: ExperimentsRepository,
@@ -32,18 +34,18 @@ internal open class CheckoutRepositoryImpl(
     val discountRepository: DiscountRepository,
     val featureProvider: FeatureProvider) : CheckoutRepository {
 
-    override suspend fun checkout(): ApiResponse<CheckoutResponse, ApiException> {
+    override suspend fun checkout(): ApiResponseCallback<CheckoutResponse> {
         val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository)
             .map(paymentSettingRepository)
 
         val preferenceId = paymentSettingRepository.checkoutPreferenceId
-        return preferenceId?.let {
-            networkApi.apiCallForResponse(CheckoutService::class.java) {
-                it.checkout(preferenceId, paymentSettingRepository.privateKey, body)
-            }
-        } ?: run {
-            networkApi.apiCallForResponse(CheckoutService::class.java) {
-                it.checkout(paymentSettingRepository.privateKey, body)
+        val privateKey = paymentSettingRepository.privateKey
+
+        return networkApi.apiCallForResponse(CheckoutService::class.java) {
+            if (preferenceId != null) {
+                it.checkout(preferenceId, privateKey, body)
+            } else {
+                it.checkout(privateKey, body)
             }
         }
     }
