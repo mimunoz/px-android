@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.BehaviourProvider;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
-import com.mercadopago.android.px.addons.model.SecurityValidationData;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.core.internal.TrackingRepositoryModelMapper;
@@ -464,9 +463,6 @@ public final class Session extends ApplicationModule {
             : checkout.getAdvancedConfiguration().getProductId();
         configurationModule.getTrackingRepository().configure(
             TrackingRepositoryModelMapper.INSTANCE.map(checkout.getTrackingConfiguration()));
-        final boolean securityEnabled = BehaviourProvider.getSecurityBehaviour()
-            .isSecurityEnabled(new SecurityValidationData.Builder(productId).build());
-        getTracker().setSecurityEnabled(securityEnabled);
         configurationModule.getProductIdProvider().configure(productId);
     }
 

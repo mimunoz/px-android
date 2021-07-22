@@ -18,6 +18,7 @@ interface CongratsService {
         @Query("campaign_id") campaignId: String,
         @Query("ifpe") turnedIFPECompliant: Boolean,
         @Query("payment_methods_ids") paymentMethodsIds: String,
+        @Query("payment_type_id") paymentTypeId: String,
         @Query("flow_name") flowName: String,
         @Query("merchant_order_id") merchantOrderId: Long?,
         @Query("pref_id") preferenceId: String?): CongratsResponse

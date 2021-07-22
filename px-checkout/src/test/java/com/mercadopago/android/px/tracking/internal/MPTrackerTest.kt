@@ -75,7 +75,8 @@ class MPTrackerTest {
 
     @Test
     fun whenTrackWithSecurityEnabledThenAddSecurityEnabledData() {
-        tracker.setSecurityEnabled(true)
+        `when`(trackingRepository.securityEnabled).thenReturn(true)
+        tracker = MPTracker(trackingRepository)
         tracker.track(trackWrapper)
 
         assertTrue(track.data["security_enabled"] as Boolean)

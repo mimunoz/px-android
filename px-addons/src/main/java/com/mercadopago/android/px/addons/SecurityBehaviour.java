@@ -1,6 +1,8 @@
 package com.mercadopago.android.px.addons;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.addons.model.SecurityValidationData;
@@ -41,5 +43,12 @@ public interface SecurityBehaviour {
     @NonNull
     default String getExtraResultKey() {
         return "NO_KEY";
+    }
+
+    /**
+     * Return whether the keyguard is secured by a PIN, pattern or password or a SIM card is currently locked.
+     */
+    default boolean isDeviceSecure(@NonNull final Context context) {
+        return ((KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE)).isKeyguardSecure();
     }
 }

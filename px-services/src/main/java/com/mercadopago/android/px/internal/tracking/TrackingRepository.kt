@@ -4,6 +4,8 @@ interface TrackingRepository {
     val sessionId: String
     val flowId: String
     val flowDetail: Map<String, Any>
+    val deviceSecured: Boolean
+    val securityEnabled: Boolean
 
     fun configure(model: Model)
     fun reset()
