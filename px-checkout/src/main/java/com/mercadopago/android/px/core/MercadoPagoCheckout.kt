@@ -25,6 +25,8 @@ class MercadoPagoCheckout internal constructor(builder: Builder) {
     val checkoutPreference: CheckoutPreference?
     val trackingConfiguration: TrackingConfiguration
     val privateKey: String
+    val acceptThirdPartyCard: Boolean = true
+    val activateCard: Boolean = false
 
     internal var prefetch: PrefetchService? = null
 
