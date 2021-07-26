@@ -1,24 +1,23 @@
 package com.mercadopago.android.px.internal.datasource
 
-import com.mercadopago.android.px.addons.ESCManagerBehaviour
-import com.mercadopago.android.px.configuration.AdvancedConfiguration
-import com.mercadopago.android.px.configuration.DiscountParamsConfiguration
+import com.mercadopago.android.px.CallbackTest
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
-import com.mercadopago.android.px.internal.features.FeatureProvider
+import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.services.CheckoutService
-import com.mercadopago.android.px.internal.tracking.TrackingRepository
+import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
-import com.mercadopago.android.px.model.CardMetadata
 import com.mercadopago.android.px.model.PaymentTypes
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule.Companion.createChargeFreeRule
 import com.mercadopago.android.px.model.exceptions.ApiException
-import com.mercadopago.android.px.model.internal.*
+import com.mercadopago.android.px.model.exceptions.MercadoPagoError
+import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import junit.framework.Assert.assertTrue
@@ -28,18 +27,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.Spy
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.*
-import retrofit2.Response
 import java.math.BigDecimal
 import java.util.*
+import retrofit2.Response as RetrofitResponse
 
 @RunWith(MockitoJUnitRunner::class)
 class CheckoutRepositoryImplTest {
 
-    @Spy
     private lateinit var checkoutRepository: CheckoutRepository
 
     @Mock
@@ -55,13 +52,7 @@ class CheckoutRepositoryImplTest {
     private lateinit var disabledPaymentMethodRepository: DisabledPaymentMethodRepository
 
     @Mock
-    private lateinit var escManagerBehaviour: ESCManagerBehaviour
-
-    @Mock
     private lateinit var networkApi: NetworkApi
-
-    @Mock
-    private lateinit var trackingRepository: TrackingRepository
 
     @Mock
     private lateinit var tracker: MPTracker
@@ -88,64 +79,41 @@ class CheckoutRepositoryImplTest {
     private lateinit var discountRepository: DiscountRepository
 
     @Mock
-    private lateinit var featureProvider: FeatureProvider
-
-    @Mock
     private lateinit var splitPaymentProcessor: SplitPaymentProcessor
-
-    @Mock
-    private lateinit var cardOneTapItem: OneTapItem
-
-    @Mock
-    private lateinit var accountMoneyOneTapItem: OneTapItem
 
     @Mock
     private lateinit var checkoutResponse: CheckoutResponse
 
-    private val accountMoneyCustomOptionId = "account_money"
+    @Mock
+    private lateinit var initRequestBodyMapper: InitRequestBodyMapper
+
+    @Mock
+    private lateinit var oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
+
+    @Mock
+    private lateinit var success: CallbackTest<CheckoutResponse>
+
+    @Mock
+    private lateinit var failure: CallbackTest<MercadoPagoError>
 
     @Before
     fun setUp() {
-        whenever(paymentSettingRepository.publicKey).thenReturn("987654321")
         whenever(paymentSettingRepository.checkoutPreferenceId).thenReturn("123456789")
-        whenever(paymentSettingRepository.checkoutPreference).thenReturn(
-            Mockito.mock(
-                CheckoutPreference::class.java
-            )
-        )
 
         val chargeRules = ArrayList<PaymentTypeChargeRule>()
         chargeRules.add(PaymentTypeChargeRule(PaymentTypes.DIGITAL_CURRENCY, BigDecimal.TEN))
         chargeRules.add(createChargeFreeRule(PaymentTypes.ACCOUNT_MONEY, "account money"))
-
-        val label: Set<String> = emptySet<String>()
-        val para = emptyMap<String, String>()
-        val advancedConfiguration = AdvancedConfiguration.Builder()
-            .setDiscountParamsConfiguration(
-                DiscountParamsConfiguration.Builder()
-                    .setProductId("")
-                    .addAdditionalParams(para)
-                    .setLabels(label).build()
-            )
-            .build()
 
         paymentConfiguration = PaymentConfiguration.Builder(
             splitPaymentProcessor
         ).addChargeRules(chargeRules)
             .build()
 
-        whenever(paymentSettingRepository.paymentConfiguration).thenReturn(paymentConfiguration)
-        whenever(paymentSettingRepository.advancedConfiguration).thenReturn(advancedConfiguration)
-
-        whenever(featureProvider.availableFeatures).thenReturn(CheckoutFeatures.Builder().build())
-
         checkoutRepository = CheckoutRepositoryImpl(
             paymentSettingRepository,
             experimentsRepository,
             disabledPaymentMethodRepository,
-            escManagerBehaviour,
             networkApi,
-            trackingRepository,
             tracker,
             payerPaymentMethodRepository,
             oneTapItemRepository,
@@ -154,7 +122,8 @@ class CheckoutRepositoryImplTest {
             payerComplianceRepository,
             amountConfigurationRepository,
             discountRepository,
-            featureProvider
+            initRequestBodyMapper,
+            oneTapItemToDisabledPaymentMethodMapper
         )
     }
 
@@ -164,10 +133,11 @@ class CheckoutRepositoryImplTest {
             val checkoutResponse = CheckoutResponseStub.FULL.get()
             val apiResponse = ApiResponse.Success(checkoutResponse)
             val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
             whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
-            assertTrue(ReflectionEquals(apiResponse).matches(response))
+            val expectedResult = Response.Success(apiResponse.result)
+            assertTrue(ReflectionEquals(expectedResult).matches(response))
         }
     }
 
@@ -179,10 +149,12 @@ class CheckoutRepositoryImplTest {
         runBlocking {
             val apiResponse = ApiResponse.Failure(apiException)
             val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
             whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
-            val response = checkoutRepository.checkout()
-            assertTrue(ReflectionEquals(apiResponse).matches(response))
+            val response = checkoutRepository.checkout() as Response.Failure
+            val expectedResult =
+                Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
+            assertTrue(ReflectionEquals(expectedResult.exception).matches(response.exception))
         }
     }
 
@@ -192,10 +164,11 @@ class CheckoutRepositoryImplTest {
             val checkoutResponse = CheckoutResponseStub.FULL.get()
             val apiResponse = ApiResponse.Success(checkoutResponse)
             val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
             whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
-            assertTrue(ReflectionEquals(apiResponse).matches(response))
+            val expectedResult = Response.Success(apiResponse.result)
+            assertTrue(ReflectionEquals(expectedResult).matches(response))
         }
     }
 
@@ -207,11 +180,12 @@ class CheckoutRepositoryImplTest {
         runBlocking {
             val apiResponse = ApiResponse.Failure(apiException)
             val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> Response<CheckoutResponse>>()
+                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
             whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
-            val response = checkoutRepository.checkout()
-            assertTrue(ReflectionEquals(apiResponse).matches(response))
-
+            val response = checkoutRepository.checkout() as Response.Failure
+            val expectedResult =
+                Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
+            assertTrue(ReflectionEquals(expectedResult.exception).matches(response.exception))
         }
     }
 
@@ -260,39 +234,111 @@ class CheckoutRepositoryImplTest {
     }
 
     @Test
-    fun testSortByPrioritizedCardId() {
-        val accountMoneyPaymentMethod: Application.PaymentMethod = mock {
-            on { id }.thenReturn(accountMoneyCustomOptionId)
-            on { type }.thenReturn(accountMoneyCustomOptionId)
+    fun whenApiResponseHaveCardWithRetryAndOnSecondCallNoRetryNeededThenItShouldRetryAndReturnSuccess() {
+        val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
+        val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
+        val cardFoundWithRetryId = checkoutResponse.oneTapItems.first().card.id
+        val captor =
+            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+        val response = runBlocking {
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+                ApiResponse.Success(retryCheckoutResponse),
+                ApiResponse.Success(checkoutResponse)
+            )
+            checkoutRepository.checkoutWithNewCard(cardFoundWithRetryId)
         }
-
-        val accountMoneyApplication: Application = mock {
-            on { this.paymentMethod }.thenReturn(accountMoneyPaymentMethod)
-        }
-
-        whenever(accountMoneyOneTapItem.getApplications()).thenReturn(listOf(accountMoneyApplication))
-
-        val card: CardMetadata = mock {
-            on { id }.thenReturn("master")
-        }
-
-        val disablePaymentMethod: DisabledPaymentMethod = mock()
-
-        whenever(disabledPaymentMethodRepository.value).thenReturn(mutableMapOf(
-            PayerPaymentMethodKey("master", "credit_card") to disablePaymentMethod
-        ))
-
-        val disableItem: OneTapItem = mock {
-            on { isCard }.thenReturn(true)
-            on { this.card }.thenReturn(card)
-        }
-
-        val actual = mutableListOf(accountMoneyOneTapItem, cardOneTapItem, disableItem)
-
         runBlocking {
-            checkoutRepository.sortByPrioritizedCardId(actual, card.id)
-            assertTrue(actual.first().card.id == card.id)
+            verify(networkApi, times(2)).apiCallForResponse(any(), captor.capture())
+        }
+        assertTrue(response is Response.Success)
+        with(response as Response.Success) {
+            assertTrue(ReflectionEquals(checkoutResponse).matches(this.result))
         }
     }
+
+    @Test
+    fun whenApiResponseHaveCardWithRetryAndOnSubsequentCallsApiFailsItShouldReturnSuccessWithCheckoutResponse() {
+        val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
+        val cardFoundWithRetryId = retryCheckoutResponse.oneTapItems.first().card.id
+        val exMsg = "Test exception msg"
+        val captor =
+            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+        runBlocking {
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+                ApiResponse.Success(retryCheckoutResponse),
+                ApiResponse.Failure(ApiException().apply { message = exMsg })
+            )
+        }
+        val response = runBlocking {
+            checkoutRepository.checkoutWithNewCard(cardFoundWithRetryId)
+        }
+
+        runBlocking {
+            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+        }
+        assertTrue(response is Response.Success)
+        with(response as Response.Success) {
+            assertTrue(ReflectionEquals(retryCheckoutResponse).matches(this.result))
+        }
+    }
+
+    @Test
+    fun whenApiResponseFailsMaxTimesAndThenSuccessButCardNotFoundItShouldReturnFailureCardNotFound() {
+        val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
+        val cardId = "123"
+        val exMsg = "Test exception msg"
+        val captor =
+            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+        runBlocking {
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+                ApiResponse.Failure(ApiException().apply { message = exMsg }),
+                ApiResponse.Failure(ApiException().apply { message = exMsg }),
+                ApiResponse.Failure(ApiException().apply { message = exMsg }),
+                ApiResponse.Success(checkoutResponse)
+            )
+        }
+        val response = runBlocking {
+            checkoutRepository.checkoutWithNewCard(cardId)
+        }
+
+        val expectedResult = Response.Failure(
+            MercadoPagoError(
+                ApiException().apply { message = "Card not found" },
+                ApiUtil.RequestOrigin.POST_INIT
+            )
+        )
+
+        runBlocking {
+            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+        }
+        assertTrue(response is Response.Failure)
+        with(response as Response.Failure) {
+            assertTrue(ReflectionEquals(expectedResult.exception.apiException).matches(this.exception.apiException))
+            assertTrue(expectedResult.exception.requestOrigin == this.exception.requestOrigin)
+        }
+    }
+
+    @Test
+    fun whenApiResponseDoesNotHaveCardThenItShouldRetryAndReturnRecoverableMPError() {
+        val captor =
+            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+        val result = runBlocking {
+            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+                ApiResponse.Success(CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get())
+            )
+            checkoutRepository.checkoutWithNewCard("123")
+        }
+        runBlocking {
+            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+        }
+        verifyNoMoreInteractions(networkApi)
+        assertTrue(result is Response.Failure)
+        with(result as Response.Failure) {
+            assertTrue(this.exception.apiException.message.contains("Card not found")
+                && this.exception.isRecoverable)
+        }
+    }
+
+    
 }
 

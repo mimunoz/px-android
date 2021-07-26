@@ -2,7 +2,10 @@ package com.mercadopago.android.px.internal.di
 
 import android.content.Context
 import com.mercadopago.android.px.R
+import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
+import com.mercadopago.android.px.internal.features.FeatureProvider
+import com.mercadopago.android.px.internal.features.FeatureProviderImpl
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.instruction.mapper.*
@@ -98,6 +101,24 @@ internal object MapperProvider {
             getAmountDescriptorMapper()
         )
     }
+
+    val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
+        get() = OneTapItemToDisabledPaymentMethodMapper()
+
+    val initRequestBodyMapper: InitRequestBodyMapper
+        get() {
+            val session = Session.getInstance()
+            val featureProvider: FeatureProvider =
+                FeatureProviderImpl(
+                    session.configurationModule.paymentSettings,
+                    BehaviourProvider.getTokenDeviceBehaviour()
+                )
+            return InitRequestBodyMapper(
+                session.mercadoPagoESC,
+                featureProvider,
+                session.configurationModule.trackingRepository
+            )
+        }
 
     val paymentResultViewModelMapper: PaymentResultViewModelMapper
         get() {

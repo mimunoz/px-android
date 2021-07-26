@@ -17,13 +17,10 @@ internal class CheckoutUseCase (
 ) : UseCase<Unit, CheckoutResponse>(tracker) {
 
     override suspend fun doExecute(param: Unit): Response<CheckoutResponse, MercadoPagoError> {
-        return when (val apiResponse = checkoutRepository.checkout()) {
-            is ApiResponse.Failure ->
-                Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
-            is ApiResponse.Success -> {
-                checkoutRepository.configure(apiResponse.result)
-                Response.Success(apiResponse.result)
-            }
+        val response = checkoutRepository.checkout()
+        if (response is Response.Success) {
+            checkoutRepository.configure(response.result)
         }
+        return response
     }
 }

@@ -76,6 +76,7 @@ internal class UseCaseModule(
     val checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
         get() {
             val session = Session.getInstance()
-            return CheckoutWithNewCardUseCase(session.checkoutRepository, session.tracker)
+            return CheckoutWithNewCardUseCase(session.checkoutRepository, session.tracker,
+                oneTapItemRepository = session.oneTapItemRepository)
         }
 }

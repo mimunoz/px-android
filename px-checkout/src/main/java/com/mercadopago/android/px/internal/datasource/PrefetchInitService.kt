@@ -1,14 +1,11 @@
 package com.mercadopago.android.px.internal.datasource
 
-import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.callbacks.Response
-import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.services.CheckoutService
-import com.mercadopago.android.px.internal.tracking.TrackingRepository
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.InitRequestBody
@@ -16,13 +13,11 @@ import com.mercadopago.android.px.model.internal.InitRequestBody
 internal class PrefetchInitService(
     private val checkout: MercadoPagoCheckout,
     private val networkApi: NetworkApi,
-    private val escManagerBehaviour: ESCManagerBehaviour,
-    private val trackingRepository: TrackingRepository,
-    private val featureProvider: FeatureProvider
+    private val initRequestBodyMapper: InitRequestBodyMapper
 ) {
 
     suspend fun get(): Response<CheckoutResponse, ApiException> {
-        val body = InitRequestBodyMapper(escManagerBehaviour, featureProvider, trackingRepository).map(checkout)
+        val body = initRequestBodyMapper.map(checkout)
 
         return when (val apiResponse = getApiResponse(body)) {
             is ApiResponse.Success -> Response.Success(apiResponse.result)
@@ -30,7 +25,7 @@ internal class PrefetchInitService(
         }
     }
 
-    private suspend fun getApiResponse(body: InitRequestBody): ApiResponse<CheckoutResponse, ApiException> {
+    private suspend fun getApiResponse(body: InitRequestBody): ApiResponseCallback<CheckoutResponse> {
         val preferenceId = checkout.preferenceId
         val privateKey = checkout.privateKey
         return networkApi.apiCallForResponse(CheckoutService::class.java) {

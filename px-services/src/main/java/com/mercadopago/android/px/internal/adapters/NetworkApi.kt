@@ -53,19 +53,20 @@ class NetworkApi(
     ): ApiResponseCallback<D> {
         var currAttempt = 1
         var apiResponse = getApiResponse(apiCall, apiServiceClass)
-        while (apiResponse is Failure && currAttempt <= MAX_RETRIES &&
-            apiResponse.exception !is SocketTimeoutApiException
-        ) {
+        while (needRetry(apiResponse, currAttempt)) {
             apiResponse = getApiResponse(apiCall, apiServiceClass)
             currAttempt++
         }
         return apiResponse
     }
 
+    private fun <D : Any> needRetry(apiResponse: ApiResponseCallback<D>, currAttempt: Int) =
+        apiResponse is Failure && currAttempt <= MAX_RETRIES && apiResponse.exception !is SocketTimeoutApiException
+
     private suspend fun <D : Any, T> getApiResponse(
         apiCall: suspend (api: T) -> Response<D>,
         apiServiceClass: Class<T>
-    ): ApiResponse<D, ApiException> {
+    ): ApiResponseCallback<D> {
         return runCatching {
             apiCall(retrofitClient.create(apiServiceClass))
         }.map(::resolveCallBackResponse).getOrElse {

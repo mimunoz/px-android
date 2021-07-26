@@ -1,11 +1,13 @@
 package com.mercadopago.android.px.internal.features.checkout
 
 import com.mercadopago.android.px.TestContextProvider
-import com.mercadopago.android.px.internal.callbacks.ApiResponse
+import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.experiments.Variant
 import com.mercadopago.android.px.internal.repository.*
+import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.BusinessPayment
 import com.mercadopago.android.px.model.Payment
@@ -23,10 +25,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -55,6 +54,9 @@ class CheckoutPresenterTest {
     @Mock
     private lateinit var postPaymentUrlsResponse: PostPaymentUrlsMapper.Response
 
+    @Mock
+    private lateinit var oneTapItemRepository: OneTapItemRepositoryImpl
+
     private lateinit var checkoutUseCase: CheckoutUseCase
     private lateinit var checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
     private lateinit var presenter: CheckoutPresenter
@@ -74,15 +76,17 @@ class CheckoutPresenterTest {
         checkoutUseCase =
             CheckoutUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
         checkoutWithNewCardUseCase =
-            CheckoutWithNewCardUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
+            CheckoutWithNewCardUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider(),
+                oneTapItemRepository)
         presenter = getPresenter()
     }
 
     @Test
     fun whenCheckoutInitializedAndPaymentMethodSearchFailsThenShowError() {
         runBlocking {
-            val apiException = Mockito.mock(ApiException::class.java)
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Failure(apiException))
+            val apiException = ApiException()
+            whenever(checkoutRepository.checkout()).thenReturn(
+                Response.Failure(MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT)))
         }
         presenter.initialize()
         verify(checkoutView).showProgress()
@@ -95,7 +99,7 @@ class CheckoutPresenterTest {
         val checkoutResponse = CheckoutResponseStub.FULL.get()
         runBlocking {
             whenever(checkoutRepository.checkout())
-                .thenReturn(ApiResponse.Success(checkoutResponse))
+                .thenReturn(Response.Success(checkoutResponse))
         }
 
         presenter.initialize()

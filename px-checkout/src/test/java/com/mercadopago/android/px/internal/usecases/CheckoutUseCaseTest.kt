@@ -3,8 +3,10 @@ package com.mercadopago.android.px.internal.usecases
 import com.mercadopago.android.px.CallbackTest
 import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
+import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.repository.CheckoutRepository
+import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
@@ -47,7 +49,7 @@ class CheckoutUseCaseTest {
     fun whenApiReturnsSuccessAndNoCardIdProvidedThenItShouldReturnSuccessWithResponse() {
         val checkoutResponse = CheckoutResponseStub.FULL.get()
         runBlocking {
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Success(checkoutResponse))
+            whenever(checkoutRepository.checkout()).thenReturn(Response.Success(checkoutResponse))
         }
         checkoutUseCase.execute(
             Unit,
@@ -61,7 +63,7 @@ class CheckoutUseCaseTest {
     fun whenApiReturnsSuccessAndNoCardIdProvidedThenItShouldCallCheckoutAndConfigureButNotSort() {
         val checkoutResponse = CheckoutResponseStub.FULL.get()
         runBlocking {
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Success(checkoutResponse))
+            whenever(checkoutRepository.checkout()).thenReturn(Response.Success(checkoutResponse))
         }
         checkoutUseCase.execute(
             Unit,
@@ -80,7 +82,8 @@ class CheckoutUseCaseTest {
         val apiExceptionMsg = "test message"
         val apiException = ApiException().apply { message = apiExceptionMsg }
         runBlocking {
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Failure(apiException))
+            whenever(checkoutRepository.checkout()).thenReturn(
+                Response.Failure(MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT)))
         }
         checkoutUseCase.execute(
             Unit,

@@ -5,7 +5,7 @@ import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
-import com.mercadopago.android.px.internal.callbacks.ApiResponse
+import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
@@ -23,7 +23,6 @@ import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDraw
 import com.mercadopago.android.px.mocks.CurrencyStub
 import com.mercadopago.android.px.mocks.SiteStub
 import com.mercadopago.android.px.model.*
-import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
@@ -155,7 +154,8 @@ class ExpressPaymentPresenterTest {
         val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
         checkoutUseCase = CheckoutUseCase(checkoutRepository, tracker, TestContextProvider())
-        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, TestContextProvider())
+        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, TestContextProvider(),
+            oneTapItemRepository)
         `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())
@@ -200,7 +200,7 @@ class ExpressPaymentPresenterTest {
     @Test
     fun whenFailToRetrieveCheckoutThenShowError() {
         runBlocking {
-            whenever(checkoutRepository.checkout()).thenReturn(ApiResponse.Failure(mock(ApiException::class.java)))
+            whenever(checkoutRepository.checkout()).thenReturn(Response.Failure(mock(MercadoPagoError::class.java)))
         }
         expressPaymentPresenter.handleDeepLink()
         runBlocking{
