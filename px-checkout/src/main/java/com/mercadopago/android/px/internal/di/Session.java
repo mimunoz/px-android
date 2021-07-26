@@ -411,7 +411,7 @@ public final class Session extends ApplicationModule {
     public PrefetchInitService getPrefetchInitService(@NonNull final MercadoPagoCheckout checkout) {
         configIds(checkout);
         return new PrefetchInitService(checkout, networkModule.getNetworkApi(),
-            MapperProvider.INSTANCE.getInitRequestBodyMapper());
+            MapperProvider.INSTANCE.getInitRequestBodyMapper(checkout));
     }
 
     @NonNull
