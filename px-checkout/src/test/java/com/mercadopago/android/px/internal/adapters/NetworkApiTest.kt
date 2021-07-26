@@ -34,41 +34,42 @@ class NetworkApiTest {
     @Mock
     private lateinit var networkApi: NetworkApi
 
+    @Mock
+    private lateinit var testService: TestService
+
     private var contextProvider: CoroutineContextProvider = CoroutineContextProvider()
 
     @Before
     fun setUp() {
+        whenever(retrofitClient.create(ITestService::class.java))
+            .thenReturn(testService)
+        runBlocking {
+            whenever(testService.apiCall(any())).thenCallRealMethod()
+        }
         networkApi = NetworkApi(retrofitClient, connectionHelper, contextProvider)
     }
 
     @Test
-    fun testApiCallForWithPreferenceIdResponseSuccess() {
+    fun testApiCallWithPreferenceIdResponseSuccess() {
+        whenever(connectionHelper.hasConnection()).thenReturn(true)
         runBlocking {
-            val checkoutResponse = CheckoutResponseStub.FULL.get()
-            val apiResponse = ApiResponse.Success(checkoutResponse)
-
-            whenever(connectionHelper.hasConnection()).thenReturn(true)
-            val result = networkApi.apiCallForResponse(CheckoutService::class.java) {
-                Response.success(checkoutResponse)
+            val result = networkApi.apiCallForResponse(ITestService::class.java) {
+                it.apiCall(ITestService.Responses.SUCCESS)
             }
-            assertTrue(ReflectionEquals(apiResponse).matches(result))
+            assertTrue(result is ApiResponse.Success)
         }
     }
 
     @Test
     fun testApiCallForWithPreferenceIdResponseFailure() {
-        val apiExceptionMsg = "No connection"
-        val apiException = ApiException().apply { message = apiExceptionMsg }
-
+        whenever(connectionHelper.hasConnection()).thenReturn(false)
         runBlocking {
-            val apiResponse = ApiResponse.Failure(apiException)
-
-            whenever(connectionHelper.hasConnection()).thenReturn(false)
-            val result = networkApi.apiCallForResponse(CheckoutService::class.java) {
-                Response.success(apiResponse)
-            } as ApiResponse.Failure
-
-            assertTrue(ReflectionEquals(apiResponse.exception).matches(result.exception))
+            val apiResponse = ApiResponse.Failure(ApiException().apply { message = "No connection" })
+            val result = networkApi.apiCallForResponse(ITestService::class.java) {
+                it.apiCall(ITestService.Responses.SUCCESS) // This does not matter because we simulate no connection
+            }
+            assertTrue(result is ApiResponse.Failure)
+            assertTrue(ReflectionEquals(apiResponse.exception).matches((result as ApiResponse.Failure).exception))
         }
     }
 
@@ -77,7 +78,7 @@ class NetworkApiTest {
         whenever(connectionHelper.hasConnection()).thenReturn(true)
         runBlocking {
             val result = networkApi.apiCallForResponse(ITestService::class.java) {
-                Response.error<Any>(400, ResponseBody.create(null, ""))
+                it.apiCall(ITestService.Responses.ERROR)
             }
             assertTrue(result is ApiResponse.Failure)
         }
@@ -109,11 +110,7 @@ class NetworkApiTest {
     @Test
     fun whenApiResponseIsSocketTimeoutThenItShouldNotRetry() {
         whenever(connectionHelper.hasConnection()).thenReturn(true)
-        val testServiceMock = mock<TestService>()
         runBlocking {
-            whenever(retrofitClient.create(ITestService::class.java))
-                .thenReturn(testServiceMock)
-            whenever(testServiceMock.apiCall(ITestService.Responses.SOCKET_EX)).thenCallRealMethod()
             val result = networkApi.apiCallForResponse(ITestService::class.java) {
                 it.apiCall(ITestService.Responses.SOCKET_EX)
             }
@@ -121,25 +118,21 @@ class NetworkApiTest {
             assertTrue((result as ApiResponse.Failure).exception is SocketTimeoutApiException)
         }
         runBlocking {
-            verify(testServiceMock).apiCall(any())
+            verify(testService).apiCall(any())
         }
     }
 
     @Test
     fun whenApiResponseIsOtherExceptionThanSocketTimeoutThenItShouldRetry() {
         whenever(connectionHelper.hasConnection()).thenReturn(true)
-        val testServiceMock = mock<TestService>()
         runBlocking {
-            whenever(retrofitClient.create(ITestService::class.java))
-                .thenReturn(testServiceMock)
-            whenever(testServiceMock.apiCall(ITestService.Responses.GENERIC_EX)).thenCallRealMethod()
             val result = networkApi.apiCallForResponse(ITestService::class.java) {
                 it.apiCall(ITestService.Responses.GENERIC_EX)
             }
             assertTrue(result is ApiResponse.Failure)
         }
         runBlocking {
-            verify(testServiceMock, atLeast(2)).apiCall(any())
+            verify(testService, atLeast(2)).apiCall(any())
         }
     }
 
@@ -147,11 +140,7 @@ class NetworkApiTest {
     fun whenApiResponseIsFailureAndThenSuccessThenItShouldRetryFirstAndThenReturnSuccess() {
         whenever(connectionHelper.hasConnection()).thenReturn(true)
         var apiCallsCounter = 1
-        val testServiceMock = mock<TestService>()
         runBlocking {
-            whenever(retrofitClient.create(ITestService::class.java))
-                .thenReturn(testServiceMock)
-            whenever(testServiceMock.apiCall(any())).thenCallRealMethod()
             val result = networkApi.apiCallForResponse(ITestService::class.java) {
                 if (apiCallsCounter == 1) {
                     apiCallsCounter++
@@ -163,7 +152,7 @@ class NetworkApiTest {
             assertTrue(result is ApiResponse.Success)
         }
         runBlocking {
-            verify(testServiceMock, times(2)).apiCall(any())
+            verify(testService, times(2)).apiCall(any())
         }
     }
 }
