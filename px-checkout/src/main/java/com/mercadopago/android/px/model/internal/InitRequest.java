@@ -9,6 +9,7 @@ import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * DTO that represents init information from checkout.
@@ -43,6 +44,8 @@ public final class InitRequest {
 
     @Nullable private final String flow;
 
+    @NonNull private final List<CardStatusDM> cardsStatus;
+
     /* default */ InitRequest(final Builder builder) {
         publicKey = builder.publicKey;
         cardsWithEsc = builder.cardsWithEsc;
@@ -52,6 +55,7 @@ public final class InitRequest {
         preference = builder.preference;
         preferenceId = builder.preferenceId;
         flow = builder.flow;
+        cardsStatus = builder.cardsStatus;
     }
 
     public static class Builder {
@@ -61,6 +65,7 @@ public final class InitRequest {
         /* default */ @NonNull DiscountParamsConfiguration discountParamsConfiguration =
             new DiscountParamsConfiguration.Builder().build();
         /* default */ @NonNull CheckoutFeatures features = new CheckoutFeatures.Builder().build();
+        /* default */ @NonNull List<CardStatusDM> cardsStatus = new ArrayList<>();
 
         /* default */ @Nullable CheckoutPreference preference;
         /* default */ @Nullable String preferenceId;
@@ -87,6 +92,11 @@ public final class InitRequest {
 
         public Builder setCheckoutFeatures(@NonNull final CheckoutFeatures features) {
             this.features = features;
+            return this;
+        }
+
+        public Builder setCardsStatus(@NonNull final List<CardStatusDM> cardsStatus) {
+            this.cardsStatus = cardsStatus;
             return this;
         }
 

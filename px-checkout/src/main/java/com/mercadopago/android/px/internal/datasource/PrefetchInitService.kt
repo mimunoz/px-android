@@ -1,6 +1,5 @@
 package com.mercadopago.android.px.internal.datasource
 
-import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.callbacks.awaitCallback
@@ -11,11 +10,10 @@ import com.mercadopago.android.px.internal.util.JsonUtil
 import com.mercadopago.android.px.model.exceptions.ApiException
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 import com.mercadopago.android.px.model.internal.InitRequest
-import java.util.*
 
 internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
     private val checkoutService: CheckoutService,
-    private val escManagerBehaviour: ESCManagerBehaviour,
+    private val cardStatusRepository: CardStatusRepository,
     private val trackingRepository: TrackingRepository,
     private val featureProvider: FeatureProvider) {
 
@@ -25,12 +23,12 @@ internal class PrefetchInitService(private val checkout: MercadoPagoCheckout,
         val discountParamsConfiguration = checkout.advancedConfiguration.discountParamsConfiguration
 
         val body = JsonUtil.getMapFromObject(InitRequest.Builder(checkout.publicKey)
-            .setCardWithEsc(ArrayList(escManagerBehaviour.escCardIds))
             .setCharges(paymentConfiguration.charges)
             .setDiscountParamsConfiguration(discountParamsConfiguration)
             .setCheckoutFeatures(featureProvider.availableFeatures)
             .setCheckoutPreference(checkoutPreference)
             .setFlow(trackingRepository.flowId)
+            .setCardsStatus(cardStatusRepository.getCardsStatus())
             .build())
 
         return checkout.preferenceId?.let {

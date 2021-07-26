@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.datasource;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
-import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.configuration.DiscountParamsConfiguration;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
@@ -33,7 +32,6 @@ import com.mercadopago.android.px.model.internal.OneTapItem;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +41,6 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
     private static final int DEFAULT_RETRY_DELAY = 500;
     private static final int LONG_RETRY_DELAY = 5000;
 
-    @NonNull private final ESCManagerBehaviour escManagerBehaviour;
     @NonNull private final CheckoutService checkoutService;
     @NonNull /* default */ final PaymentSettingRepository paymentSettingRepository;
     @NonNull /* default */ final ExperimentsRepository experimentsRepository;
@@ -57,6 +54,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
     @NonNull private final AmountConfigurationRepository amountConfigurationRepository;
     @NonNull private final DiscountRepository discountRepository;
     @NonNull private final TrackingRepository trackingRepository;
+    @NonNull private final CardStatusRepository cardStatusRepository;
     @NonNull private final FeatureProvider featureProvider;
     /* default */ int refreshRetriesAvailable = MAX_REFRESH_RETRIES;
     /* default */ Handler retryHandler;
@@ -64,7 +62,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
     public CheckoutRepositoryImpl(@NonNull final PaymentSettingRepository paymentSettingRepository,
         @NonNull final ExperimentsRepository experimentsRepository,
         @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
-        @NonNull final ESCManagerBehaviour escManagerBehaviour, @NonNull final CheckoutService checkoutService,
+        @NonNull final CheckoutService checkoutService,
         @NonNull final TrackingRepository trackingRepository, @NonNull final MPTracker tracker,
         @NonNull final PayerPaymentMethodRepository payerPaymentMethodRepository,
         @NonNull final OneTapItemRepository oneTapItemRepository,
@@ -73,11 +71,11 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         @NonNull final PayerComplianceRepository payerComplianceRepository,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final DiscountRepository discountRepository,
+        @NonNull final CardStatusRepository cardStatusRepository,
         @NonNull final FeatureProvider featureProvider) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.experimentsRepository = experimentsRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
-        this.escManagerBehaviour = escManagerBehaviour;
         this.checkoutService = checkoutService;
         this.trackingRepository = trackingRepository;
         this.tracker = tracker;
@@ -88,6 +86,7 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
         this.payerComplianceRepository = payerComplianceRepository;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.discountRepository = discountRepository;
+        this.cardStatusRepository = cardStatusRepository;
         this.featureProvider = featureProvider;
     }
 
@@ -173,12 +172,12 @@ public class CheckoutRepositoryImpl implements CheckoutRepository {
 
         final Map<String, Object> body = JsonUtil.getMapFromObject(
             new InitRequest.Builder(paymentSettingRepository.getPublicKey())
-                .setCardWithEsc(new ArrayList<>(escManagerBehaviour.getESCCardIds()))
                 .setCharges(paymentConfiguration.getCharges())
                 .setDiscountParamsConfiguration(discountParamsConfiguration)
                 .setCheckoutFeatures(featureProvider.getAvailableFeatures())
                 .setCheckoutPreference(checkoutPreference)
                 .setFlow(trackingRepository.getFlowId())
+                .setCardsStatus(cardStatusRepository.getCardsStatus())
                 .build());
 
         final String preferenceId = paymentSettingRepository.getCheckoutPreferenceId();
