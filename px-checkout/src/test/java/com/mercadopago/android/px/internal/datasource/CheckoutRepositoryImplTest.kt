@@ -90,12 +90,6 @@ class CheckoutRepositoryImplTest {
     @Mock
     private lateinit var oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
 
-    @Mock
-    private lateinit var success: CallbackTest<CheckoutResponse>
-
-    @Mock
-    private lateinit var failure: CallbackTest<MercadoPagoError>
-
     @Before
     fun setUp() {
         whenever(paymentSettingRepository.checkoutPreferenceId).thenReturn("123456789")
@@ -132,9 +126,12 @@ class CheckoutRepositoryImplTest {
         runBlocking {
             val checkoutResponse = CheckoutResponseStub.FULL.get()
             val apiResponse = ApiResponse.Success(checkoutResponse)
-            val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
             val expectedResult = Response.Success(apiResponse.result)
             assertTrue(ReflectionEquals(expectedResult).matches(response))
@@ -148,9 +145,11 @@ class CheckoutRepositoryImplTest {
 
         runBlocking {
             val apiResponse = ApiResponse.Failure(apiException)
-            val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(apiResponse)
             val response = checkoutRepository.checkout() as Response.Failure
             val expectedResult =
                 Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
@@ -163,9 +162,11 @@ class CheckoutRepositoryImplTest {
         runBlocking {
             val checkoutResponse = CheckoutResponseStub.FULL.get()
             val apiResponse = ApiResponse.Success(checkoutResponse)
-            val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(apiResponse)
             val response = checkoutRepository.checkout()
             val expectedResult = Response.Success(apiResponse.result)
             assertTrue(ReflectionEquals(expectedResult).matches(response))
@@ -179,9 +180,11 @@ class CheckoutRepositoryImplTest {
 
         runBlocking {
             val apiResponse = ApiResponse.Failure(apiException)
-            val captor =
-                argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(apiResponse)
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(apiResponse)
             val response = checkoutRepository.checkout() as Response.Failure
             val expectedResult =
                 Response.Failure(MercadoPagoError(apiResponse.exception, ApiUtil.RequestOrigin.POST_INIT))
@@ -238,17 +241,21 @@ class CheckoutRepositoryImplTest {
         val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
         val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
         val cardFoundWithRetryId = checkoutResponse.oneTapItems.first().card.id
-        val captor =
-            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+
         val response = runBlocking {
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
-                ApiResponse.Success(retryCheckoutResponse),
-                ApiResponse.Success(checkoutResponse)
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(
+                ApiResponse.Success(retryCheckoutResponse), ApiResponse.Success(checkoutResponse)
             )
             checkoutRepository.checkoutWithNewCard(cardFoundWithRetryId)
         }
         runBlocking {
-            verify(networkApi, times(2)).apiCallForResponse(any(), captor.capture())
+            verify(networkApi, times(2)).apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+            )
         }
         assertTrue(response is Response.Success)
         with(response as Response.Success) {
@@ -261,20 +268,23 @@ class CheckoutRepositoryImplTest {
         val retryCheckoutResponse = CheckoutResponseStub.ONE_TAP_CREDIT_CARD_WITH_RETRY.get()
         val cardFoundWithRetryId = retryCheckoutResponse.oneTapItems.first().card.id
         val exMsg = "Test exception msg"
-        val captor =
-            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-        runBlocking {
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+
+        val response = runBlocking {
+            whenever(
+                networkApi.apiCallForResponse(
+                    any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+                )
+            ).thenReturn(
                 ApiResponse.Success(retryCheckoutResponse),
                 ApiResponse.Failure(ApiException().apply { message = exMsg })
             )
-        }
-        val response = runBlocking {
             checkoutRepository.checkoutWithNewCard(cardFoundWithRetryId)
         }
 
         runBlocking {
-            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+            verify(networkApi, atLeast(2)).apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+            )
         }
         assertTrue(response is Response.Success)
         with(response as Response.Success) {
@@ -287,17 +297,16 @@ class CheckoutRepositoryImplTest {
         val checkoutResponse = CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get()
         val cardId = "123"
         val exMsg = "Test exception msg"
-        val captor =
-            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
-        runBlocking {
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+
+        val response = runBlocking {
+            whenever(networkApi.apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>())
+            ).thenReturn(
                 ApiResponse.Failure(ApiException().apply { message = exMsg }),
                 ApiResponse.Failure(ApiException().apply { message = exMsg }),
                 ApiResponse.Failure(ApiException().apply { message = exMsg }),
                 ApiResponse.Success(checkoutResponse)
             )
-        }
-        val response = runBlocking {
             checkoutRepository.checkoutWithNewCard(cardId)
         }
 
@@ -309,7 +318,9 @@ class CheckoutRepositoryImplTest {
         )
 
         runBlocking {
-            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+            verify(networkApi, atLeast(2)).apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+            )
         }
         assertTrue(response is Response.Failure)
         with(response as Response.Failure) {
@@ -320,16 +331,18 @@ class CheckoutRepositoryImplTest {
 
     @Test
     fun whenApiResponseDoesNotHaveCardThenItShouldRetryAndReturnRecoverableMPError() {
-        val captor =
-            argumentCaptor<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
         val result = runBlocking {
-            whenever(networkApi.apiCallForResponse(any(), captor.capture())).thenReturn(
+            whenever(networkApi.apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>())
+            ).thenReturn(
                 ApiResponse.Success(CheckoutResponseStub.ONE_TAP_VISA_CREDIT_CARD.get())
             )
             checkoutRepository.checkoutWithNewCard("123")
         }
         runBlocking {
-            verify(networkApi, atLeast(2)).apiCallForResponse(any(), captor.capture())
+            verify(networkApi, atLeast(2)).apiCallForResponse(
+                any(), any<suspend (api: CheckoutService) -> RetrofitResponse<CheckoutResponse>>()
+            )
         }
         verifyNoMoreInteractions(networkApi)
         assertTrue(result is Response.Failure)
