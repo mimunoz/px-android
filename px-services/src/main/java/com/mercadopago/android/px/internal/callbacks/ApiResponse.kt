@@ -6,11 +6,4 @@ sealed class ApiResponse<out T, out F> {
 
     fun <T> success(r: T) = Success(r)
     fun <F> failure(f: F) = Failure(f)
-
-    fun resolve(success: (result: T)-> Unit = {}, error: (error: F)-> Unit = {}) {
-        when(this) {
-            is Success -> success(result)
-            is Failure -> error(exception)
-        }
-    }
 }

@@ -1,6 +1,5 @@
 package com.mercadopago.android.px.internal.datasource
 
-import com.mercadopago.android.px.CallbackTest
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi

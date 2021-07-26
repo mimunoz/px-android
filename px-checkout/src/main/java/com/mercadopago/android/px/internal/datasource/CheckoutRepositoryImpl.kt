@@ -4,7 +4,6 @@ import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.extensions.fold
-import com.mercadopago.android.px.internal.extensions.next
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*

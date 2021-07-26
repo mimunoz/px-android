@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.adapters
 
 import com.mercadopago.android.px.ITestService
+import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.TestService
 import com.mercadopago.android.px.internal.base.CoroutineContextProvider
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
@@ -37,7 +38,7 @@ class NetworkApiTest {
     @Mock
     private lateinit var testService: TestService
 
-    private var contextProvider: CoroutineContextProvider = CoroutineContextProvider()
+    private var contextProvider: CoroutineContextProvider = TestContextProvider()
 
     @Before
     fun setUp() {

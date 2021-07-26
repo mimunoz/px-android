@@ -71,7 +71,7 @@ class CheckoutPresenterTest {
                 CheckoutPreference::class.java
             )
         )
-        whenever(postPaymentUrlsMapper.map(argumentCaptor<PostPaymentUrlsMapper.Model>().capture()))
+        whenever(postPaymentUrlsMapper.map(any<PostPaymentUrlsMapper.Model>()))
             .thenReturn(postPaymentUrlsResponse)
         checkoutUseCase =
             CheckoutUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
