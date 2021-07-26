@@ -10,16 +10,18 @@ interface ITestService {
     enum class Responses {
         SOCKET_EX,
         GENERIC_EX,
+        ERROR,
         SUCCESS
     }
     suspend fun apiCall(response: Responses): Response<Any> {
-        when (response) {
+        return when (response) {
             Responses.SOCKET_EX -> throw(SocketTimeoutException())
             Responses.GENERIC_EX -> throw(Exception())
-            Responses.SUCCESS -> return Response.success(
+            Responses.SUCCESS -> Response.success(
                 200,
                 ResponseBody.create(null, "Testing response body")
             )
+            Responses.ERROR -> Response.error<Any>(400, ResponseBody.create(null, ""))
         }
     }
 }
