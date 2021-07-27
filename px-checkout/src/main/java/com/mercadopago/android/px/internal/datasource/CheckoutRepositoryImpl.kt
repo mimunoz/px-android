@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.datasource
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.callbacks.Response
-import com.mercadopago.android.px.internal.extensions.fold
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
 import com.mercadopago.android.px.internal.repository.*
@@ -81,19 +80,19 @@ internal open class CheckoutRepositoryImpl(
     }
 
     override suspend fun checkoutWithNewCard(cardId: String): Response<CheckoutResponse, MercadoPagoError> {
-        var findCardRes = checkoutAndFindCard(cardId)
-        var lastSuccessResponse: Response.Success<CheckoutResponse>? = null
-        findCardRes.response.fold(success = { lastSuccessResponse = Response.Success(it) })
-
-        while (cardNotFoundOrRetryNeeded(findCardRes) && hasRefreshRetriesAvailable()) {
-            --refreshRetriesAvailable
-            delay(findCardRes.retryDelay)
-            findCardRes = checkoutAndFindCard(cardId)
-            findCardRes.response.fold(success = { lastSuccessResponse = Response.Success(it) })
+        var findCardResult = checkoutAndFindCard(cardId)
+        var lastSuccessResponse = findCardResult.response.takeIf { it is Response.Success }
+        while (cardNotFoundOrRetryNeeded(findCardResult) && hasRefreshRetriesAvailable()) {
+            refreshRetriesAvailable--
+            delay(findCardResult.retryDelay)
+            findCardResult = checkoutAndFindCard(cardId)
+            if (findCardResult.response is Response.Success) {
+                lastSuccessResponse = findCardResult.response
+            }
         }
         refreshRetriesAvailable = MAX_REFRESH_RETRIES
 
-        if (findCardRes.response is Response.Success && !findCardRes.cardFound) {
+        if (findCardResult.response is Response.Success && !findCardResult.cardFound) {
             return Response.Failure(
                 MercadoPagoError(
                     ApiException().also { it.message = "Card not found" },
@@ -102,7 +101,7 @@ internal open class CheckoutRepositoryImpl(
             )
         }
 
-        return lastSuccessResponse ?: findCardRes.response
+        return lastSuccessResponse ?: findCardResult.response
     }
 
     private suspend fun checkoutAndFindCard(cardId: String): FindCardResult =

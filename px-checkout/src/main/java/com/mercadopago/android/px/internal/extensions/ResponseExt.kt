@@ -14,16 +14,3 @@ inline fun <T> Response<T, MercadoPagoError>.ifSuccess(
         is Response.Failure -> failure(exception)
     }
 }
-
-fun <T> Response<T, MercadoPagoError>.fold(
-    complete: (Unit) -> Unit = {},
-    success: (value: T) -> Unit = {},
-    error: (error: MercadoPagoError) -> Unit = {}
-) {
-    when (this) {
-        is Response.Success -> {
-            success(result); complete(Unit)
-        }
-        is Response.Failure -> error(exception)
-    }
-}
