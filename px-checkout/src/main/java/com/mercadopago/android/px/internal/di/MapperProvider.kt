@@ -5,7 +5,6 @@ import com.mercadopago.android.px.R
 import com.mercadopago.android.px.addons.BehaviourProvider
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
-import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.features.FeatureProviderImpl
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
@@ -105,11 +104,7 @@ internal object MapperProvider {
 
     fun getInitRequestBodyMapper(checkout: MercadoPagoCheckout): InitRequestBodyMapper {
         val session = Session.getInstance()
-        val featureProvider: FeatureProvider =
-            FeatureProviderImpl(
-                checkout,
-                BehaviourProvider.getTokenDeviceBehaviour()
-            )
+        val featureProvider = FeatureProviderImpl(checkout, BehaviourProvider.getTokenDeviceBehaviour())
         return InitRequestBodyMapper(
             session.mercadoPagoESC,
             featureProvider,
@@ -119,11 +114,10 @@ internal object MapperProvider {
 
     fun getInitRequestBodyMapper(): InitRequestBodyMapper {
         val session = Session.getInstance()
-        val featureProvider: FeatureProvider =
-            FeatureProviderImpl(
-                session.configurationModule.paymentSettings,
-                BehaviourProvider.getTokenDeviceBehaviour()
-            )
+        val featureProvider = FeatureProviderImpl(
+            session.configurationModule.paymentSettings,
+            BehaviourProvider.getTokenDeviceBehaviour()
+        )
         return InitRequestBodyMapper(
             session.mercadoPagoESC,
             featureProvider,

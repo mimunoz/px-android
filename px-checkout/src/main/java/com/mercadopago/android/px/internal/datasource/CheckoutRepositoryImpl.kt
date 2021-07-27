@@ -35,7 +35,6 @@ internal open class CheckoutRepositoryImpl(
     val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
 ) : CheckoutRepository {
 
-    /* default */
     private var refreshRetriesAvailable = MAX_REFRESH_RETRIES
 
     override suspend fun checkout(): ResponseCallback<CheckoutResponse> {
@@ -58,16 +57,6 @@ internal open class CheckoutRepositoryImpl(
             )
             is ApiResponse.Success -> Response.Success(apiResponse.result)
         }
-
-/*
-        return networkApi.apiCallForResponse(CheckoutService::class.java) {
-            if (preferenceId != null) {
-                it.checkout(preferenceId, privateKey, body)
-            } else {
-                it.checkout(privateKey, body)
-            }
-        }
- */
     }
 
     override fun configure(checkoutResponse: CheckoutResponse) {

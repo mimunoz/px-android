@@ -45,8 +45,8 @@ class CheckoutWithNewCardUseCaseTest {
     @Before
     fun setUp() {
         testContextProvider = TestContextProvider()
-        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, testContextProvider,
-            oneTapItemRepository)
+        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker,
+            oneTapItemRepository, testContextProvider)
     }
 
     @Test
@@ -76,8 +76,8 @@ class CheckoutWithNewCardUseCaseTest {
             val newCheckoutWithNewCardUseCase = CheckoutWithNewCardUseCase(
                 checkoutRepository,
                 tracker,
-                TestContextProvider(coroutineContext, coroutineContext),
-                oneTapItemRepository
+                oneTapItemRepository,
+                TestContextProvider(coroutineContext, coroutineContext)
             )
             whenever(checkoutRepository.checkoutWithNewCard("123")).thenReturn(
                 Response.Failure(

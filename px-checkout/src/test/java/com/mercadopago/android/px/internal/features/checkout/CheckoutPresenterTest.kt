@@ -25,7 +25,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 
 
 @RunWith(MockitoJUnitRunner::class)
@@ -76,8 +79,10 @@ class CheckoutPresenterTest {
         checkoutUseCase =
             CheckoutUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
         checkoutWithNewCardUseCase =
-            CheckoutWithNewCardUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider(),
-                oneTapItemRepository)
+            CheckoutWithNewCardUseCase(
+                checkoutRepository, Mockito.mock(MPTracker::class.java),
+                oneTapItemRepository, TestContextProvider()
+            )
         presenter = getPresenter()
     }
 

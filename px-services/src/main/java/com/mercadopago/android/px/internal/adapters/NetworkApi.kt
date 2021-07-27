@@ -75,6 +75,6 @@ class NetworkApi(
     }
 
     companion object {
-        const val MAX_RETRIES = 3
+        private const val MAX_RETRIES = 3
     }
 }
