@@ -181,7 +181,6 @@ public final class Session extends ApplicationModule {
         getModalRepository().reset();
         getAmountConfigurationRepository().reset();
         getDiscountRepository().reset();
-        networkModule.reset();
         useCaseModule = null;
         discountRepository = null;
         amountRepository = null;

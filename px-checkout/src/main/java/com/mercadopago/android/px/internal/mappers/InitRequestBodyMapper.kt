@@ -2,7 +2,6 @@ package com.mercadopago.android.px.internal.mappers
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
-import com.mercadopago.android.px.configuration.DiscountParamsConfiguration
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.features.FeatureProvider
@@ -42,8 +41,8 @@ internal class InitRequestBodyMapper (
 
     private fun map(
         publicKey: String,
-        paymentCfg: PaymentConfiguration,
-        advancedCfg : AdvancedConfiguration,
+        paymentConfiguration: PaymentConfiguration,
+        advancedConfiguration : AdvancedConfiguration,
         checkoutPreferenceId: String?,
         checkoutPreference: CheckoutPreference?
     ): InitRequestBody {
@@ -51,12 +50,12 @@ internal class InitRequestBodyMapper (
         return InitRequestBody(
             publicKey,
             escManagerBehaviour.escCardIds,
-            paymentCfg.charges.map {
+            paymentConfiguration.charges.map {
                 PaymentTypeChargeRuleDM(it.paymentTypeId, it.charge(), it.message)
             },
             DiscountParamsConfigurationDM(
-                advancedCfg.discountParamsConfiguration.labels, advancedCfg.productId,
-                advancedCfg.discountParamsConfiguration.additionalParams
+                advancedConfiguration.discountParamsConfiguration.labels, advancedConfiguration.productId,
+                advancedConfiguration.discountParamsConfiguration.additionalParams
             ),
             CheckoutFeaturesDM(
                 features.express, features.split, features.odrFlag, features.comboCard,

@@ -9,28 +9,11 @@ import retrofit2.Retrofit
 
 class NetworkModule(context: Context) : ApplicationModule(context) {
 
-    private var internalRetrofit: Retrofit? = null
-    val retrofitClient: Retrofit
-        get() {
-            if (internalRetrofit == null) {
-                internalRetrofit = RetrofitUtil.getRetrofitClient(applicationContext)
-            }
-            return internalRetrofit!!
-        }
+    val retrofitClient: Retrofit by lazy {
+        RetrofitUtil.getRetrofitClient(applicationContext)
+    }
 
-    private var _networkApi: NetworkApi? = null
-    val networkApi: NetworkApi
-        get() {
-            if (_networkApi == null) {
-                _networkApi = NetworkApi(
-                    retrofitClient,
-                    ConnectionHelper().also{ it.initialize(applicationContext) })
-            }
-            return _networkApi!!
-        }
-
-    fun reset() {
-        internalRetrofit = null
-        _networkApi = null
+    val networkApi: NetworkApi by lazy {
+        NetworkApi(retrofitClient, ConnectionHelper().also{ it.initialize(applicationContext) })
     }
 }
