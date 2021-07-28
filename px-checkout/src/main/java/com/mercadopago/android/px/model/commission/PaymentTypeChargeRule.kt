@@ -8,14 +8,25 @@ import com.mercadopago.android.px.internal.util.ParcelableUtil
 import java.io.Serializable
 import java.math.BigDecimal
 
-class PaymentTypeChargeRule private constructor(val paymentTypeId: String, private val charge: BigDecimal,
-    val detailModal: DynamicDialogCreator?, val message: String?) : Serializable, Parcelable {
+class PaymentTypeChargeRule private constructor(
+    val paymentTypeId: String, private val charge: BigDecimal,
+    val detailModal: DynamicDialogCreator?, val message: String?, val label: String?
+) : Serializable, Parcelable {
 
     private constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         ParcelableUtil.getBigDecimal(parcel),
         parcel.readParcelable(DynamicDialogCreator::class.java.classLoader),
-        parcel.readString())
+        parcel.readString(),
+        parcel.readString()
+    )
+
+    internal constructor(
+        paymentTypeId: String,
+        charge: BigDecimal,
+        detailModal: DynamicDialogCreator?,
+        label: String?
+    ) : this(paymentTypeId, charge, detailModal, null, label)
 
     /**
      * @param paymentTypeId the payment type associated with the charge to shouldBeTriggered.
@@ -23,8 +34,10 @@ class PaymentTypeChargeRule private constructor(val paymentTypeId: String, priva
      * @param detailModal creator for the dialog with charge info
      */
     @JvmOverloads
-    constructor(paymentTypeId: String, charge: BigDecimal,
-        detailModal: DynamicDialogCreator? = null) : this(paymentTypeId, charge, detailModal, null)
+    constructor(
+        paymentTypeId: String, charge: BigDecimal,
+        detailModal: DynamicDialogCreator? = null
+    ) : this(paymentTypeId, charge, detailModal, null, null)
 
     //Shouldn't really exist
     @Deprecated("")
@@ -39,6 +52,7 @@ class PaymentTypeChargeRule private constructor(val paymentTypeId: String, priva
         ParcelableUtil.write(parcel, charge)
         parcel.writeParcelable(detailModal, flags)
         parcel.writeString(message)
+        parcel.writeString(label)
     }
 
     override fun describeContents() = 0
@@ -52,7 +66,7 @@ class PaymentTypeChargeRule private constructor(val paymentTypeId: String, priva
          */
         @JvmStatic
         fun createChargeFreeRule(paymentTypeId: String, message: String): PaymentTypeChargeRule {
-            return PaymentTypeChargeRule(paymentTypeId, BigDecimal.ZERO, null, message)
+            return PaymentTypeChargeRule(paymentTypeId, BigDecimal.ZERO, null, message, null)
         }
 
         @JvmField

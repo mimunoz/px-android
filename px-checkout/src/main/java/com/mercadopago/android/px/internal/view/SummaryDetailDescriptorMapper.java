@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.view;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.mercadopago.android.px.internal.mappers.AmountDescriptorMapper;
 import com.mercadopago.android.px.internal.mappers.Mapper;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.util.ChargeRuleHelper;
@@ -12,11 +13,10 @@ import com.mercadopago.android.px.internal.viewmodel.IDetailColor;
 import com.mercadopago.android.px.internal.viewmodel.ItemLocalized;
 import com.mercadopago.android.px.internal.viewmodel.SummaryViewDefaultColor;
 import com.mercadopago.android.px.internal.viewmodel.SummaryViewDetailDrawable;
-import com.mercadopago.android.px.internal.mappers.AmountDescriptorMapper;
 import com.mercadopago.android.px.model.AmountConfiguration;
+import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule;
 import com.mercadopago.android.px.model.Currency;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
-import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule;
 import com.mercadopago.android.px.model.DiscountOverview;
 import com.mercadopago.android.px.model.internal.SummaryInfo;
 import java.util.ArrayList;
@@ -62,9 +62,10 @@ public class SummaryDetailDescriptorMapper extends Mapper<
     private void addChargesRow(@NonNull final Model value,
         @NonNull final Collection<AmountDescriptorView.Model> list) {
         final PaymentTypeChargeRule chargeRule = Objects.requireNonNull(value.chargeRule);
-        final AmountDescriptorView.OnClickListener  onClickListener = value.onClickListener;
-        final AmountDescriptorView.Model model = new AmountDescriptorView.Model(new ChargeLocalized(summaryInfo),
-            new AmountLocalized(chargeRule.charge(), currency), new SummaryViewDefaultColor());
+        final AmountDescriptorView.OnClickListener onClickListener = value.onClickListener;
+        final AmountDescriptorView.Model model =
+            new AmountDescriptorView.Model(new ChargeLocalized(chargeRule.getLabel()),
+                new AmountLocalized(chargeRule.charge(), currency), new SummaryViewDefaultColor());
         if (chargeRule.hasDetailModal()) {
             model.setDetailDrawable(new SummaryViewDetailDrawable(), new SummaryViewDefaultColor())
                 .setListener(v -> onClickListener.onChargesAmountDescriptorClicked(chargeRule.getDetailModal()));

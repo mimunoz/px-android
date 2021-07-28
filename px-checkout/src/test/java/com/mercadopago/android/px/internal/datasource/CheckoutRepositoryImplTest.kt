@@ -4,6 +4,7 @@ import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
+import com.mercadopago.android.px.internal.mappers.CustomChargeToPaymentTypeChargeMapper
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
@@ -24,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyList
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
@@ -78,6 +80,9 @@ class CheckoutRepositoryImplTest {
     private lateinit var discountRepository: DiscountRepository
 
     @Mock
+    private lateinit var customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper
+
+    @Mock
     private lateinit var splitPaymentProcessor: SplitPaymentProcessor
 
     @Mock
@@ -115,6 +120,7 @@ class CheckoutRepositoryImplTest {
             payerComplianceRepository,
             amountConfigurationRepository,
             discountRepository,
+            customChargeToPaymentTypeChargeMapper,
             initRequestBodyMapper,
             oneTapItemToDisabledPaymentMethodMapper
         )
@@ -222,6 +228,8 @@ class CheckoutRepositoryImplTest {
             verify(paymentSettingRepository).configure(checkoutResponse.site)
             verify(paymentSettingRepository).configure(checkoutResponse.currency)
             verify(paymentSettingRepository).configure(checkoutResponse.configuration)
+            verify(customChargeToPaymentTypeChargeMapper).map(checkoutResponse.customCharges ?: mapOf())
+            verify(paymentSettingRepository).configure(anyList())
             verify(experimentsRepository).configure(checkoutResponse.experiments)
             verify(payerPaymentMethodRepository).configure(checkoutResponse.payerPaymentMethods)
             verify(oneTapItemRepository).configure(checkoutResponse.oneTapItems)

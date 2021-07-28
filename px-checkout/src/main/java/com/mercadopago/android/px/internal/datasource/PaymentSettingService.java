@@ -146,6 +146,13 @@ public class PaymentSettingService implements PaymentSettingRepository {
     }
 
     @Override
+    public void configure(@NonNull final List<PaymentTypeChargeRule> charges) {
+        paymentConfiguration.getCharges().clear();
+        paymentConfiguration.getCharges().addAll(charges);
+        configure(paymentConfiguration);
+    }
+
+    @Override
     public void configure(@Nullable final CheckoutPreference checkoutPreference) {
         final SharedPreferences.Editor edit = sharedPreferences.edit();
         if (checkoutPreference == null) {
@@ -270,4 +277,5 @@ public class PaymentSettingService implements PaymentSettingRepository {
     public String getPrivateKey() {
         return sharedPreferences.getString(PREF_PRIVATE_KEY, null);
     }
+
 }

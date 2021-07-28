@@ -212,6 +212,7 @@ public final class Session extends ApplicationModule {
                 getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
                 getAmountConfigurationRepository(), getDiscountRepository(),
+                MapperProvider.INSTANCE.getCustomChargeToPaymentTypeChargeMapper(),
                 MapperProvider.INSTANCE.getInitRequestBodyMapper(),
                 MapperProvider.INSTANCE.getOneTapItemToDisabledPaymentMethodMapper()) {
             };

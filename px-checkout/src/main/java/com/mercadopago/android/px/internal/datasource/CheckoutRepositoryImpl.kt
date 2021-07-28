@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
+import com.mercadopago.android.px.internal.mappers.CustomChargeToPaymentTypeChargeMapper
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.mappers.InitRequestBodyMapper
 import com.mercadopago.android.px.internal.mappers.OneTapItemToDisabledPaymentMethodMapper
@@ -30,6 +31,7 @@ internal open class CheckoutRepositoryImpl(
     val payerComplianceRepository: PayerComplianceRepository,
     val amountConfigurationRepository: AmountConfigurationRepository,
     val discountRepository: DiscountRepository,
+    val customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper,
     val initRequestBodyMapper: InitRequestBodyMapper,
     val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
 ) : CheckoutRepository {
@@ -65,6 +67,14 @@ internal open class CheckoutRepositoryImpl(
         paymentSettingRepository.configure(checkoutResponse.site)
         paymentSettingRepository.configure(checkoutResponse.currency)
         paymentSettingRepository.configure(checkoutResponse.configuration)
+
+        // TODO: Remove null check when backend has IDC ready
+        checkoutResponse.customCharges?.let {
+            paymentSettingRepository.configure(
+                customChargeToPaymentTypeChargeMapper.map(it)
+            )
+        }
+
         experimentsRepository.configure(checkoutResponse.experiments)
         payerPaymentMethodRepository.configure(checkoutResponse.payerPaymentMethods)
         oneTapItemRepository.configure(checkoutResponse.oneTapItems)

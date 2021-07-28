@@ -102,6 +102,11 @@ internal object MapperProvider {
         )
     }
 
+    val customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper
+        get() = CustomChargeToPaymentTypeChargeMapper(
+            Session.getInstance().configurationModule.paymentSettings.paymentConfiguration
+        )
+
     fun getInitRequestBodyMapper(checkout: MercadoPagoCheckout): InitRequestBodyMapper {
         val session = Session.getInstance()
         val featureProvider = FeatureProviderImpl(checkout, BehaviourProvider.getTokenDeviceBehaviour())
