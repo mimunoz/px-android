@@ -9,6 +9,8 @@ import com.mercadopago.android.px.model.CardMetadata
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod
 import com.mercadopago.android.px.model.internal.OneTapItem
+import junit.framework.Assert
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -119,6 +121,43 @@ class OneTapItemRepositoryTest {
         expected.forEachIndexed { index, oneTapItem ->
             assertTrue(
                 CustomOptionIdSolver.compare(oneTapItem, CustomOptionIdSolver.defaultCustomOptionId(actual[index])))
+        }
+    }
+
+
+    @Test
+    fun testSortByPrioritizedCardId() {
+        val accountMoneyPaymentMethod: Application.PaymentMethod = mock {
+            on { id }.thenReturn(accountMoneyCustomOptionId)
+            on { type }.thenReturn(accountMoneyCustomOptionId)
+        }
+
+        val accountMoneyApplication: Application = mock {
+            on { this.paymentMethod }.thenReturn(accountMoneyPaymentMethod)
+        }
+
+        whenever(accountMoneyOneTapItem.getApplications()).thenReturn(listOf(accountMoneyApplication))
+
+        val card: CardMetadata = mock {
+            on { id }.thenReturn("master")
+        }
+
+        val disablePaymentMethod: DisabledPaymentMethod = mock()
+
+        whenever(disabledPaymentMethodRepository.value).thenReturn(mutableMapOf(
+            PayerPaymentMethodKey("master", "credit_card") to disablePaymentMethod
+        ))
+
+        val disableItem: OneTapItem = mock {
+            on { isCard }.thenReturn(true)
+            on { this.card }.thenReturn(card)
+        }
+
+        val actual = mutableListOf(accountMoneyOneTapItem, cardOneTapItem, disableItem)
+
+        runBlocking {
+            oneTapItemRepository.sortByPrioritizedCardId(actual, card.id)
+            assertTrue(actual.first().card.id == card.id)
         }
     }
 }
