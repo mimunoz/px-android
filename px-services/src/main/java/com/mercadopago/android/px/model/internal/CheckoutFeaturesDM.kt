@@ -11,6 +11,7 @@ data class CheckoutFeaturesDM(
     val comboCard: Boolean,
     val hybridCard: Boolean,
     val pix: Boolean,
+    val customCharges: Boolean,
     @SerializedName("validations_programs")
     val validationPrograms: List<String>
 )

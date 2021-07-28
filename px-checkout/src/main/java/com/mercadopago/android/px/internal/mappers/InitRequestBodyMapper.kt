@@ -59,7 +59,7 @@ internal class InitRequestBodyMapper (
             ),
             CheckoutFeaturesDM(
                 features.express, features.split, features.odrFlag, features.comboCard,
-                features.hybridCard, features.pix, features.validationPrograms
+                features.hybridCard, features.pix, features.customCharges, features.validationPrograms
             ),
             checkoutPreferenceId,
             checkoutPreference,
