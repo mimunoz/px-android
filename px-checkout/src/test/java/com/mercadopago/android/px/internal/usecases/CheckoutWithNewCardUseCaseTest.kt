@@ -5,7 +5,6 @@ import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
-import com.mercadopago.android.px.internal.repository.OneTapItemRepository
 import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.exceptions.ApiException
@@ -17,9 +16,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
 class CheckoutWithNewCardUseCaseTest {
@@ -36,17 +37,13 @@ class CheckoutWithNewCardUseCaseTest {
     @Mock
     private lateinit var checkoutRepository: CheckoutRepositoryImpl
 
-    @Mock
-    private lateinit var oneTapItemRepository: OneTapItemRepository
-
     private lateinit var testContextProvider: TestContextProvider
     private lateinit var checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
 
     @Before
     fun setUp() {
         testContextProvider = TestContextProvider()
-        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker,
-            oneTapItemRepository, testContextProvider)
+        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, testContextProvider)
     }
 
     @Test
@@ -65,7 +62,6 @@ class CheckoutWithNewCardUseCaseTest {
             verify(checkoutRepository).checkoutWithNewCard(oneTapItem.card.id)
             verify(checkoutRepository).configure(checkoutResponse)
         }
-        verify(oneTapItemRepository).sortByPrioritizedCardId(any(), argThat { this == oneTapItem.card.id })
     }
 
     @Test
@@ -76,7 +72,6 @@ class CheckoutWithNewCardUseCaseTest {
             val newCheckoutWithNewCardUseCase = CheckoutWithNewCardUseCase(
                 checkoutRepository,
                 tracker,
-                oneTapItemRepository,
                 TestContextProvider(coroutineContext, coroutineContext)
             )
             whenever(checkoutRepository.checkoutWithNewCard("123")).thenReturn(

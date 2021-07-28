@@ -15,6 +15,7 @@ interface CheckoutService {
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     suspend fun checkout(
         @Query("access_token") privateKey: String?,
+        @Query("new_card_id") newCardId: String?,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 
@@ -22,6 +23,7 @@ interface CheckoutService {
     suspend fun checkout(
         @Path(value = "preference_id", encoded = true) preferenceId: String,
         @Query("access_token") privateKey: String?,
+        @Query("new_card_id") newCardId: String?,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 

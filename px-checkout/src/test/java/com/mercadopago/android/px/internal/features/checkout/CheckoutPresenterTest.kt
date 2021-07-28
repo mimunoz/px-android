@@ -2,11 +2,14 @@ package com.mercadopago.android.px.internal.features.checkout
 
 import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.Response
-import com.mercadopago.android.px.internal.datasource.OneTapItemRepositoryImpl
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
 import com.mercadopago.android.px.internal.experiments.Variant
-import com.mercadopago.android.px.internal.repository.*
+import com.mercadopago.android.px.internal.repository.CheckoutRepository
+import com.mercadopago.android.px.internal.repository.ExperimentsRepository
+import com.mercadopago.android.px.internal.repository.PaymentRepository
+import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
+import com.mercadopago.android.px.internal.repository.UserSelectionRepository
 import com.mercadopago.android.px.internal.util.ApiUtil
 import com.mercadopago.android.px.mocks.CheckoutResponseStub
 import com.mercadopago.android.px.model.BusinessPayment
@@ -57,9 +60,6 @@ class CheckoutPresenterTest {
     @Mock
     private lateinit var postPaymentUrlsResponse: PostPaymentUrlsMapper.Response
 
-    @Mock
-    private lateinit var oneTapItemRepository: OneTapItemRepositoryImpl
-
     private lateinit var checkoutUseCase: CheckoutUseCase
     private lateinit var checkoutWithNewCardUseCase: CheckoutWithNewCardUseCase
     private lateinit var presenter: CheckoutPresenter
@@ -80,8 +80,7 @@ class CheckoutPresenterTest {
             CheckoutUseCase(checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider())
         checkoutWithNewCardUseCase =
             CheckoutWithNewCardUseCase(
-                checkoutRepository, Mockito.mock(MPTracker::class.java),
-                oneTapItemRepository, TestContextProvider()
+                checkoutRepository, Mockito.mock(MPTracker::class.java), TestContextProvider()
             )
         presenter = getPresenter()
     }
