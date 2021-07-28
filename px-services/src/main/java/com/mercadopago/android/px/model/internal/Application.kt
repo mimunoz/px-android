@@ -15,8 +15,11 @@ data class Application(
 
     data class ValidationProgram(
         val id: String,
-        val mandatory: Boolean
-    )
+        val mandatory: Boolean,
+        val status: Status) {
+
+        data class Status(val enabled: Boolean, val reason: String)
+    }
 
     enum class KnownValidationProgram(val value: String) {
         STP("stp"),

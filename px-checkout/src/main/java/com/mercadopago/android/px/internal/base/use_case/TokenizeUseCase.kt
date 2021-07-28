@@ -23,7 +23,13 @@ internal class TokenizeUseCase(
 
     override suspend fun doExecute(param: TokenizeParams) = run {
         param.paymentRecovery.runIfNotNull {
-            CVVRecoveryWrapper(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase, it, tracker).recoverWithCVV(param.securityCode)
+            CVVRecoveryWrapper(
+                cardTokenRepository,
+                escManagerBehaviour,
+                tokenizeWithCvvUseCase,
+                it,
+                tracker
+            ).recoverWithCVV(param.securityCode)
         } ?: notNull(param.card).let {
             TokenCreationWrapper
                 .Builder(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase)

@@ -13,6 +13,8 @@ import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.AmountConfigurationRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.AmountService;
 import com.mercadopago.android.px.internal.datasource.CardHolderAuthenticatorRepositoryImpl;
+import com.mercadopago.android.px.internal.datasource.CardStatusRepository;
+import com.mercadopago.android.px.internal.datasource.CardStatusRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.CardTokenService;
 import com.mercadopago.android.px.internal.datasource.CheckoutRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.ConfigurationSolver;
@@ -91,7 +93,8 @@ public final class Session extends ApplicationModule {
     private PaymentMethodRepository paymentMethodRepository;
     private ModalRepository modalRepository;
     private ConfigurationSolver configurationSolver;
-    private CardHolderAuthenticatorRepositoryImpl cardHolderAuthenticatorRepository;
+    private CardHolderAuthenticatorRepository cardHolderAuthenticatorRepository;
+    private CardStatusRepository cardStatusRepository;
     private UseCaseModule useCaseModule;
     private CustomOptionIdSolver customOptionIdSolver;
     private AudioPlayer audioPlayer;
@@ -212,13 +215,14 @@ public final class Session extends ApplicationModule {
             final FeatureProvider featureProvider =
                 new FeatureProviderImpl(paymentSettings, BehaviourProvider.getTokenDeviceBehaviour());
             checkoutRepository = new CheckoutRepositoryImpl(paymentSettings, getExperimentsRepository(),
-                configurationModule.getDisabledPaymentMethodRepository(), getMercadoPagoESC(),
+                configurationModule.getDisabledPaymentMethodRepository(),
                 networkModule.getRetrofitClient().create(CheckoutService.class),
                 configurationModule.getTrackingRepository(), getTracker(),
                 getPayerPaymentMethodRepository(), getOneTapItemRepository(),
                 getPaymentMethodRepository(),
                 getModalRepository(), getConfigurationModule().getPayerComplianceRepository(),
-                getAmountConfigurationRepository(), getDiscountRepository(), featureProvider) {
+                getAmountConfigurationRepository(), getDiscountRepository(), getCardStatusRepository(),
+                featureProvider) {
             };
         }
         return checkoutRepository;
@@ -419,7 +423,7 @@ public final class Session extends ApplicationModule {
         final FeatureProvider featureProvider =
             new FeatureProviderImpl(checkout, BehaviourProvider.getTokenDeviceBehaviour());
         return new PrefetchInitService(checkout, networkModule.getRetrofitClient().create(CheckoutService.class),
-            getMercadoPagoESC(), configurationModule.getTrackingRepository(), featureProvider);
+            getCardStatusRepository(), configurationModule.getTrackingRepository(), featureProvider);
     }
 
     @NonNull
@@ -455,6 +459,14 @@ public final class Session extends ApplicationModule {
                 new CardHolderAuthenticatorRepositoryImpl(service, configurationModule.getPaymentSettings());
         }
         return cardHolderAuthenticatorRepository;
+    }
+
+    public CardStatusRepository getCardStatusRepository() {
+        if (cardStatusRepository == null) {
+            cardStatusRepository =
+                new CardStatusRepositoryImpl(getMercadoPagoESC(), BehaviourProvider.getTokenDeviceBehaviour());
+        }
+        return cardStatusRepository;
     }
 
     private void configIds(@NonNull final MercadoPagoCheckout checkout) {
