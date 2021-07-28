@@ -154,8 +154,7 @@ class ExpressPaymentPresenterTest {
         val applicationPaymentMethod = mock(Application.PaymentMethod::class.java)
         val item = mock(Item::class.java)
         checkoutUseCase = CheckoutUseCase(checkoutRepository, tracker, TestContextProvider())
-        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker,
-            oneTapItemRepository, TestContextProvider())
+        checkoutWithNewCardUseCase = CheckoutWithNewCardUseCase(checkoutRepository, tracker, TestContextProvider())
         `when`(application.paymentMethod).thenReturn(Application.PaymentMethod("id", "type"))
         `when`(preference.items).thenReturn(listOf(item))
         `when`(paymentSettingRepository.site).thenReturn(SiteStub.MLA.get())

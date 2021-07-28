@@ -19,46 +19,24 @@ internal typealias ApiResponseCallback<R> = ApiResponse<R, ApiException>
 internal typealias ResponseCallback<R> = Response<R, MercadoPagoError>
 
 internal open class CheckoutRepositoryImpl(
-    val paymentSettingRepository: PaymentSettingRepository,
-    val experimentsRepository: ExperimentsRepository,
-    val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
-    val networkApi: NetworkApi,
-    val tracker: MPTracker,
-    val payerPaymentMethodRepository: PayerPaymentMethodRepository,
-    val oneTapItemRepository: OneTapItemRepository,
-    val paymentMethodRepository: PaymentMethodRepository,
-    val modalRepository: ModalRepository,
-    val payerComplianceRepository: PayerComplianceRepository,
-    val amountConfigurationRepository: AmountConfigurationRepository,
-    val discountRepository: DiscountRepository,
-    val customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper,
-    val initRequestBodyMapper: InitRequestBodyMapper,
-    val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
+    private val paymentSettingRepository: PaymentSettingRepository,
+    private val experimentsRepository: ExperimentsRepository,
+    private val disabledPaymentMethodRepository: DisabledPaymentMethodRepository,
+    private val networkApi: NetworkApi,
+    private val tracker: MPTracker,
+    private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
+    private val oneTapItemRepository: OneTapItemRepository,
+    private val paymentMethodRepository: PaymentMethodRepository,
+    private val modalRepository: ModalRepository,
+    private val payerComplianceRepository: PayerComplianceRepository,
+    private val amountConfigurationRepository: AmountConfigurationRepository,
+    private val discountRepository: DiscountRepository,
+    private val customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper,
+    private val initRequestBodyMapper: InitRequestBodyMapper,
+    private val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
 ) : CheckoutRepository {
 
-    private var refreshRetriesAvailable = MAX_REFRESH_RETRIES
-
-    override suspend fun checkout(): ResponseCallback<CheckoutResponse> {
-        val body = initRequestBodyMapper.map(paymentSettingRepository)
-        val preferenceId = paymentSettingRepository.checkoutPreferenceId
-        val privateKey = paymentSettingRepository.privateKey
-        val apiResponse = networkApi.apiCallForResponse(CheckoutService::class.java) {
-            if (preferenceId != null) {
-                it.checkout(preferenceId, privateKey, body)
-            } else {
-                it.checkout(privateKey, body)
-            }
-        }
-        return when (apiResponse) {
-            is ApiResponse.Failure -> Response.Failure(
-                MercadoPagoError(
-                    apiResponse.exception,
-                    ApiUtil.RequestOrigin.POST_INIT
-                )
-            )
-            is ApiResponse.Success -> Response.Success(apiResponse.result)
-        }
-    }
+    override suspend fun checkout() = doCheckout(null)
 
     override fun configure(checkoutResponse: CheckoutResponse) {
         if (checkoutResponse.preference != null) {
@@ -90,68 +68,68 @@ internal open class CheckoutRepositoryImpl(
     }
 
     override suspend fun checkoutWithNewCard(cardId: String): Response<CheckoutResponse, MercadoPagoError> {
+        var retriesAvailable = MAX_REFRESH_RETRIES
         var findCardResult = checkoutAndFindCard(cardId)
         var lastSuccessResponse = findCardResult.response.takeIf { it is Response.Success }
-        while (cardNotFoundOrRetryNeeded(findCardResult) && hasRefreshRetriesAvailable()) {
-            refreshRetriesAvailable--
-            delay(findCardResult.retryDelay)
+        while (findCardResult.retryNeeded && retriesAvailable > 0) {
+            retriesAvailable--
+            delay(RETRY_DELAY)
             findCardResult = checkoutAndFindCard(cardId)
             if (findCardResult.response is Response.Success) {
                 lastSuccessResponse = findCardResult.response
             }
         }
-        refreshRetriesAvailable = MAX_REFRESH_RETRIES
-
-        if (findCardResult.response is Response.Success && !findCardResult.cardFound) {
-            return Response.Failure(
-                MercadoPagoError(
-                    ApiException().also { it.message = "Card not found" },
-                    ApiUtil.RequestOrigin.POST_INIT
-                )
-            )
-        }
 
         return lastSuccessResponse ?: findCardResult.response
     }
 
-    private suspend fun checkoutAndFindCard(cardId: String): FindCardResult =
-        when (val response = checkout()) {
-            is Response.Success -> findCard(response, cardId)
-            is Response.Failure -> FindCardResult(cardFound = false, retryNeeded = true, response = response)
+    private suspend fun doCheckout(cardId: String?): ResponseCallback<CheckoutResponse> {
+        val body = initRequestBodyMapper.map(paymentSettingRepository)
+        val preferenceId = paymentSettingRepository.checkoutPreferenceId
+        val privateKey = paymentSettingRepository.privateKey
+        val apiResponse = networkApi.apiCallForResponse(CheckoutService::class.java) {
+            if (preferenceId != null) {
+                it.checkout(preferenceId, privateKey, cardId, body)
+            } else {
+                it.checkout(privateKey, cardId, body)
+            }
         }
-
-
-    private fun hasRefreshRetriesAvailable(): Boolean {
-        return refreshRetriesAvailable > 0
+        return when (apiResponse) {
+            is ApiResponse.Failure -> Response.Failure(
+                MercadoPagoError(
+                    apiResponse.exception,
+                    ApiUtil.RequestOrigin.POST_INIT
+                )
+            )
+            is ApiResponse.Success -> Response.Success(apiResponse.result)
+        }
     }
 
-    private fun cardNotFoundOrRetryNeeded(findCardRes: FindCardResult?): Boolean {
-        return (findCardRes == null || !findCardRes.cardFound || findCardRes.retryNeeded)
+    private suspend fun checkoutAndFindCard(cardId: String): FindCardResult {
+        return when (val response = doCheckout(cardId)) {
+            is Response.Success -> findCard(response, cardId)
+            is Response.Failure -> FindCardResult(false, response)
+        }
     }
 
     private fun findCard(response: Response.Success<CheckoutResponse>, cardId: String): FindCardResult {
-        var cardFound = false
         var retryNeeded = false
         for (node in response.result.oneTapItems) {
             if (node.isCard && node.card.id == cardId) {
-                cardFound = true
                 retryNeeded = node.card.retry.isNeeded
                 break
             }
         }
-        return FindCardResult(cardFound, retryNeeded, response = response)
+        return FindCardResult(retryNeeded, response)
     }
 
     private data class FindCardResult(
-        val cardFound: Boolean,
         val retryNeeded: Boolean,
-        val retryDelay: Long = if (retryNeeded) LONG_RETRY_DELAY else DEFAULT_RETRY_DELAY,
         var response: ResponseCallback<CheckoutResponse>
     )
 
     companion object {
         private const val MAX_REFRESH_RETRIES = 3
-        private const val DEFAULT_RETRY_DELAY = 500L
-        private const val LONG_RETRY_DELAY = 5000L
+        private const val RETRY_DELAY = 5000L
     }
 }
