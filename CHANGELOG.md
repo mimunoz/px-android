@@ -1,3 +1,10 @@
+## VERSION 4.85.0
+_28_07_2021_
+* FEATURE - Adds Accept third party card flag.
+* ENHANCEMENT - Process charges in backend.
+* ENHANCEMENT - Removes cardFound retry after associating a card.
+* ENHANCEMENT - Migrates to coroutines in checkout repository.
+
 ## VERSION 4.84.0
 _15_07_2021_
 * FIX - Crash on restoring one tap after a error.
