@@ -2,7 +2,7 @@ package com.mercadopago.android.px.model.internal;
 
 import com.mercadopago.android.px.addons.model.TokenState
 
-internal data class CardStatusDM(val cardId: String, val tokenState: TokenStateDM, val hasEsc: Boolean) {
+data class CardStatusDM(val cardId: String, val tokenState: TokenStateDM, val hasEsc: Boolean) {
     enum class TokenStateDM {
         ENABLED,
         IN_PROGRESS,

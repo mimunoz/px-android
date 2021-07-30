@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.addons.internal
 
 import com.mercadopago.android.px.addons.TokenDeviceBehaviour
-import com.mercadopago.android.px.addons.model.TokenState
 import com.mercadopago.android.px.addons.model.RemotePaymentToken
+import com.mercadopago.android.px.addons.model.TokenState
 import java.math.BigDecimal
 
 internal class TokenDeviceDefaultBehaviour : TokenDeviceBehaviour {

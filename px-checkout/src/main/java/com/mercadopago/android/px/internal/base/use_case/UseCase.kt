@@ -1,13 +1,15 @@
 package com.mercadopago.android.px.internal.base.use_case
 
+import com.mercadopago.android.px.internal.base.CoroutineContextProvider
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.callbacks.Response.Failure
 import com.mercadopago.android.px.internal.extensions.orIfEmpty
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.FrictionEventTracker
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 typealias CallBack<T> = (T) -> Unit
 
@@ -44,11 +46,5 @@ abstract class UseCase<in P, out R>(protected val tracker: MPTracker) {
     suspend fun suspendExecute(param: P) = withContext(contextProvider.Default) {
         runCatching { doExecute(param) }
             .getOrElse { Failure(MercadoPagoError(it.message.orEmpty(), false)) }
-    }
-
-    open class CoroutineContextProvider {
-        open val Default: CoroutineContext by lazy { Dispatchers.Default }
-        open val Main: CoroutineContext by lazy { Dispatchers.Main }
-        open val IO: CoroutineContext by lazy { Dispatchers.IO }
     }
 }

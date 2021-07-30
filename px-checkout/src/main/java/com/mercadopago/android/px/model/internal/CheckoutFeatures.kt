@@ -16,6 +16,7 @@ internal class CheckoutFeatures(builder: Builder) {
     val comboCard: Boolean
     val hybridCard: Boolean
     val pix: Boolean
+    val customCharges: Boolean
 
     @SerializedName("validations_programs")
     val validationPrograms: List<String>
@@ -28,6 +29,7 @@ internal class CheckoutFeatures(builder: Builder) {
         comboCard = builder.comboCard
         hybridCard = builder.hybridCard
         pix = builder.pix
+        customCharges = builder.customCharges
         validationPrograms = builder.validationPrograms
     }
 
@@ -38,6 +40,7 @@ internal class CheckoutFeatures(builder: Builder) {
         var comboCard = false
         var hybridCard = false
         var pix = false
+        var customCharges = false
         var validationPrograms: MutableList<String> = mutableListOf()
 
         fun setSplit(split: Boolean) = apply { this.split = split }
@@ -51,6 +54,8 @@ internal class CheckoutFeatures(builder: Builder) {
         fun setHybridCard(hybridCard: Boolean) = apply { this.hybridCard = hybridCard }
 
         fun setPix(pix: Boolean) = apply { this.pix = pix }
+
+        fun setCustomCharges(customCharges: Boolean) = apply { this.customCharges = customCharges }
 
         fun addValidationPrograms(validationPrograms: List<String>) =
             apply { this.validationPrograms.addAll(validationPrograms) }

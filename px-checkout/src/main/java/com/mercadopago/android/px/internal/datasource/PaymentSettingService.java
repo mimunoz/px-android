@@ -39,6 +39,7 @@ public class PaymentSettingService implements PaymentSettingRepository {
     private static final String PREF_ONE_TAP_ENABLED = "PREF_ONE_TAP_ENABLED";
     private static final String PREF_CUSTOM_STRINGS = "PREF_CUSTOM_STRINGS";
     private static final String PREF_CONFIGURATION = "PREF_CONFIGURATION";
+    private static final String PREF_ACCEPT_THIRD_PARTY_CARD = "PREF_ACCEPT_THIRD_PARTY_CARD";
     private static final String FILE_PAYMENT_CONFIG = "px_payment_config";
 
     @NonNull private final SharedPreferences sharedPreferences;
@@ -107,6 +108,7 @@ public class PaymentSettingService implements PaymentSettingRepository {
         edit.putString(PREF_DISCOUNT_PARAMS,
             JsonUtil.toJson(advancedConfiguration.getDiscountParamsConfiguration().getAdditionalParams()));
         edit.putBoolean(PREF_ONE_TAP_ENABLED, advancedConfiguration.isExpressPaymentEnabled()).apply();
+        edit.putBoolean(PREF_ACCEPT_THIRD_PARTY_CARD, advancedConfiguration.acceptThirdPartyCard());
 
         this.advancedConfiguration = advancedConfiguration;
     }
@@ -143,6 +145,13 @@ public class PaymentSettingService implements PaymentSettingRepository {
     public void configure(@NonNull final PaymentConfiguration paymentConfiguration) {
         this.paymentConfiguration = paymentConfiguration;
         fileManager.writeToFile(paymentConfigFile, paymentConfiguration);
+    }
+
+    @Override
+    public void configure(@NonNull final List<PaymentTypeChargeRule> charges) {
+        paymentConfiguration.getCharges().clear();
+        paymentConfiguration.getCharges().addAll(charges);
+        configure(paymentConfiguration);
     }
 
     @Override
@@ -253,6 +262,7 @@ public class PaymentSettingService implements PaymentSettingRepository {
         if (advancedConfiguration == null) {
             return new AdvancedConfiguration.Builder()
                 .setExpressPaymentEnable(sharedPreferences.getBoolean(PREF_ONE_TAP_ENABLED, false))
+                .setAcceptThirdPartyCard(sharedPreferences.getBoolean(PREF_ACCEPT_THIRD_PARTY_CARD, true))
                 .setDiscountParamsConfiguration(new DiscountParamsConfiguration.Builder()
                     .setProductId(sharedPreferences.getString(PREF_PRODUCT_ID, ""))
                     .addAdditionalParams(
