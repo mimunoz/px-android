@@ -52,6 +52,7 @@ internal class FeatureProviderTest {
         Assert.assertTrue(checkoutFeatures.comboCard)
         Assert.assertTrue(checkoutFeatures.hybridCard)
         Assert.assertTrue(checkoutFeatures.odrFlag)
+        Assert.assertTrue(checkoutFeatures.customCharges)
     }
 
     @Test

@@ -33,6 +33,7 @@ internal class FeatureProviderImpl(
                 .setComboCard(true)
                 .setHybridCard(true)
                 .setPix(true)
+                .setCustomCharges(true)
                 .addValidationProgram(Application.KnownValidationProgram.STP.value)
 
             if (tokenDeviceBehaviour.isFeatureAvailable) {

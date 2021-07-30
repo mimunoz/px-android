@@ -15,6 +15,34 @@ public enum CheckoutResponseStub implements JsonStub<CheckoutResponse> {
         CustomSearchItemStub.values(),
         ExpressMetadataStub.values()),
 
+    ONE_TAP_FULL(SiteStub.MLA,
+        CurrencyStub.MLA,
+        CheckoutPreferenceStub.DEFAULT,
+        PaymentMethodStub.values(),
+        PaymentMethodSearchItemStub.values(),
+        CustomSearchItemStub.values(),
+        new OneTapItemStub[] {
+            OneTapItemStub.ONE_TAP_ACCOUNT_MONEY,
+            OneTapItemStub.ONE_TAP_VISA_CREDIT_CARD,
+            OneTapItemStub.ONE_TAP_MASTER_CREDIT_CARD
+        }),
+
+    ONE_TAP_VISA_CREDIT_CARD(SiteStub.MLA,
+        CurrencyStub.MLA,
+        CheckoutPreferenceStub.DEFAULT,
+        PaymentMethodStub.values(),
+        PaymentMethodSearchItemStub.values(),
+        CustomSearchItemStub.values(),
+        new OneTapItemStub[] { OneTapItemStub.ONE_TAP_VISA_CREDIT_CARD }),
+
+    ONE_TAP_CREDIT_CARD_WITH_RETRY(SiteStub.MLA,
+        CurrencyStub.MLA,
+        CheckoutPreferenceStub.DEFAULT,
+        PaymentMethodStub.values(),
+        PaymentMethodSearchItemStub.values(),
+        CustomSearchItemStub.values(),
+        new OneTapItemStub[] { OneTapItemStub.ONE_TAP_CREDIT_CARD_WITH_RETRY }),
+
     NO_CUSTOM_OPTIONS(SiteStub.MLA,
         CurrencyStub.MLA,
         CheckoutPreferenceStub.DEFAULT,
@@ -100,6 +128,29 @@ public enum CheckoutResponseStub implements JsonStub<CheckoutResponse> {
         ListJsonInjector.injectAll(Arrays.asList(paymentMethodSearchItemStubs).iterator(), jsonContainer);
         ListJsonInjector.injectAll(Arrays.asList(customSearchItemStubs).iterator(), jsonContainer);
         ListJsonInjector.injectAll(Arrays.asList(expressMetadataStubs).iterator(), jsonContainer);
+
+        final String dirtyJson = jsonContainer.toString();
+        json = dirtyJson.replaceAll("%(.*?)%", "");
+    }
+
+    CheckoutResponseStub(@NonNull final SiteStub siteStub,
+        @NonNull final CurrencyStub currencyStub,
+        @NonNull final CheckoutPreferenceStub checkoutPreferenceStub,
+        @NonNull final PaymentMethodStub[] paymentMethodStubs,
+        @NonNull final PaymentMethodSearchItemStub[] paymentMethodSearchItemStubs,
+        @NonNull final CustomSearchItemStub[] customSearchItemStubs,
+        @NonNull final OneTapItemStub[] oneTapItemStubs) {
+
+        final StringBuilder jsonContainer =
+            new StringBuilder(ResourcesUtil.getStringResource("init_response_template.json"));
+
+        siteStub.inject(jsonContainer);
+        currencyStub.inject(jsonContainer);
+        checkoutPreferenceStub.inject(jsonContainer);
+        ListJsonInjector.injectAll(Arrays.asList(paymentMethodStubs).iterator(), jsonContainer);
+        ListJsonInjector.injectAll(Arrays.asList(paymentMethodSearchItemStubs).iterator(), jsonContainer);
+        ListJsonInjector.injectAll(Arrays.asList(customSearchItemStubs).iterator(), jsonContainer);
+        ListJsonInjector.injectAll(Arrays.asList(oneTapItemStubs).iterator(), jsonContainer);
 
         final String dirtyJson = jsonContainer.toString();
         json = dirtyJson.replaceAll("%(.*?)%", "");

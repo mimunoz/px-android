@@ -19,6 +19,8 @@ data class CheckoutResponse(
     val defaultAmountConfiguration: String,
     @SerializedName("coupons")
     val discountsConfigurations: Map<String, DiscountConfigurationModel>,
+    // TODO: Make non-nullable when backend has IDC ready
+    val customCharges: Map<String, CustomChargeDM>? = null, // Maps payment type id to charges
     val preference: CheckoutPreference? = null,
     val experiments: List<Experiment>? = null,
     val payerCompliance: PayerCompliance? = null

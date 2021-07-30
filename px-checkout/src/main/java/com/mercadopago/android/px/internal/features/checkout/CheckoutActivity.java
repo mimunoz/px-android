@@ -112,7 +112,8 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         presenter =
             new CheckoutPresenter(configurationModule.getPaymentSettings(),
                 configurationModule.getUserSelectionRepository(),
-                session.getCheckoutRepository(),
+                session.getUseCaseModule().getCheckoutUseCase(),
+                session.getUseCaseModule().getCheckoutWithNewCardUseCase(),
                 session.getPaymentRepository(),
                 session.getExperimentsRepository(),
                 MapperProvider.INSTANCE.getPostPaymentUrlsMapper(),
@@ -173,7 +174,8 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
 
         return new CheckoutPresenter(configuration,
             configurationModule.getUserSelectionRepository(),
-            session.getCheckoutRepository(),
+            session.getUseCaseModule().getCheckoutUseCase(),
+            session.getUseCaseModule().getCheckoutWithNewCardUseCase(),
             session.getPaymentRepository(),
             session.getExperimentsRepository(),
             MapperProvider.INSTANCE.getPostPaymentUrlsMapper(),

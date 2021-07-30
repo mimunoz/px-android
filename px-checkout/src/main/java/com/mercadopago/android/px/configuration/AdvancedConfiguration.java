@@ -17,6 +17,7 @@ public final class AdvancedConfiguration implements Serializable {
     private final boolean bankDealsEnabled;
     private final boolean expressEnabled;
     private final boolean amountRowEnabled;
+    private final boolean acceptThirdPartyCard;
     @NonNull private final PaymentResultScreenConfiguration paymentResultScreenConfiguration;
     @NonNull private final ReviewAndConfirmConfiguration reviewAndConfirmConfiguration;
     @NonNull private final DynamicFragmentConfiguration dynamicFragmentConfiguration;
@@ -29,6 +30,7 @@ public final class AdvancedConfiguration implements Serializable {
         bankDealsEnabled = builder.bankDealsEnabled;
         expressEnabled = builder.expressEnabled;
         amountRowEnabled = builder.amountRowEnabled;
+        acceptThirdPartyCard = builder.acceptThirdPartyCard;
         paymentResultScreenConfiguration = builder.paymentResultScreenConfiguration;
         reviewAndConfirmConfiguration = builder.reviewAndConfirmConfiguration;
         dynamicFragmentConfiguration = builder.dynamicFragmentConfiguration;
@@ -56,6 +58,10 @@ public final class AdvancedConfiguration implements Serializable {
     @Deprecated
     public boolean isAmountRowEnabled() {
         return amountRowEnabled;
+    }
+
+    public boolean acceptThirdPartyCard() {
+        return acceptThirdPartyCard;
     }
 
     /**
@@ -114,6 +120,7 @@ public final class AdvancedConfiguration implements Serializable {
         /* default */ boolean bankDealsEnabled = true;
         /* default */ boolean expressEnabled = false;
         /* default */ boolean amountRowEnabled = true;
+        /* default */ boolean acceptThirdPartyCard = true;
         /* default */ @NonNull PaymentResultScreenConfiguration paymentResultScreenConfiguration =
             new PaymentResultScreenConfiguration.Builder().build();
         /* default */ @NonNull ReviewAndConfirmConfiguration reviewAndConfirmConfiguration =
@@ -271,6 +278,17 @@ public final class AdvancedConfiguration implements Serializable {
          */
         public Builder setProductId(@NonNull final String productId) {
             this.productId = productId;
+            return this;
+        }
+
+        /**
+         * Set if accept third party cards on new card form.
+         *
+         * @param acceptThirdPartyCard the value
+         * @return builder to keep operating
+         */
+        public Builder setAcceptThirdPartyCard(final boolean acceptThirdPartyCard) {
+            this.acceptThirdPartyCard = acceptThirdPartyCard;
             return this;
         }
 

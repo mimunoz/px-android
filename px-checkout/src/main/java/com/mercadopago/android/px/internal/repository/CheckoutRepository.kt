@@ -1,10 +1,13 @@
 package com.mercadopago.android.px.internal.repository
 
-import com.mercadopago.android.px.internal.callbacks.MPCall
+import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.model.internal.CheckoutResponse
 
+typealias ResponseCallback<D> = Response<D, MercadoPagoError>
+
 interface CheckoutRepository {
-    fun checkout(): MPCall<CheckoutResponse>
-    fun refreshWithNewCard(cardId: String): MPCall<CheckoutResponse>
-    fun lazyConfigure(checkoutResponse: CheckoutResponse)
+    suspend fun checkout(): ResponseCallback<CheckoutResponse>
+    suspend fun checkoutWithNewCard(cardId: String): ResponseCallback<CheckoutResponse>
+    fun configure(checkoutResponse: CheckoutResponse)
 }
