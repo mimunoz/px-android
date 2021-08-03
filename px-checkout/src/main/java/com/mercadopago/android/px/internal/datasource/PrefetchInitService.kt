@@ -30,9 +30,11 @@ internal class PrefetchInitService(
         val privateKey = checkout.privateKey
         return networkApi.apiCallForResponse(CheckoutService::class.java) {
             if (preferenceId != null) {
-                it.checkout(preferenceId, privateKey, null, body)
+//                it.checkout(preferenceId, privateKey, null, body)
+                it.checkout(preferenceId, privateKey, body)
             } else {
-                it.checkout(privateKey, null, body)
+//                it.checkout(privateKey, null, body)
+                it.checkout(privateKey, body)
             }
         }
     }

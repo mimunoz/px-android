@@ -4,6 +4,7 @@ import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
+import com.mercadopago.android.px.internal.extensions.notNull
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
@@ -25,17 +26,19 @@ internal class InitRequestBodyMapper (
             checkout.paymentConfiguration,
             checkout.advancedConfiguration,
             checkout.preferenceId,
-            checkout.checkoutPreference
+            checkout.checkoutPreference,
+            null //todo
         )
     }
 
-    fun map(paymentSettingRepository: PaymentSettingRepository): InitRequestBody {
+    fun map(paymentSettingRepository: PaymentSettingRepository, cardId: String?): InitRequestBody {
         return map(
             paymentSettingRepository.publicKey,
             paymentSettingRepository.paymentConfiguration,
             paymentSettingRepository.advancedConfiguration,
             paymentSettingRepository.checkoutPreferenceId,
-            paymentSettingRepository.checkoutPreference
+            paymentSettingRepository.checkoutPreference,
+            cardId //todo
         )
     }
 
@@ -44,7 +47,8 @@ internal class InitRequestBodyMapper (
         paymentConfiguration: PaymentConfiguration,
         advancedConfiguration : AdvancedConfiguration,
         checkoutPreferenceId: String?,
-        checkoutPreference: CheckoutPreference?
+        checkoutPreference: CheckoutPreference?,
+        cardId: String?
     ): InitRequestBody {
         val features = featureProvider.availableFeatures
         return InitRequestBody(
@@ -63,7 +67,8 @@ internal class InitRequestBodyMapper (
             ),
             checkoutPreferenceId,
             checkoutPreference,
-            trackingRepository.flowId
+            trackingRepository.flowId,
+            cardId
         )
     }
 }
