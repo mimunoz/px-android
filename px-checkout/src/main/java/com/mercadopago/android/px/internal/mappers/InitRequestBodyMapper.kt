@@ -54,7 +54,8 @@ internal class InitRequestBodyMapper (
                 PaymentTypeChargeRuleDM(it.paymentTypeId, it.charge(), it.message)
             },
             DiscountParamsConfigurationDM(
-                advancedConfiguration.discountParamsConfiguration.labels, advancedConfiguration.productId,
+                advancedConfiguration.discountParamsConfiguration.labels,
+                advancedConfiguration.discountParamsConfiguration.productId,
                 advancedConfiguration.discountParamsConfiguration.additionalParams
             ),
             CheckoutFeaturesDM(
