@@ -20,14 +20,14 @@ internal class InitRequestBodyMapper (
     val featureProvider: FeatureProvider,
     val trackingRepository: TrackingRepository
 ) {
-    fun map(checkout: MercadoPagoCheckout): InitRequestBody {
+    fun map(checkout: MercadoPagoCheckout, cardId: String?): InitRequestBody {
         return map(
             checkout.publicKey,
             checkout.paymentConfiguration,
             checkout.advancedConfiguration,
             checkout.preferenceId,
             checkout.checkoutPreference,
-            null //todo
+            cardId
         )
     }
 
@@ -38,7 +38,7 @@ internal class InitRequestBodyMapper (
             paymentSettingRepository.advancedConfiguration,
             paymentSettingRepository.checkoutPreferenceId,
             paymentSettingRepository.checkoutPreference,
-            cardId //todo
+            cardId
         )
     }
 

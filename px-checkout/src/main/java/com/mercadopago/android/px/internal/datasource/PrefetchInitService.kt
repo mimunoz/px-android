@@ -17,7 +17,7 @@ internal class PrefetchInitService(
 ) {
 
     suspend fun get(): Response<CheckoutResponse, ApiException> {
-        val body = initRequestBodyMapper.map(checkout)
+        val body = initRequestBodyMapper.map(checkout, null)
 
         return when (val apiResponse = getApiResponse(body)) {
             is ApiResponse.Success -> Response.Success(apiResponse.result)
@@ -30,10 +30,8 @@ internal class PrefetchInitService(
         val privateKey = checkout.privateKey
         return networkApi.apiCallForResponse(CheckoutService::class.java) {
             if (preferenceId != null) {
-//                it.checkout(preferenceId, privateKey, null, body)
                 it.checkout(preferenceId, privateKey, body)
             } else {
-//                it.checkout(privateKey, null, body)
                 it.checkout(privateKey, body)
             }
         }
