@@ -11,6 +11,7 @@ public final class PXBehaviourConfigurer {
     private FlowBehaviour flowBehaviour;
     private ThreeDSBehaviour threeDSBehaviour;
     private TokenDeviceBehaviour tokenDeviceBehaviour;
+    private AuthenticationBehaviour authenticationBehaviour;
 
     public PXBehaviourConfigurer with(@NonNull final ESCManagerBehaviour escManagerBehaviour) {
         this.escManagerBehaviour = escManagerBehaviour;
@@ -47,6 +48,11 @@ public final class PXBehaviourConfigurer {
         return this;
     }
 
+    public PXBehaviourConfigurer with(@NonNull final AuthenticationBehaviour authenticationBehaviour) {
+        this.authenticationBehaviour = authenticationBehaviour;
+        return this;
+    }
+
     public void configure() {
         BehaviourProvider.set(securityBehaviour);
         BehaviourProvider.set(escManagerBehaviour);
@@ -55,5 +61,6 @@ public final class PXBehaviourConfigurer {
         BehaviourProvider.set(flowBehaviour);
         BehaviourProvider.set(threeDSBehaviour);
         BehaviourProvider.set(tokenDeviceBehaviour);
+        BehaviourProvider.set(authenticationBehaviour);
     }
 }
