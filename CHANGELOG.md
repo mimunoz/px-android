@@ -1,3 +1,8 @@
+## VERSION 4.86.0
+_12_08_2021_
+* FEATURE - Added support for IDC regulation
+* FIX - Fix resource not found exception
+
 ## VERSION 4.85.1
 _02_08_2021_
 * FIX - Sends correct product id on discount params.
