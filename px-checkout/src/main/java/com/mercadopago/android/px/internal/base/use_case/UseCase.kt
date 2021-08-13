@@ -2,6 +2,7 @@ package com.mercadopago.android.px.internal.base.use_case
 
 import com.mercadopago.android.px.internal.base.CoroutineContextProvider
 import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.internal.callbacks.Response.Failure
 import com.mercadopago.android.px.internal.extensions.orIfEmpty
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError
 import com.mercadopago.android.px.tracking.internal.MPTracker
@@ -40,5 +41,10 @@ abstract class UseCase<in P, out R>(protected val tracker: MPTracker) {
                 }
             }
         }
+    }
+
+    suspend fun suspendExecute(param: P) = withContext(contextProvider.Default) {
+        runCatching { doExecute(param) }
+            .getOrElse { Failure(MercadoPagoError(it.message.orEmpty(), false)) }
     }
 }

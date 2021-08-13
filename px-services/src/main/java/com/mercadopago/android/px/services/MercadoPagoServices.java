@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.BehaviourProvider;
+import com.mercadopago.android.px.internal.model.CardTokenBody;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.services.BankDealService;
 import com.mercadopago.android.px.internal.services.CheckoutService;
@@ -121,13 +122,17 @@ public class MercadoPagoServices {
     public void createToken(final SavedCardToken savedCardToken, final Callback<Token> callback) {
         savedCardToken.setDevice(context);
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.createToken(publicKey, privateKey, savedCardToken).enqueue(callback);
+        final CardTokenBody body =
+            new CardTokenBody(savedCardToken.getCardId(), savedCardToken.getDevice(), savedCardToken.getSecurityCode());
+        service.createToken(publicKey, privateKey, body).enqueue(callback);
     }
 
     public void createToken(final SavedESCCardToken savedESCCardToken, final Callback<Token> callback) {
         savedESCCardToken.setDevice(context);
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.createToken(publicKey, privateKey, savedESCCardToken).enqueue(callback);
+        final CardTokenBody body = new CardTokenBody(savedESCCardToken.getCardId(), savedESCCardToken.getDevice(), true,
+            savedESCCardToken.getSecurityCode(), savedESCCardToken.getEsc(), null);
+        service.createToken(publicKey, privateKey, body).enqueue(callback);
     }
 
     public void cloneToken(final String tokenId, final Callback<Token> callback) {

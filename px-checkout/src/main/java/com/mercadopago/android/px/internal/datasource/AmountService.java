@@ -6,9 +6,11 @@ import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.ChargeRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
+import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.model.Discount;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.PayerCost;
+import com.mercadopago.android.px.model.PaymentMethod;
 import java.math.BigDecimal;
 
 public class AmountService implements AmountRepository {
@@ -16,13 +18,16 @@ public class AmountService implements AmountRepository {
     @NonNull private final PaymentSettingRepository paymentSetting;
     @NonNull private final ChargeRepository chargeRepository;
     @NonNull private final DiscountRepository discountRepository;
+    @NonNull private final UserSelectionRepository userSelectionRepository;
 
     public AmountService(@NonNull final PaymentSettingRepository paymentSetting,
         @NonNull final ChargeRepository chargeRepository,
-        @NonNull final DiscountRepository discountRepository) {
+        @NonNull final DiscountRepository discountRepository,
+        @NonNull final UserSelectionRepository userSelectionRepository) {
         this.paymentSetting = paymentSetting;
         this.chargeRepository = chargeRepository;
         this.discountRepository = discountRepository;
+        this.userSelectionRepository = userSelectionRepository;
     }
 
     @Override
@@ -78,6 +83,14 @@ public class AmountService implements AmountRepository {
             return payerCost.getTotalAmount() //Payer cost has discount already applied
                 .add(getDiscountAmount());
         }
+    }
+
+    @NonNull
+    @Override
+    public BigDecimal getCurrentAmountToPay() {
+        final PaymentMethod paymentMethod = userSelectionRepository.getPaymentMethod();
+        final PayerCost payerCost = userSelectionRepository.getPayerCost();
+        return getAmountToPay(paymentMethod.getPaymentTypeId(), payerCost);
     }
 
     @NonNull

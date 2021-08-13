@@ -59,4 +59,13 @@ public interface AmountRepository {
      */
     @NonNull
     BigDecimal getAmountWithoutDiscount(@NonNull String paymentTypeId, @Nullable PayerCost payerCost);
+
+    /**
+     * Final amount value to pay
+     * Discounts, charges and payer costs are involved on this value.
+     *
+     * @return amount to be processed for current user selection
+     */
+    @NonNull
+    BigDecimal getCurrentAmountToPay();
 }

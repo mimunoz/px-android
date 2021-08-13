@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.internal.base.BaseState
 import com.mercadopago.android.px.internal.base.BaseViewModelWithState
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithCvvUseCase
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
@@ -35,6 +36,7 @@ internal class RemediesViewModel(
     private val escManagerBehaviour: ESCManagerBehaviour,
     private val amountConfigurationRepository: AmountConfigurationRepository,
     private val applicationSelectionRepository: ApplicationSelectionRepository,
+    private val tokenizeWithCvvUseCase: TokenizeWithCvvUseCase,
     oneTapItemRepository: OneTapItemRepository,
     fromPayerPaymentMethodToCardMapper: FromPayerPaymentMethodToCardMapper,
     tracker: MPTracker
@@ -120,7 +122,7 @@ internal class RemediesViewModel(
         track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION)))
         remediesModel.retryPayment?.cvvModel?.let {
             CoroutineScope(Dispatchers.IO).launch {
-                val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
+                val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour, tokenizeWithCvvUseCase)
                     .with(card!!).build().createToken(state.cvv)
 
                 withContext(Dispatchers.Main) {
@@ -139,6 +141,7 @@ internal class RemediesViewModel(
             val response = CVVRecoveryWrapper(
                 cardTokenRepository,
                 escManagerBehaviour,
+                tokenizeWithCvvUseCase,
                 state.paymentRecovery,
                 tracker).recoverWithCVV(state.cvv)
 

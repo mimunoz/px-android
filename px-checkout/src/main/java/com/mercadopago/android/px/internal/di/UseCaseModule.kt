@@ -5,9 +5,13 @@ import com.mercadopago.android.px.internal.audio.PlaySoundUseCase
 import com.mercadopago.android.px.internal.base.use_case.TokenizeUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithCvvUseCase
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithEscUseCase
+import com.mercadopago.android.px.internal.base.use_case.TokenizeWithoutCvvUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.DisplayDataUseCase
 import com.mercadopago.android.px.internal.features.security_code.domain.use_case.SecurityTrackModelUseCase
 import com.mercadopago.android.px.internal.features.validation_program.AuthenticateUseCase
+import com.mercadopago.android.px.internal.features.validation_program.TokenDeviceUseCase
 import com.mercadopago.android.px.internal.features.validation_program.ValidationProgramUseCase
 
 internal class UseCaseModule(
@@ -15,15 +19,45 @@ internal class UseCaseModule(
     private val mapperProvider: MapperProvider
 ) {
 
+    private val tokenDeviceUseCase: TokenDeviceUseCase
+        get() {
+            val session = Session.getInstance()
+            return TokenDeviceUseCase(
+                session.amountRepository,
+                BehaviourProvider.getTokenDeviceBehaviour(),
+                configurationModule.applicationSelectionRepository,
+                session.tracker
+            )
+        }
+
+    val tokenizeWithCvvUseCase: TokenizeWithCvvUseCase
+        get() {
+            val session = Session.getInstance()
+            return TokenizeWithCvvUseCase(tokenDeviceUseCase, session.cardTokenRepository, session.tracker)
+        }
+
     val tokenizeUseCase: TokenizeUseCase
         get() {
             val session = Session.getInstance()
             return TokenizeUseCase(
+                tokenizeWithCvvUseCase,
                 session.cardTokenRepository,
                 session.mercadoPagoESC,
                 configurationModule.paymentSettings,
                 session.tracker
             )
+        }
+
+    val tokenizeWithEscUseCase: TokenizeWithEscUseCase
+        get() {
+            val session = Session.getInstance()
+            return TokenizeWithEscUseCase(tokenDeviceUseCase, session.tokenRepository, session.tracker)
+        }
+
+    val tokenizeWithoutCvvUseCase: TokenizeWithoutCvvUseCase
+        get() {
+            val session = Session.getInstance()
+            return TokenizeWithoutCvvUseCase(tokenDeviceUseCase, session.tokenRepository, session.tracker)
         }
 
     val displayDataUseCase: DisplayDataUseCase

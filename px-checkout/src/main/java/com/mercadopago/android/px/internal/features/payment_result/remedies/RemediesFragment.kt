@@ -44,6 +44,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
                 session.amountConfigurationRepository, session.configurationModule.applicationSelectionRepository,
+                session.useCaseModule.tokenizeWithCvvUseCase,
                 session.oneTapItemRepository,
                 MapperProvider.getFromPayerPaymentMethodToCardMapper(),
                 session.tracker

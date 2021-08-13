@@ -27,6 +27,10 @@ public final class SavedESCCardToken extends SavedCardToken {
         setDevice(device);
     }
 
+    public String getEsc() {
+        return esc;
+    }
+
     public static SavedESCCardToken createWithSecurityCode(@NonNull final String cardId,
         @NonNull final String securityCode) {
         return new SavedESCCardToken(cardId, securityCode, "");

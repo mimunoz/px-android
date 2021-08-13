@@ -88,8 +88,12 @@ class ValidationProgramUseCaseTest {
 
     @Test
     fun whenIsSTPValidationProgram() {
+        val status : Application.ValidationProgram.Status = mock {
+            on { enabled }.thenReturn(true)
+        }
         val validationProgram: Application.ValidationProgram = mock {
             on { id }.thenReturn("STP")
+            on { this.status }.thenReturn(status)
         }
         val application: Application = mock {
             on { validationPrograms }.thenReturn(listOf(validationProgram))
