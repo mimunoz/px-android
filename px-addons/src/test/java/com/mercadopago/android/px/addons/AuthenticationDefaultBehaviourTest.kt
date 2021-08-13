@@ -9,7 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class AuthenticationDefaultBehaviourTest {
 
     @Test
-    fun testThreeDSDefaultBehaviour() {
+    fun testAuthenticationDefaultBehaviour() {
         Assert.assertNull(BehaviourProvider.getAuthenticationBehaviour().getDeviceProfileId())
     }
 }
