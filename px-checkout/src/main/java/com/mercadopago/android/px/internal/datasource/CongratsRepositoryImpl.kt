@@ -69,8 +69,7 @@ internal class CongratsRepositoryImpl(
             val campaignId = paymentResult.paymentData.campaign?.id.orEmpty()
             val paymentTypeId = paymentResult.paymentData.paymentMethod.paymentTypeId
             with(paymentSettingRepository) {
-                congratsService.getCongrats(PermissionHelper.instance.isLocationGranted(),
-                    privateKey!!, publicKey, joinedPaymentIds, platform, campaignId,
+                congratsService.getCongrats(PermissionHelper.instance.isLocationGranted(), publicKey, joinedPaymentIds, platform, campaignId,
                     payerComplianceRepository.turnedIFPECompliant(), joinedPaymentMethodsIds, paymentTypeId,
                     trackingRepository.flowId, checkoutPreference?.merchantOrderId, checkoutPreference?.id)
             }
@@ -97,7 +96,6 @@ internal class CongratsRepositoryImpl(
             ).map(paymentData)
             congratsService.getRemedies(
                 payment.id.toString(),
-                paymentSettingRepository.privateKey!!,
                 hasOneTap,
                 body
             )

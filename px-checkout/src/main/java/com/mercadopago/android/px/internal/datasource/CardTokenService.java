@@ -38,7 +38,7 @@ public class CardTokenService implements CardTokenRepository {
     public MPCall<Token> createToken(final SavedCardToken savedCardToken) {
         savedCardToken.setDevice(device);
         return gatewayService
-            .createToken(paymentSettingRepository.getPublicKey(), paymentSettingRepository.getPrivateKey(),
+            .createToken(paymentSettingRepository.getPublicKey(),
                 savedCardToken);
     }
 
@@ -46,14 +46,14 @@ public class CardTokenService implements CardTokenRepository {
     public MPCall<Token> createToken(final SavedESCCardToken savedESCCardToken) {
         savedESCCardToken.setDevice(device);
         return gatewayService
-            .createToken(paymentSettingRepository.getPublicKey(), paymentSettingRepository.getPrivateKey(),
+            .createToken(paymentSettingRepository.getPublicKey(),
                 savedESCCardToken);
     }
 
     @Override
     public MPCall<Token> cloneToken(final String tokenId) {
         return gatewayService
-            .cloneToken(tokenId, paymentSettingRepository.getPublicKey(), paymentSettingRepository.getPrivateKey());
+            .cloneToken(tokenId, paymentSettingRepository.getPublicKey());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class CardTokenService implements CardTokenRepository {
         final SecurityCodeIntent securityCodeIntent = new SecurityCodeIntent();
         securityCodeIntent.setSecurityCode(securityCode);
         return gatewayService
-            .updateToken(tokenId, paymentSettingRepository.getPublicKey(), paymentSettingRepository.getPrivateKey(),
+            .updateToken(tokenId, paymentSettingRepository.getPublicKey(),
                 securityCodeIntent);
     }
 
@@ -71,7 +71,7 @@ public class CardTokenService implements CardTokenRepository {
             callback.execute();
             return;
         }
-        gatewayService.clearCap(API_ENVIRONMENT_NEW, cardId, paymentSettingRepository.getPrivateKey())
+        gatewayService.clearCap(API_ENVIRONMENT_NEW, cardId)
             .enqueue(new Callback<String>() {
                 @Override
                 public void success(final String s) {
