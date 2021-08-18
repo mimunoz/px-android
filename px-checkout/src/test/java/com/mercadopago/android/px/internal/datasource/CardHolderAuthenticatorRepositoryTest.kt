@@ -74,8 +74,6 @@ class CardHolderAuthenticatorRepositoryTest {
 
             whenever(paymentSettingRepository.site).thenReturn(site)
 
-//            whenever(paymentSettingRepository.privateKey).thenReturn("987654321")
-
         runBlocking {
 
             whenever(cardHolderAuthenticatorService.authenticate(any(), any())).thenReturn(mock())

@@ -5,12 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
-class AuthorizationInterceptor(private val sharedPreferences: SharedPreferences) : Interceptor{
-
-    companion object {
-        private const val AUTHORIZATION_HEADER = "Authorization"
-        private const val PREF_PRIVATE_KEY = "PREF_PRIVATE_KEY"
-    }
+class AuthorizationInterceptor(private val sharedPreferences: SharedPreferences) : Interceptor {
 
     private val privateKey: String = getPrivateKey()
 
@@ -25,5 +20,10 @@ class AuthorizationInterceptor(private val sharedPreferences: SharedPreferences)
 
     private fun getPrivateKey(): String {
         return "Bearer " + sharedPreferences.getString(PREF_PRIVATE_KEY, null)
+    }
+
+    companion object {
+        private const val AUTHORIZATION_HEADER = "Authorization"
+        private const val PREF_PRIVATE_KEY = "PREF_PRIVATE_KEY"
     }
 }
