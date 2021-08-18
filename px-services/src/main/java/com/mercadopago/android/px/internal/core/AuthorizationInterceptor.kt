@@ -5,7 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 
-class AuthorizationInterceptor(private val sharedPreferences: SharedPreferences) : Interceptor {
+internal class AuthorizationInterceptor(private val sharedPreferences: SharedPreferences) : Interceptor {
 
     private val privateKey: String = getPrivateKey()
 
