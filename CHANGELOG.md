@@ -1,3 +1,7 @@
+## VERSION 4.87.0
+_19_08_2021_
+* FEATURE - Added profile id as header in payments api call
+
 ## VERSION 4.86.0
 _12_08_2021_
 * FEATURE - Added support for IDC regulation
