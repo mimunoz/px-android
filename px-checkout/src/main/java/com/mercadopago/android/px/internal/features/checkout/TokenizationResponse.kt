@@ -10,4 +10,3 @@ internal data class TokenizationResponse(val result: State) {
         @SerializedName("error") ERROR
     }
 }
-
