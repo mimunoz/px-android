@@ -2,7 +2,9 @@ package com.mercadopago.android.px.internal.features.checkout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import com.mercadopago.android.px.internal.features.security_code.SecurityCodeFr
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
 import com.mercadopago.android.px.internal.util.FragmentUtil;
+import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
@@ -66,8 +69,22 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     protected void onCreated(@Nullable final Bundle savedInstanceState) {
         setContentView(R.layout.px_activity_checkout);
         progress = findViewById(R.id.mpsdkProgressLayout);
+
+        handleDeepLinkFromTokenization();
+
         if (savedInstanceState == null) {
             initPresenter();
+        }
+    }
+
+    private void handleDeepLinkFromTokenization() {
+        final Uri uri = getIntent().getData();
+        final String from = uri != null && uri.getQueryParameter("from") != null ? uri.getQueryParameter("from") : "none";
+        final From fromResponse = From.valueOf(from.toUpperCase());
+        if (fromResponse.equals(From.TOKENIZATION)) {
+            final String response = uri.getQueryParameter("response");
+            final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
+            //TODO: show snackbar with data
         }
     }
 
