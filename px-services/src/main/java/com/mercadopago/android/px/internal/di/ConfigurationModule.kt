@@ -20,6 +20,7 @@ abstract class ConfigurationModule(context: Context) : ApplicationModule(context
     open fun reset() {
         productIdProvider.reset()
         trackingRepository.reset()
+        authorizationProvider.reset()
     }
 
     companion object {

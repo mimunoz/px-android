@@ -178,12 +178,24 @@ class ExpressPaymentPresenterTest {
         `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
         `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
-        expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
-            payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository,
-            checkoutUseCase, checkoutWithNewCardUseCase, amountConfigurationRepository, chargeRepository, escManagerBehaviour,
-            experimentsRepository, payerComplianceRepository, trackingRepository,
+        expressPaymentPresenter = ExpressPaymentPresenter(
+            paymentSettingRepository,
+            disabledPaymentMethodRepository,
+            payerCostSelectionRepository,
+            applicationSelectionRepository,
+            discountRepository,
+            amountRepository,
+            checkoutUseCase,
+            checkoutWithNewCardUseCase,
+            amountConfigurationRepository,
+            chargeRepository,
+            escManagerBehaviour,
+            experimentsRepository,
+            payerComplianceRepository,
+            trackingRepository,
             mock(CustomTextsRepository::class.java),
-            oneTapItemRepository, payerPaymentMethodRepository,
+            oneTapItemRepository,
+            payerPaymentMethodRepository,
             modalRepository,
             customOptionIdSolver,
             paymentMethodDrawableItemMapper,
@@ -192,7 +204,9 @@ class ExpressPaymentPresenterTest {
             summaryInfoMapper,
             elementDescriptorMapper,
             mock(FromApplicationToApplicationInfo::class.java),
-            tracker)
+            tracker,
+            configurationModule.getAuthorizationProvider()
+        )
         verifyAttachView()
     }
 

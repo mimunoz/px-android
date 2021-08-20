@@ -389,7 +389,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             MapperProvider.INSTANCE.getSummaryInfoMapper(),
             MapperProvider.INSTANCE.getElementDescriptorMapper(),
             MapperProvider.INSTANCE.getFromApplicationToApplicationInfo(),
-            session.getTracker()
+            session.getTracker(),
+            configurationModule.getAuthorizationProvider()
         );
     }
 

@@ -1,7 +1,9 @@
 package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.addons.ESCManagerBehaviour
+import com.mercadopago.android.px.internal.core.AuthorizationProvider
 import com.mercadopago.android.px.internal.core.PermissionHelper
+import com.mercadopago.android.px.internal.core.ProductIdProvider
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesBodyMapper
 import com.mercadopago.android.px.internal.repository.*
@@ -32,14 +34,15 @@ internal class CongratsRepositoryImpl(
     private val oneTapItemRepository: OneTapItemRepository,
     private val paymentSettingRepository: PaymentSettingRepository,
     private val payerPaymentMethodRepository: PayerPaymentMethodRepository,
-    private val alternativePayerPaymentMethodsMapper: AlternativePayerPaymentMethodsMapper) : CongratsRepository {
+    private val alternativePayerPaymentMethodsMapper: AlternativePayerPaymentMethodsMapper,
+    private val authorizationProvider: AuthorizationProvider) : CongratsRepository {
 
     private val paymentRewardCache = HashMap<String, CongratsResponse>()
     private val remediesCache = HashMap<String, RemediesResponse>()
 
     override fun getPostPaymentData(payment: IPaymentDescriptor, paymentResult: PaymentResult,
         callback: PostPaymentCallback) {
-        val whiteLabel = TextUtil.isEmpty(paymentSettingRepository.privateKey)
+        val whiteLabel = TextUtil.isEmpty(authorizationProvider.privateKey)
         val isSuccess = StatusHelper.isSuccess(payment)
         CoroutineScope(Dispatchers.IO).launch {
             val paymentId = payment.paymentIds?.get(0) ?: payment.id.toString()

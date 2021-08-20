@@ -132,7 +132,7 @@ public final class Session extends ApplicationModule {
         final PaymentSettingRepository paymentSetting = configurationModule.getPaymentSettings();
         paymentSetting.configure(mercadoPagoCheckout.getPublicKey());
         paymentSetting.configure(mercadoPagoCheckout.getAdvancedConfiguration());
-        paymentSetting.configurePrivateKey(mercadoPagoCheckout.getPrivateKey());
+//        paymentSetting.configurePrivateKey(mercadoPagoCheckout.getPrivateKey());
         paymentSetting.configure(paymentConfiguration);
         resolvePreference(mercadoPagoCheckout, paymentSetting);
         // end Store persistent paymentSetting
@@ -245,7 +245,7 @@ public final class Session extends ApplicationModule {
     public MercadoPagoServices getMercadoPagoServices() {
         final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
         return new MercadoPagoServices(getApplicationContext(), paymentSettings.getPublicKey(),
-            paymentSettings.getPrivateKey());
+            configurationModule.getAuthorizationProvider().getPrivateKey());
     }
 
     @NonNull
@@ -325,7 +325,7 @@ public final class Session extends ApplicationModule {
             final GatewayService gatewayService =
                 networkModule.getRetrofitClient().create(GatewayService.class);
             cardTokenRepository = new CardTokenService(gatewayService, getConfigurationModule().getPaymentSettings(),
-                getDevice(), getMercadoPagoESC());
+                getDevice(), getMercadoPagoESC(), getConfigurationModule().getAuthorizationProvider());
         }
         return cardTokenRepository;
     }
@@ -340,7 +340,8 @@ public final class Session extends ApplicationModule {
                 configurationModule.getDisabledPaymentMethodRepository(),
                 configurationModule.getPayerComplianceRepository(), getMercadoPagoESC(), getOneTapItemRepository(),
                 configurationModule.getPaymentSettings(), getPayerPaymentMethodRepository(),
-                MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper()
+                MapperProvider.INSTANCE.getAlternativePayerPaymentMethodsMapper(),
+                configurationModule.getAuthorizationProvider()
             );
         }
         return congratsRepository;
@@ -455,9 +456,12 @@ public final class Session extends ApplicationModule {
             checkout.getAdvancedConfiguration().getDiscountParamsConfiguration().getProductId();
         final String productId = TextUtil.isNotEmpty(deprecatedProductId) ? deprecatedProductId
             : checkout.getAdvancedConfiguration().getProductId();
+        final String accessToken = checkout.getPrivateKey();
+
         configurationModule.getTrackingRepository().configure(
             TrackingRepositoryModelMapper.INSTANCE.map(checkout.getTrackingConfiguration()));
         configurationModule.getProductIdProvider().configure(productId);
+        configurationModule.getAuthorizationProvider().configure(accessToken);
     }
 
     public enum State {
