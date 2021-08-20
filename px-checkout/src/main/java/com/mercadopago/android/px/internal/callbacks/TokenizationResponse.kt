@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.features.checkout
+package com.mercadopago.android.px.internal.callbacks
 
 import com.google.gson.annotations.SerializedName
 

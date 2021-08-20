@@ -2,7 +2,6 @@ package com.mercadopago.android.px.internal.callbacks
 
 import android.net.Uri
 import com.mercadopago.android.px.BasicRobolectricTest
-import com.mercadopago.android.px.internal.features.checkout.TokenizationResponse
 import com.mercadopago.android.px.internal.util.JsonUtil.fromJson
 import org.junit.Assert.assertEquals
 import org.junit.Test
