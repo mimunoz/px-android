@@ -132,7 +132,6 @@ public final class Session extends ApplicationModule {
         final PaymentSettingRepository paymentSetting = configurationModule.getPaymentSettings();
         paymentSetting.configure(mercadoPagoCheckout.getPublicKey());
         paymentSetting.configure(mercadoPagoCheckout.getAdvancedConfiguration());
-//        paymentSetting.configurePrivateKey(mercadoPagoCheckout.getPrivateKey());
         paymentSetting.configure(paymentConfiguration);
         resolvePreference(mercadoPagoCheckout, paymentSetting);
         // end Store persistent paymentSetting

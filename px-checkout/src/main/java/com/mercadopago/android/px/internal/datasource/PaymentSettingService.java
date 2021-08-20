@@ -134,13 +134,6 @@ public class PaymentSettingService implements PaymentSettingRepository {
         edit.apply();
     }
 
-//    @Override
-//    public void configurePrivateKey(@Nullable final String privateKey) {
-//        final SharedPreferences.Editor edit = sharedPreferences.edit();
-//        edit.putString(PREF_PRIVATE_KEY, privateKey);
-//        edit.apply();
-//    }
-
     @Override
     public void configure(@NonNull final PaymentConfiguration paymentConfiguration) {
         this.paymentConfiguration = paymentConfiguration;
@@ -274,10 +267,4 @@ public class PaymentSettingService implements PaymentSettingRepository {
         }
         return advancedConfiguration;
     }
-
-//    @Nullable
-//    @Override
-//    public String getPrivateKey() {
-//        return sharedPreferences.getString(PREF_PRIVATE_KEY, null);
-//    }
 }
