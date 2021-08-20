@@ -50,7 +50,8 @@ public class CongratsViewModelMapper extends Mapper<PaymentCongratsResponse, Con
             getDownloadAppData(discount),
             getExpenseSplitData(paymentCongratsResponse.getExpenseSplit()),
             getCrossSellingBoxData(paymentCongratsResponse.getCrossSellings()),
-            paymentCongratsResponse.getViewReceipt(), paymentCongratsResponse.hasCustomOrder());
+            paymentCongratsResponse.getViewReceipt(), paymentCongratsResponse.hasCustomOrder(),
+            getOperationInfo(paymentCongratsResponse.getOperationInfo()));
     }
 
     @Nullable
@@ -317,5 +318,13 @@ public class CongratsViewModelMapper extends Mapper<PaymentCongratsResponse, Con
     @Nullable
     private MLBusinessActionCardViewData getExpenseSplitData(@Nullable final PaymentCongratsResponse.ExpenseSplit moneySplit) {
         return MLBusinessMapper.map(moneySplit);
+    }
+
+    @Nullable
+    private PaymentCongratsResponse.OperationInfo getOperationInfo(@Nullable final PaymentCongratsResponse.OperationInfo operationInfo) {
+        if (operationInfo != null) {
+            return operationInfo;
+        }
+        return null;
     }
 }

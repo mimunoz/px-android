@@ -6,6 +6,7 @@ import com.mercadopago.android.px.internal.features.payment_result.remedies.Reme
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
 import com.mercadopago.android.px.internal.view.PaymentResultBody
 import com.mercadopago.android.px.internal.view.PaymentResultHeader
+import com.mercadopago.android.px.model.OperationInfo
 
 internal class PaymentResultViewModel(
     val headerModel: PaymentResultHeader.Model,
@@ -14,5 +15,6 @@ internal class PaymentResultViewModel(
     val bodyModel: PaymentResultBody.Model,
     val legacyViewModel: PaymentResultLegacyViewModel,
     val instructionModel: Instruction.Model?,
-    val autoReturnModel: CongratsAutoReturn.Model? = null
+    val autoReturnModel: CongratsAutoReturn.Model? = null,
+    val operationInfo: OperationInfo? = null
 )
