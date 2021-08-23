@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.checkout
 
+import android.net.Uri
 import com.mercadopago.android.px.TestContextProvider
 import com.mercadopago.android.px.internal.callbacks.Response
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
@@ -92,7 +93,7 @@ class CheckoutPresenterTest {
             whenever(checkoutRepository.checkout()).thenReturn(
                 Response.Failure(MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT)))
         }
-        presenter.initialize()
+        presenter.initialize(null)
         verify(checkoutView).showProgress()
         verify(checkoutView).showError(ArgumentMatchers.any(MercadoPagoError::class.java))
         verifyNoMoreInteractions(checkoutView)
@@ -105,15 +106,15 @@ class CheckoutPresenterTest {
             whenever(checkoutRepository.checkout())
                 .thenReturn(Response.Success(checkoutResponse))
         }
-
-        presenter.initialize()
+        val uri = Mockito.mock(Uri::class.java)
+        presenter.initialize(uri)
         runBlocking {
             verify(checkoutRepository).checkout()
             verify(checkoutRepository).configure(checkoutResponse)
         }
         verify(checkoutView).showProgress()
         verify(checkoutView).hideProgress()
-        verify(checkoutView).showOneTap(ArgumentMatchers.any(Variant::class.java))
+        verify(checkoutView).showOneTap(ArgumentMatchers.any(Variant::class.java), ArgumentMatchers.any(Uri::class.java))
         verifyNoMoreInteractions(checkoutView)
         verifyNoMoreInteractions(checkoutRepository)
     }

@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +21,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
         void cancelCheckout();
 
-        void showOneTap(@NonNull final Variant variant);
+        void showOneTap(@NonNull final Variant variant, @Nullable final Uri uri);
 
         void hideProgress();
 
@@ -30,7 +31,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
     }
 
     /* default */ interface Actions {
-        void initialize();
+        void initialize(@Nullable final Uri uri);
 
         void onErrorCancel(@Nullable final MercadoPagoError mercadoPagoError);
 

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.BackHandler;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.BaseFragment;
+import com.mercadopago.android.px.internal.callbacks.From;
+import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.MapperProvider;
 import com.mercadopago.android.px.internal.di.Session;
@@ -63,6 +66,7 @@ import com.mercadopago.android.px.internal.features.pay_button.PayButtonFragment
 import com.mercadopago.android.px.internal.features.security_code.SecurityCodeFragment;
 import com.mercadopago.android.px.internal.util.CardFormWrapper;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
+import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.internal.util.Logger;
 import com.mercadopago.android.px.internal.util.VibrationUtils;
 import com.mercadopago.android.px.internal.view.DiscountDetailDialog;
@@ -105,6 +109,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private static final String EXTRA_VARIANT = "EXTRA_VARIANT";
     private static final String EXTRA_RENDER_MODE = "render_mode";
     private static final String EXTRA_NAVIGATION_STATE = "navigation_state";
+    private static final String URI = "uri";
 
     private static final int REQ_CODE_DISABLE_DIALOG = 105;
     private static final float PAGER_NEGATIVE_MARGIN_MULTIPLIER = -1.5f;
@@ -142,10 +147,11 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private PayButtonFragment payButtonFragment;
     private OfflineMethodsFragment offlineMethodsFragment;
 
-    public static Fragment getInstance(@NonNull final Variant variant) {
+    public static Fragment getInstance(@NonNull final Variant variant, @Nullable final Uri uri) {
         final ExpressPaymentFragment expressPaymentFragment = new ExpressPaymentFragment();
         final Bundle bundle = new Bundle();
         bundle.putParcelable(EXTRA_VARIANT, variant);
+        bundle.putParcelable(URI, uri);
         expressPaymentFragment.setArguments(bundle);
         return expressPaymentFragment;
     }
@@ -274,6 +280,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         configurePaymentMethodHeader(view);
         payButtonFragment = (PayButtonFragment) getChildFragmentManager().findFragmentById(R.id.pay_button);
         payButtonContainer = view.findViewById(R.id.pay_button);
+        configureSnackBar();
         offlineMethodsFragment =
             (OfflineMethodsFragment) getChildFragmentManager().findFragmentById(R.id.offline_methods);
         splitPaymentView = view.findViewById(R.id.labeledSwitch);
@@ -300,6 +307,22 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             new PaymentMethodHeaderAdapter(paymentMethodHeaderView),
             new ConfirmButtonAdapter(payButtonFragment)
         ));
+    }
+
+    private void configureSnackBar() {
+        final Uri uri = getArguments().getParcelable(URI);
+        final String from = uri != null && uri.getQueryParameter("from") != null ? uri.getQueryParameter("from") : "none";
+        final From fromResponse = From.valueOf(from.toUpperCase());
+        if (fromResponse.equals(From.TOKENIZATION)) {
+            final String response = uri.getQueryParameter("response");
+            final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
+
+            Log.d("dani", "from: " + fromResponse.toString());
+            Log.d("dani", "response result: " + tokenizationResponse.getResult());
+            Log.d("dani", "response message: " + tokenizationResponse.getMessage());
+
+            showSnackBar(tokenizationResponse.getMessage());
+        }
     }
 
     @Override

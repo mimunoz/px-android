@@ -2,6 +2,8 @@ package com.mercadopago.android.px.internal.base
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import com.mercadopago.android.px.internal.extensions.showSnackBar
+import org.jetbrains.annotations.NotNull
 
 abstract class BaseFragment : Fragment() {
 
@@ -23,6 +25,10 @@ abstract class BaseFragment : Fragment() {
         if (context is PXActivity<*>) {
             (context as PXActivity<*>).forceBack()
         }
+    }
+
+    fun showSnackBar(message: String) {
+        view?.showSnackBar(message)
     }
 
     companion object {

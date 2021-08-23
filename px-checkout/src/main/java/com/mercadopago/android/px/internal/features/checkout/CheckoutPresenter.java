@@ -1,6 +1,9 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
@@ -54,14 +57,14 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     }
 
     @Override
-    public void initialize() {
+    public void initialize(@Nullable final Uri uri) {
         if (!withPrefetch) {
             getView().showProgress();
             if (isViewAttached()) {
                 checkoutUseCase.execute(
                     Unit.INSTANCE,
                     checkoutResponse -> {
-                        showOneTap();
+                        showOneTap(uri);
                         return Unit.INSTANCE;
                     },
                     error -> {
@@ -72,16 +75,17 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
                     });
             }
         } else {
-            showOneTap();
+            showOneTap(uri);
         }
     }
 
-    /* default */ void showOneTap() {
+    /* default */ void showOneTap(@Nullable final Uri uri) {
         if (isViewAttached()) {
             showingOneTap = true;
             getView().hideProgress();
             getView().showOneTap(ExperimentHelper.INSTANCE.getVariantFrom(
-                experimentsRepository.getExperiments(), KnownVariant.SCROLLED));
+                experimentsRepository.getExperiments(), KnownVariant.SCROLLED),
+                    uri);
         }
     }
 
@@ -89,7 +93,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     public void onRestore(@NonNull final Bundle bundle) {
         showingOneTap = bundle.getBoolean(EXTRA_SHOWING_ONE_TAP);
         if (showingOneTap) {
-            showOneTap();
+            showOneTap(null);
         }
     }
 
@@ -105,7 +109,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
 
     @Override
     public void recoverFromFailure() {
-        initialize();
+        initialize(null);
     }
 
     @Override
