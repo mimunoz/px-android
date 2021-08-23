@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.mercadolibre.android.andesui.bottomsheet.AndesBottomSheet;
+import com.mercadolibre.android.andesui.snackbar.type.AndesSnackbarType;
 import com.mercadolibre.android.cardform.CardForm;
 import com.mercadolibre.android.cardform.internal.CardFormWithFragment;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
@@ -321,7 +322,14 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             Log.d("dani", "response result: " + tokenizationResponse.getResult());
             Log.d("dani", "response message: " + tokenizationResponse.getMessage());
 
-            showSnackBar(tokenizationResponse.getMessage());
+            switch(tokenizationResponse.getResult()) {
+                case SUCCESS: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.SUCCESS);
+                              break;
+                case PENDING: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.NEUTRAL);
+                              break;
+                case ERROR: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.ERROR);
+                              break;
+            }
         }
     }
 
