@@ -28,10 +28,6 @@ abstract class BaseFragment : Fragment() {
         }
     }
 
-    fun showSnackBar(message: String, andesSnackbarType: AndesSnackbarType) {
-        view?.showSnackBar(message, andesSnackbarType)
-    }
-
     companion object {
         const val BUNDLE_STATE = "bundle_state"
     }

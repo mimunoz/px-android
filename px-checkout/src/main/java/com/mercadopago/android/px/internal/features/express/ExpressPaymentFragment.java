@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.mercadolibre.android.andesui.bottomsheet.AndesBottomSheet;
+import com.mercadolibre.android.andesui.snackbar.duration.AndesSnackbarDuration;
 import com.mercadolibre.android.andesui.snackbar.type.AndesSnackbarType;
 import com.mercadolibre.android.cardform.CardForm;
 import com.mercadolibre.android.cardform.internal.CardFormWithFragment;
@@ -39,6 +39,7 @@ import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
 import com.mercadopago.android.px.internal.experiments.Variant;
 import com.mercadopago.android.px.internal.experiments.VariantHandler;
+import com.mercadopago.android.px.internal.extensions.ViewExtensionsKt;
 import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
 import com.mercadopago.android.px.internal.features.express.add_new_card.OtherPaymentMethodFragment;
 import com.mercadopago.android.px.internal.features.express.add_new_card.sheet_options.CardFormBottomSheetFragment;
@@ -91,6 +92,9 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -111,6 +115,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private static final String EXTRA_RENDER_MODE = "render_mode";
     private static final String EXTRA_NAVIGATION_STATE = "navigation_state";
     private static final String URI = "uri";
+    private static final String FROM = "from";
+    private static final String RESPONSE = "response";
 
     private static final int REQ_CODE_DISABLE_DIALOG = 105;
     private static final float PAGER_NEGATIVE_MARGIN_MULTIPLIER = -1.5f;
@@ -279,9 +285,9 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     private void configureViews(@NonNull final View view) {
         configurePaymentMethodHeader(view);
+        configureSnackBar();
         payButtonFragment = (PayButtonFragment) getChildFragmentManager().findFragmentById(R.id.pay_button);
         payButtonContainer = view.findViewById(R.id.pay_button);
-        configureSnackBar();
         offlineMethodsFragment =
             (OfflineMethodsFragment) getChildFragmentManager().findFragmentById(R.id.offline_methods);
         splitPaymentView = view.findViewById(R.id.labeledSwitch);
@@ -311,26 +317,29 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     private void configureSnackBar() {
-        final Uri uri = getArguments().getParcelable(URI);
-        final String from = uri != null && uri.getQueryParameter("from") != null ? uri.getQueryParameter("from") : "none";
+        final Uri uri = Objects.requireNonNull(getArguments()).getParcelable(URI);
+        final String from = uri != null && uri.getQueryParameter(FROM) != null ? uri.getQueryParameter(FROM) : From.NONE.getValue();
         final From fromResponse = From.valueOf(from.toUpperCase());
         if (fromResponse.equals(From.TOKENIZATION)) {
-            final String response = uri.getQueryParameter("response");
+            final String response = Objects.requireNonNull(uri).getQueryParameter(RESPONSE);
             final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
-
-            Log.d("dani", "from: " + fromResponse.toString());
-            Log.d("dani", "response result: " + tokenizationResponse.getResult());
-            Log.d("dani", "response message: " + tokenizationResponse.getMessage());
-
-            switch(tokenizationResponse.getResult()) {
-                case SUCCESS: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.SUCCESS);
-                              break;
-                case PENDING: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.NEUTRAL);
-                              break;
-                case ERROR: showSnackBar(tokenizationResponse.getMessage(), AndesSnackbarType.ERROR);
-                              break;
-            }
+            showSnackBar(Objects.requireNonNull(tokenizationResponse).getResult(), tokenizationResponse.getMessage());
         }
+    }
+
+    private void showSnackBar(@NotNull final TokenizationResponse.State state, @NotNull final String message) {
+        switch(state) {
+            case SUCCESS: showSnackBar(message, AndesSnackbarType.SUCCESS);
+                break;
+            case PENDING: showSnackBar(message, AndesSnackbarType.NEUTRAL);
+                break;
+            case ERROR: showSnackBar(message, AndesSnackbarType.ERROR);
+                break;
+        }
+    }
+
+    private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {
+        ViewExtensionsKt.showSnackBar(getView(), message, andesSnackbarType, AndesSnackbarDuration.LONG, null);
     }
 
     @Override
