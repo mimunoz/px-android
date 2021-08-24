@@ -21,7 +21,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 
         void cancelCheckout();
 
-        void showOneTap(@NonNull final Variant variant, @Nullable final Uri uri);
+        void showOneTap(@NonNull final Variant variant);
 
         void hideProgress();
 
@@ -31,7 +31,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
     }
 
     /* default */ interface Actions {
-        void initialize(@Nullable final Uri uri);
+        void initialize();
 
         void onErrorCancel(@Nullable final MercadoPagoError mercadoPagoError);
 

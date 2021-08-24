@@ -55,14 +55,14 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     }
 
     @Override
-    public void initialize(@Nullable final Uri uri) {
+    public void initialize() {
         if (!withPrefetch) {
             getView().showProgress();
             if (isViewAttached()) {
                 checkoutUseCase.execute(
                     Unit.INSTANCE,
                     checkoutResponse -> {
-                        showOneTap(uri);
+                        showOneTap();
                         return Unit.INSTANCE;
                     },
                     error -> {
@@ -73,17 +73,16 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
                     });
             }
         } else {
-            showOneTap(uri);
+            showOneTap();
         }
     }
 
-    /* default */ void showOneTap(@Nullable final Uri uri) {
+    /* default */ void showOneTap() {
         if (isViewAttached()) {
             showingOneTap = true;
             getView().hideProgress();
             getView().showOneTap(ExperimentHelper.INSTANCE.getVariantFrom(
-                experimentsRepository.getExperiments(), KnownVariant.SCROLLED),
-                    uri);
+                experimentsRepository.getExperiments(), KnownVariant.SCROLLED));
         }
     }
 
@@ -91,7 +90,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
     public void onRestore(@NonNull final Bundle bundle) {
         showingOneTap = bundle.getBoolean(EXTRA_SHOWING_ONE_TAP);
         if (showingOneTap) {
-            showOneTap(null);
+            showOneTap();
         }
     }
 
@@ -107,7 +106,7 @@ public class CheckoutPresenter extends BasePresenter<Checkout.View> implements C
 
     @Override
     public void recoverFromFailure() {
-        initialize(null);
+        initialize();
     }
 
     @Override

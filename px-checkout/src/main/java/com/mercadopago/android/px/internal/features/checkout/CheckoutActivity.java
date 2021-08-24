@@ -96,7 +96,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     private void initPresenter() {
         presenter = getActivityParameters();
         presenter.attachView(this);
-        presenter.initialize(getIntent().getData());
+        presenter.initialize();
     }
 
     @Override
@@ -188,13 +188,13 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     }
 
     @Override
-    public void showOneTap(@NonNull final Variant variant, @Nullable final Uri uri) {
+    public void showOneTap(@NonNull final Variant variant) {
         final FragmentManager supportFragmentManager = getSupportFragmentManager();
         if (supportFragmentManager.findFragmentByTag(TAG_ONETAP_FRAGMENT) == null) {
             supportFragmentManager
                 .beginTransaction()
                 .setCustomAnimations(R.anim.px_slide_right_to_left_in, R.anim.px_slide_right_to_left_out)
-                .replace(R.id.one_tap_fragment, ExpressPaymentFragment.getInstance(variant, uri), TAG_ONETAP_FRAGMENT)
+                .replace(R.id.one_tap_fragment, ExpressPaymentFragment.getInstance(variant, getIntent().getData()), TAG_ONETAP_FRAGMENT)
                 .commitNowAllowingStateLoss();
         }
     }
