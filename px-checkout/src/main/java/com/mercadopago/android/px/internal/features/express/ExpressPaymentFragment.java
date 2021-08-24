@@ -321,17 +321,17 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         if (fromResponse.equals(From.TOKENIZATION)) {
             final String response = Objects.requireNonNull(uri).getQueryParameter(RESPONSE);
             final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
-            showSnackBar(Objects.requireNonNull(tokenizationResponse).getResult(), tokenizationResponse.getMessage());
+            showSnackBar(Objects.requireNonNull(tokenizationResponse).getResult());
         }
     }
 
-    private void showSnackBar(@NotNull final TokenizationResponse.State state, @NotNull final String message) {
+    private void showSnackBar(@NotNull final TokenizationResponse.State state) {
         switch(state) {
-            case SUCCESS: showSnackBar(message, AndesSnackbarType.SUCCESS);
+            case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
                 break;
-            case PENDING: showSnackBar(message, AndesSnackbarType.NEUTRAL);
+            case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
                 break;
-            case ERROR: showSnackBar(message, AndesSnackbarType.ERROR);
+            case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
                 break;
         }
     }

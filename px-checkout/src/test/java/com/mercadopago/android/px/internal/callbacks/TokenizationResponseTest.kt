@@ -13,37 +13,34 @@ class TokenizationResponseTest : BasicRobolectricTest() {
 
     @Test
     fun whenReceiveIntentWithDataThenReturnStateSuccessWithMessage() {
-        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"success\",\"message\":\"successful tokenization\"}")
+        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"success\"}")
         val response: String = uri.getQueryParameter("response")!!
         val tokenizationResponse: TokenizationResponse = fromJson(response, TokenizationResponse::class.java)!!
 
         assertEquals(TokenizationResponse.State.SUCCESS, tokenizationResponse.result)
-        assertEquals("successful tokenization", tokenizationResponse.message)
     }
 
     @Test
     fun whenReceiveIntentWithDataThenReturnStatePendingWithMessage() {
-        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"pending\",\"message\":\"pending tokenization\"}")
+        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"pending\"}")
         val response: String = uri.getQueryParameter("response")!!
         val tokenizationResponse: TokenizationResponse = fromJson(response, TokenizationResponse::class.java)!!
 
         assertEquals(TokenizationResponse.State.PENDING, tokenizationResponse.result)
-        assertEquals("pending tokenization", tokenizationResponse.message)
     }
 
     @Test
     fun whenReceiveIntentWithDataThenReturnStateErrorWithMessage() {
-        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"error\",\"message\":\"error tokenization\"}")
+        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"error\"}")
         val response: String = uri.getQueryParameter("response")!!
         val tokenizationResponse: TokenizationResponse = fromJson(response, TokenizationResponse::class.java)!!
 
         assertEquals(TokenizationResponse.State.ERROR, tokenizationResponse.result)
-        assertEquals("error tokenization", tokenizationResponse.message)
     }
 
     @Test
     fun whenReceiveIntentWithDataThenReturnFromTokenization() {
-        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"error\",\"message\":\"error tokenization\"}")
+        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=tokenization&response={\"result\":\"error\"}")
         val from: String = uri.getQueryParameter("from")!!
 
         assertEquals(From.TOKENIZATION.value, from)
@@ -51,7 +48,7 @@ class TokenizationResponseTest : BasicRobolectricTest() {
 
     @Test
     fun whenReceiveIntentWithDataThenReturnFromDefault() {
-        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=none&response={\"result\":\"error\",\"message\":\"error tokenization\"}")
+        val uri: Uri = Uri.parse("mercadopago://px/one_tap?from=none&response={\"result\":\"error\"}")
         val from: String = uri.getQueryParameter("from")!!
 
         assertEquals(From.NONE.value, from)
