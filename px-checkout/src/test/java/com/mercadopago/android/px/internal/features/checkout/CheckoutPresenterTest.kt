@@ -87,13 +87,27 @@ class CheckoutPresenterTest {
     }
 
     @Test
-    fun whenCheckoutInitializedAndPaymentMethodSearchFailsThenShowError() {
+    fun whenCheckoutInitializedWithoutUriAndPaymentMethodSearchFailsThenShowError() {
         runBlocking {
             val apiException = ApiException()
             whenever(checkoutRepository.checkout()).thenReturn(
                 Response.Failure(MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT)))
         }
         presenter.initialize(null)
+        verify(checkoutView).showProgress()
+        verify(checkoutView).showError(ArgumentMatchers.any(MercadoPagoError::class.java))
+        verifyNoMoreInteractions(checkoutView)
+    }
+
+    @Test
+    fun whenCheckoutInitializedWithUriAndPaymentMethodSearchFailsThenShowError() {
+        runBlocking {
+            val apiException = ApiException()
+            whenever(checkoutRepository.checkout()).thenReturn(
+                Response.Failure(MercadoPagoError(apiException, ApiUtil.RequestOrigin.POST_INIT)))
+        }
+        val uri = Mockito.mock(Uri::class.java)
+        presenter.initialize(uri)
         verify(checkoutView).showProgress()
         verify(checkoutView).showError(ArgumentMatchers.any(MercadoPagoError::class.java))
         verifyNoMoreInteractions(checkoutView)
