@@ -2,8 +2,6 @@ package com.mercadopago.android.px.internal.features.checkout;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
