@@ -2,9 +2,6 @@ package com.mercadopago.android.px.internal.base
 
 import android.content.Context
 import androidx.fragment.app.Fragment
-import com.mercadolibre.android.andesui.snackbar.type.AndesSnackbarType
-import com.mercadopago.android.px.internal.extensions.showSnackBar
-import org.jetbrains.annotations.NotNull
 
 abstract class BaseFragment : Fragment() {
 
