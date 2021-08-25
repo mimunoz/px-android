@@ -1,3 +1,6 @@
+## VERSION 4.90.0
+* FEATURE - Migration of Nudata flow to Dynamic Features also update PXBehaviourConfigurer to avoid null sets.
+
 ## VERSION 4.87.1
 _25_08_2021_
 * FIX - Crash on congrats with split payments
