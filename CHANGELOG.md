@@ -1,3 +1,7 @@
+## VERSION 4.87.1
+_25_08_2021_
+* FIX - Crash on congrats with split payments
+
 ## VERSION 4.87.0
 _19_08_2021_
 * FEATURE - Added profile id as header in payments api call
