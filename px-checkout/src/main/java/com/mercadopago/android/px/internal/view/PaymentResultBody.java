@@ -89,7 +89,7 @@ public final class PaymentResultBody extends LinearLayout {
         renderMoneySplit(model.congratsViewModel.getActionCardViewData(), listener);
         renderCrossSellingBox(model.congratsViewModel.getCrossSellingBoxData(), listener);
         renderReceipt(model.receiptId);
-        renderOperationInfo(model.congratsViewModel.getOperationInfo(), listener);
+        renderOperationInfo(model.congratsViewModel.getOperationInfo());
         renderHelp(model.help);
         renderFragment(R.id.px_fragment_container_top, model.topFragment);
         renderMethods(model);
@@ -97,7 +97,7 @@ public final class PaymentResultBody extends LinearLayout {
         renderFragment(R.id.px_fragment_container_bottom, model.bottomFragment);
     }
 
-    private void renderOperationInfo(final PaymentCongratsResponse.OperationInfo operationInfo, final Listener listener) {
+    private void renderOperationInfo(@Nullable final PaymentCongratsResponse.OperationInfo operationInfo) {
         final AndesMessage operationInfoView = findViewById(R.id.operationInfo);
         if (operationInfo != null) {
             operationInfoView.setVisibility(VISIBLE);

@@ -2,11 +2,11 @@ package com.mercadopago.android.px.internal.features.payment_result.viewmodel
 
 import com.mercadopago.android.px.internal.features.payment_result.CongratsAutoReturn
 import com.mercadopago.android.px.internal.features.payment_result.instruction.Instruction
-import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesModel
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
+import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesModel
 import com.mercadopago.android.px.internal.view.PaymentResultBody
 import com.mercadopago.android.px.internal.view.PaymentResultHeader
-import com.mercadopago.android.px.model.OperationInfo
+import com.mercadopago.android.px.model.internal.CongratsResponse
 
 internal class PaymentResultViewModel(
     val headerModel: PaymentResultHeader.Model,
@@ -16,5 +16,5 @@ internal class PaymentResultViewModel(
     val legacyViewModel: PaymentResultLegacyViewModel,
     val instructionModel: Instruction.Model?,
     val autoReturnModel: CongratsAutoReturn.Model? = null,
-    val operationInfo: OperationInfo? = null
+    val operationInfo: CongratsResponse.OperationInfo? = null
 )

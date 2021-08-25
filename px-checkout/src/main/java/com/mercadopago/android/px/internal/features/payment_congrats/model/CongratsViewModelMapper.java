@@ -51,7 +51,7 @@ public class CongratsViewModelMapper extends Mapper<PaymentCongratsResponse, Con
             getExpenseSplitData(paymentCongratsResponse.getExpenseSplit()),
             getCrossSellingBoxData(paymentCongratsResponse.getCrossSellings()),
             paymentCongratsResponse.getViewReceipt(), paymentCongratsResponse.hasCustomOrder(),
-            getOperationInfo(paymentCongratsResponse.getOperationInfo()));
+            paymentCongratsResponse.getOperationInfo());
     }
 
     @Nullable

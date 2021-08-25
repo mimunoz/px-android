@@ -395,7 +395,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     @Override
     public void onSaveInstanceState(@NonNull final Bundle outState) {
-
         outState.putSerializable(EXTRA_RENDER_MODE, renderMode);
         outState.putSerializable(EXTRA_NAVIGATION_STATE, navigationState);
         if (presenter != null) {
