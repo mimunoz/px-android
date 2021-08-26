@@ -319,12 +319,4 @@ public class CongratsViewModelMapper extends Mapper<PaymentCongratsResponse, Con
     private MLBusinessActionCardViewData getExpenseSplitData(@Nullable final PaymentCongratsResponse.ExpenseSplit moneySplit) {
         return MLBusinessMapper.map(moneySplit);
     }
-
-    @Nullable
-    private PaymentCongratsResponse.OperationInfo getOperationInfo(@Nullable final PaymentCongratsResponse.OperationInfo operationInfo) {
-        if (operationInfo != null) {
-            return operationInfo;
-        }
-        return null;
-    }
 }
