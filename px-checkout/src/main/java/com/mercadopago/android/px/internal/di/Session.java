@@ -323,8 +323,8 @@ public final class Session extends ApplicationModule {
         if (cardTokenRepository == null) {
             final GatewayService gatewayService =
                 networkModule.getRetrofitClient().create(GatewayService.class);
-            cardTokenRepository = new CardTokenService(gatewayService, getConfigurationModule().getPaymentSettings(),
-                getDevice(), getMercadoPagoESC(), getConfigurationModule().getAuthorizationProvider());
+            cardTokenRepository = new CardTokenService(gatewayService, configurationModule.getPaymentSettings(),
+                getDevice(), getMercadoPagoESC(), configurationModule.getAuthorizationProvider());
         }
         return cardTokenRepository;
     }
