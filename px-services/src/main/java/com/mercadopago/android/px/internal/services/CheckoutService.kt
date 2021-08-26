@@ -12,9 +12,15 @@ import java.math.BigDecimal
 
 interface CheckoutService {
 
+    // final 011 - default
+    // final a95 - retorno somente do link tyc
+    // final b7c - retorno html + links sem access_token
+
 
     //@POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     @POST("https://run.mocky.io/v3/e45eeb80-92d5-4914-920b-bef63c6f7011")
+    //@POST("https://run.mocky.io/v3/747b1fc9-8917-47e7-a386-059da0b24a95")
+    //@POST("https://run.mocky.io/v3/67163351-e9dc-4ae0-8fca-acef814eeb7c")
     suspend fun checkout(
         @Query("access_token") privateKey: String?,
         @Query("new_card_id") newCardId: String?,

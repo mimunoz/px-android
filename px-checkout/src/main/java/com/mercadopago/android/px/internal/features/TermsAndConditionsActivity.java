@@ -4,15 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.PXActivity;
 import com.mercadopago.android.px.internal.di.Session;
@@ -46,8 +52,9 @@ public class TermsAndConditionsActivity extends PXActivity {
         mProgressLayout = findViewById(R.id.mpsdkProgressLayout);
         mMPTermsAndConditionsView = findViewById(R.id.mpsdkMPTermsAndConditions);
         mTermsAndConditionsWebView = findViewById(R.id.mpsdkTermsAndConditionsWebView);
-        mTermsAndConditionsWebView.setVerticalScrollBarEnabled(true);
-        mTermsAndConditionsWebView.setHorizontalScrollBarEnabled(true);
+        //mTermsAndConditionsWebView.setVerticalScrollBarEnabled(true);
+        //mTermsAndConditionsWebView.setHorizontalScrollBarEnabled(true);
+        mTermsAndConditionsWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         initializeToolbar();
         showMPTermsAndConditions();
     }
@@ -61,6 +68,7 @@ public class TermsAndConditionsActivity extends PXActivity {
         mToolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
+
     private void showMPTermsAndConditions() {
         mProgressLayout.setVisibility(View.VISIBLE);
         mTermsAndConditionsWebView.setWebViewClient(new WebViewClient() {
@@ -71,16 +79,23 @@ public class TermsAndConditionsActivity extends PXActivity {
             }
         });
 
+        String version;
+        try {
+
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = packageInfo.versionName;
+        } catch (final PackageManager.NameNotFoundException e) {
+            version = "1.0.0";
+        }
+        mTermsAndConditionsWebView.getSettings().setUserAgentString("MercadoLibre-Android/" + version);
+
         if (URLUtil.isValidUrl(data)) {
-            String version;
-            try {
-                final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                version = packageInfo.versionName;
-            } catch (final PackageManager.NameNotFoundException e) {
-                version = "1.0.0";
-            }
-            mTermsAndConditionsWebView.getSettings().setUserAgentString("MercadoLibre-Android/" + version);
-            mTermsAndConditionsWebView.loadUrl(data);
+            String link = Uri.parse(data).buildUpon()
+                    .appendQueryParameter("access_token", "APP_USR-1311377052931992-081820-5939b449e0b02e30834bbb0593b02aac-790498102")
+                    .build().toString();
+
+          mTermsAndConditionsWebView.loadUrl(link);
+            Log.d("tyc", link.toString());
         } else {
             mTermsAndConditionsWebView.loadData(data, "text/html", "UTF-8");
         }
