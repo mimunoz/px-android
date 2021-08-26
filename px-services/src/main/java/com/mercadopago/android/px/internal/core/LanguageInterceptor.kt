@@ -1,5 +1,7 @@
 package com.mercadopago.android.px.internal.core
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.mercadopago.android.px.addons.LocaleBehaviour
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -7,6 +9,7 @@ import java.io.IOException
 
 internal class LanguageInterceptor(private val localeBehaviour: LocaleBehaviour) : Interceptor {
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
