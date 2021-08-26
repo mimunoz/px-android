@@ -283,7 +283,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     private void configureViews(@NonNull final View view) {
         configurePaymentMethodHeader(view);
-        configureSnackBar();
+        resolveDeepLinkResponse();
         payButtonFragment = (PayButtonFragment) getChildFragmentManager().findFragmentById(R.id.pay_button);
         payButtonContainer = view.findViewById(R.id.pay_button);
         offlineMethodsFragment =
@@ -314,30 +314,15 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         ));
     }
 
-    private void configureSnackBar() {
+    private void resolveDeepLinkResponse() {
         final Uri uri = Objects.requireNonNull(getArguments()).getParcelable(URI);
         final String from = uri != null && uri.getQueryParameter(FROM) != null ? uri.getQueryParameter(FROM) : From.NONE.getValue();
         final From fromResponse = From.valueOf(from.toUpperCase());
         if (fromResponse.equals(From.TOKENIZATION)) {
             final String response = Objects.requireNonNull(uri).getQueryParameter(RESPONSE);
             final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
-            showSnackBar(Objects.requireNonNull(tokenizationResponse).getResult());
+            TokenizationDeepLinkHelper.doAction(Objects.requireNonNull(tokenizationResponse), this);
         }
-    }
-
-    private void showSnackBar(@NotNull final TokenizationResponse.State state) {
-        switch(state) {
-            case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
-                break;
-            case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
-                break;
-            case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
-                break;
-        }
-    }
-
-    private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {
-        ViewExtensionsKt.showSnackBar(getView(), message, andesSnackbarType, AndesSnackbarDuration.LONG, null);
     }
 
     @Override
