@@ -251,6 +251,6 @@
     <!-- Tokenization snackbar -->
     <string name="px_tokenization_snackbar_success">¡Listo! Ya puedes pagar con más seguridad.</string>
     <string name="px_tokenization_snackbar_pending">No fue posible validar tu tarjeta.</string>
-    <string name="px_tokenization_snackbar_error">No és posible validar tu tarjeta.</string>
+    <string name="px_tokenization_snackbar_error">No es posible validar tu tarjeta.</string>
 
 </resources>
