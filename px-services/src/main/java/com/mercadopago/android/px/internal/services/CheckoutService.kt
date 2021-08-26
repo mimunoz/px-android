@@ -14,7 +14,7 @@ interface CheckoutService {
 
 
     //@POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
-    @POST("https://run.mocky.io/v3/85409409-d1c4-49af-87ed-a4fb3b5f14ee")
+    @POST("https://run.mocky.io/v3/e45eeb80-92d5-4914-920b-bef63c6f7011")
     suspend fun checkout(
         @Query("access_token") privateKey: String?,
         @Query("new_card_id") newCardId: String?,
