@@ -1,3 +1,7 @@
+## VERSION 4.87.2
+_27_08_2021_
+* FIX - Connection check with VPN in API < 29.
+
 ## VERSION 4.88.0
 _26_08_2021_
 * FEATURE - Migration of Nudata flow to Dynamic Features also update PXBehaviourConfigurer to avoid null sets.
