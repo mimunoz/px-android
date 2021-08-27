@@ -1,3 +1,7 @@
+## VERSION 4.88.1
+_27_08_2021_
+* FIX - Connection check with VPN in API < 29.
+
 ## VERSION 4.87.2
 _27_08_2021_
 * FIX - Connection check with VPN in API < 29.
