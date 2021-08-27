@@ -1,5 +1,7 @@
-## VERSION 4.90.0
+## VERSION 4.88.0
+_26_08_2021_
 * FEATURE - Migration of Nudata flow to Dynamic Features also update PXBehaviourConfigurer to avoid null sets.
+* FEATURE - Adds notification message in congrats for MLA when using third party cards.
 
 ## VERSION 4.87.1
 _25_08_2021_
