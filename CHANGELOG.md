@@ -1,3 +1,7 @@
+## VERSION 4.87.2
+_27_08_2021_
+* FIX - Connection check with VPN in API < 29.
+
 ## VERSION 4.87.1
 _25_08_2021_
 * FIX - Crash on congrats with split payments
