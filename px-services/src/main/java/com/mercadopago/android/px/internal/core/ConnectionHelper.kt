@@ -2,64 +2,36 @@ package com.mercadopago.android.px.internal.core
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
-import java.util.Collections
 
-class ConnectionHelper(private val context: Context) {
+class ConnectionHelper(context: Context) {
+
+    private val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     fun hasConnection(): Boolean {
-        val cm = (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            checkConnection(cm)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            checkConnection()
         } else {
-            checkConnectionLegacy(cm)
+            checkConnectionLegacy()
         }
     }
 
     @Suppress("DEPRECATION")
-    private fun checkConnectionLegacy(cm: ConnectivityManager) = try {
-        var haveConnectedWifi = false
-        var haveConnectedMobile = false
-        val networkInfo = cm.activeNetworkInfo
-        if (networkInfo != null && networkInfo.isConnected) {
-            if (networkInfo.type == ConnectivityManager.TYPE_WIFI) {
-                if (networkInfo.isConnectedOrConnecting) {
-                    haveConnectedWifi = true
-                }
-            }
-            if (networkInfo.type == ConnectivityManager.TYPE_MOBILE) {
-                if (networkInfo.isConnectedOrConnecting) {
-                    haveConnectedMobile = true
-                }
-            }
-        }
-
-        haveConnectedWifi || haveConnectedMobile
-    } catch (ex: Exception) {
-        false
+    private fun checkConnectionLegacy(): Boolean {
+        return cm.activeNetworkInfo?.let {
+            it.isConnectedOrConnecting
+                && it.type == ConnectivityManager.TYPE_WIFI
+                || it.type == ConnectivityManager.TYPE_MOBILE
+        } ?: false
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun checkConnection(cm: ConnectivityManager): Boolean {
-        getNetworks(cm).forEach { network ->
-            cm.getNetworkCapabilities(network)?.let {
-                if (it.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun getNetworks(cm: ConnectivityManager): List<Network> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            cm.activeNetwork?.let { Collections.singletonList(it) } ?: emptyList()
-        } else {
-            cm.allNetworks.toList()
-        }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun checkConnection(): Boolean {
+        return cm.getNetworkCapabilities(cm.activeNetwork)?.let {
+            it.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                && it.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        } ?: false
     }
 }
