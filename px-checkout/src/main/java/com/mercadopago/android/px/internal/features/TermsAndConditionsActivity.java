@@ -84,9 +84,9 @@ public class TermsAndConditionsActivity extends PXActivity {
         if (URLUtil.isValidUrl(data)) {
             mTermsAndConditionsWebView.loadUrl(data);
         } else {
-            String base64 = Base64.encodeToString(data.getBytes(StandardCharsets.UTF_8),
+            final String encodedUrl = Base64.encodeToString(data.getBytes(StandardCharsets.UTF_8),
                 Base64.DEFAULT);
-            mTermsAndConditionsWebView.loadData(base64, "text/html; charset=utf-8", "base64");
+            mTermsAndConditionsWebView.loadData(encodedUrl, "text/html; charset=utf-8", "base64");
         }
     }
 }
