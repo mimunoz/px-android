@@ -14,24 +14,21 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import com.meli.android.carddrawer.model.CardDrawerView;
+import com.meli.android.carddrawer.model.Label;
 import com.meli.android.carddrawer.model.customview.CardDrawerSwitch;
 import com.meli.android.carddrawer.model.customview.SwitchModel;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BasePagerFragment;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
-import com.mercadopago.android.px.internal.features.express.animations.BottomSlideAnimationSet;
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialog;
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogAction;
 import com.mercadopago.android.px.internal.features.generic_modal.GenericDialogItem;
 import com.mercadopago.android.px.internal.util.TextUtil;
-import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.view.DynamicHeightViewPager;
-import com.mercadopago.android.px.internal.view.MPTextView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
-import java.util.Arrays;
-
+import com.mercadopago.android.px.model.internal.Text;
 import static com.mercadopago.android.px.internal.util.AccessibilityUtilsKt.executeIfAccessibilityTalkBackEnable;
 
 public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
@@ -42,15 +39,14 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     private static final int CONTENT_DESCRIPTION_DELAY = 800;
 
     private CardView card;
-    private BottomSlideAnimationSet animation;
     private boolean focused;
-    private MPTextView bottomDescription;
     private Handler handler;
     private CardDrawerView cardDrawerView;
     @Nullable
     private SwitchModel switchModel;
     private PaymentMethodPagerListener listener = paymentTypeId -> {
     };
+    private boolean hasHighlightText;
 
     @Override
     public void onAttach(@NonNull final Context context) {
@@ -71,7 +67,6 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        animation = new BottomSlideAnimationSet();
         handler = new Handler();
     }
 
@@ -95,7 +90,6 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @CallSuper
     public void initializeViews(@NonNull final View view) {
         card = view.findViewById(R.id.payment_method);
-        bottomDescription = view.findViewById(R.id.bottom_description);
         cardDrawerView = view.findViewById(R.id.card);
         updateView();
         setUpCardDrawerCustomView();
@@ -103,23 +97,22 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
 
     @Override
     public void updateView() {
-        final View view = getView();
-        if (model.shouldHighlightBottomDescription()) {
-            final View highlightContainer = view.findViewById(R.id.bottom_description_container);
-            highlightContainer.setVisibility(View.INVISIBLE);
-            bottomDescription.setVisibility(View.INVISIBLE);
-            animation.initialize(Arrays.asList(highlightContainer, bottomDescription));
-        } else {
-            ViewUtils.setBackgroundColor(view.findViewById(R.id.bottom_description_background),
-                model.getBottomDescription().getBackgroundColor());
-            ViewUtils.loadOrHide(View.INVISIBLE, model.getBottomDescription(), bottomDescription);
-            view.findViewById(R.id.bottom_description_shadow).setVisibility(View.INVISIBLE);
-        }
         if (hasFocus()) {
             onFocusIn();
         }
+
         if (cardDrawerView != null) {
+            setBottomLabel();
             updateCardDrawerView(cardDrawerView);
+        }
+    }
+
+    private void setBottomLabel() {
+        if (!model.shouldHighlightBottomDescription()) {
+            Text text = model.getBottomDescription();
+            Label label = new Label(text.getMessage(), text.getBackgroundColor(), text.getTextColor(), text.getWeight(), false);
+            cardDrawerView.setBottomLabel(label);
+            cardDrawerView.showBottomLabel();
         }
     }
 
@@ -177,7 +170,10 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
 
     @Override
     public void updateHighlightText(@Nullable final String text) {
-        bottomDescription.setText(text);
+        hasHighlightText = cardDrawerView != null && TextUtil.isNotEmpty(text);
+        if (hasHighlightText) {
+            cardDrawerView.setBottomLabel(new Label(text));
+        }
     }
 
     @Override
@@ -259,19 +255,19 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
     @Override
     public void animateHighlightMessageIn() {
         if (shouldAnimate()) {
-            animation.slideUp();
+            cardDrawerView.showBottomLabel();
         }
     }
 
     @Override
     public void animateHighlightMessageOut() {
         if (shouldAnimate()) {
-            animation.slideDown();
+            cardDrawerView.hideBottomLabel();
         }
     }
 
     private boolean shouldAnimate() {
-        return animation != null && TextUtil.isNotEmpty(bottomDescription.getText());
+        return cardDrawerView != null && hasHighlightText;
     }
 
     @Override
