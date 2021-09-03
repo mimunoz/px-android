@@ -10,6 +10,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$mockito"
 
     implementation "androidx.appcompat:appcompat:$appcompat"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin"
+    implementation "com.google.code.gson:gson:$gson"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlin"
 }
