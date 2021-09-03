@@ -1,10 +1,8 @@
 package com.mercadopago.android.px.services;
 
 import android.content.Context;
-import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import com.mercadopago.android.px.addons.BehaviourProvider;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.services.BankDealService;
@@ -143,7 +141,6 @@ public class MercadoPagoServices {
         service.updateToken(tokenId, publicKey, privateKey, securityCodeIntent).enqueue(callback);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void getBankDeals(final Callback<List<BankDeal>> callback) {
         final BankDealService service = retrofitClient.create(BankDealService.class);
         service.getBankDeals(publicKey, privateKey, BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag())
@@ -168,7 +165,6 @@ public class MercadoPagoServices {
         service.getIdentificationTypesForAuthUser(accessToken).enqueue(callback);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void getInstallments(final String bin,
         final BigDecimal amount,
         final Long issuerId,

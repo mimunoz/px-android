@@ -112,6 +112,7 @@ internal class SecurityCodeFragment : BaseFragment(), PayButton.Handler, BackHan
                 postAnimationConfig()
             }
         }
+
         return super.onCreateAnimator(transit, enter, nextAnim)
     }
 
