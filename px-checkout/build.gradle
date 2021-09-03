@@ -8,7 +8,6 @@ apply plugin:'kotlin-android-extensions'
 android {
     defaultConfig {
         multiDexEnabled true
-        vectorDrawables.useSupportLibrary = true
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -28,7 +27,6 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:$androidTestArch"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutines"
 
-    implementation "androidx.multidex:multidex:$multidex"
     implementation "androidx.cardview:cardview:$cardView"
     implementation "androidx.recyclerview:recyclerview:$recyclerView"
     implementation "androidx.appcompat:appcompat:$appcompat"

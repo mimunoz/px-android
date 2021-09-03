@@ -43,7 +43,7 @@
             app:layout_constraintBottom_toTopOf="@id/top_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/px_consumer_credits_onetap" />
+            android:src="@drawable/px_consumer_credits_onetap" />
 
         <com.mercadopago.android.px.internal.view.LinkableTextView
             android:id="@+id/top_text"
@@ -66,11 +66,11 @@
             android:layout_marginBottom="@dimen/px_xxxs_margin"
             android:gravity="center_horizontal"
             android:textSize="@dimen/px_xxxs_text"
-            app:layout_constraintBottom_toTopOf="@id/bottom_description_container"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/top_text"
-            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintVertical_bias="0.0"
             tools:text="Al confirmar, aceptás los términos generales y las condiciones particulares de este préstamo." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
