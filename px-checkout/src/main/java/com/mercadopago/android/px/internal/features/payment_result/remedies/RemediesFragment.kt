@@ -11,6 +11,8 @@ import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.di.MapperProvider
 import com.mercadopago.android.px.internal.di.Session
 import com.mercadopago.android.px.internal.extensions.visible
+import com.mercadopago.android.px.internal.features.generic_modal.*
+import com.mercadopago.android.px.internal.features.generic_modal.GenericDialog.Companion.showDialog
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
@@ -20,14 +22,17 @@ import com.mercadopago.android.px.internal.features.payment_result.remedies.view
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil
 import com.mercadopago.android.px.internal.util.nonNullObserve
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
+import com.mercadopago.android.px.internal.viewmodel.TextLocalized
 
-internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener, PaymentResultFooter.Listener {
+internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener, PaymentResultFooter.Listener,
+    GenericDialog.Listener {
 
     private lateinit var viewModel: RemediesViewModel
     private var listener: Listener? = null
     private lateinit var retryPaymentFragment: RetryPaymentFragment
     private lateinit var retryPaymentContainer: View
     private lateinit var highRisk: HighRiskRemedy
+    private var showModalRemedies: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies, container, false)
@@ -41,7 +46,8 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             val paymentModel = getParcelable<PaymentModel>(PAYMENT_MODEL)
             val remediesModel = getParcelable<RemediesModel>(REMEDIES_MODEL)
             val session = Session.getInstance()
-            viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
+            viewModel = RemediesViewModel(
+                remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
                 session.amountConfigurationRepository, session.configurationModule.applicationSelectionRepository,
                 session.oneTapItemRepository,
@@ -78,7 +84,31 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
     }
 
     override fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback) {
-        viewModel.onPrePayment(callback)
+        if (showModalRemedies) {
+            viewModel.remedyMessageModal.value?.let { dataModal ->
+                showDialog(
+                    childFragmentManager, GenericDialogItem(
+                        dataModal.description.message,
+                        null,
+                        TextLocalized(dataModal.title, 0),
+                        TextLocalized(dataModal.description, 0),
+                        Actionable(
+                            dataModal.mainButton.label, null,
+                            ActionType.valueOf(dataModal.mainButton.action?.name.toString())
+                        ),
+                        dataModal.secondaryButton?.let { secondaryButton ->
+                            Actionable(
+                                secondaryButton.label,
+                                null,
+                                ActionType.valueOf(secondaryButton.action?.name.toString())
+                            )
+                        }
+                    )
+                )
+            }
+        } else {
+            viewModel.onPrePayment(callback)
+        }
     }
 
     override fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback) {
@@ -141,10 +171,28 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
         }
     }
 
+    override fun onAction(genericDialogAction: GenericDialogAction) {
+        super.onAttach(context!!)
+        if (genericDialogAction is GenericDialogAction.CustomAction) {
+            when (genericDialogAction.type) {
+                ActionType.PAY -> {
+                    showModalRemedies = false
+                    listener?.paymentWithModal()
+                }
+
+                ActionType.CHANGE_PM -> {
+                    showModalRemedies = false;
+                    viewModel.onButtonPressed(PaymentResultButton.Action.valueOf(genericDialogAction.type.name))
+                }
+            }
+        }
+    }
+
     interface Listener {
         fun enablePayButton()
         fun disablePayButton()
         fun onUserValidation()
         fun changePaymentMethod()
+        fun paymentWithModal()
     }
 }

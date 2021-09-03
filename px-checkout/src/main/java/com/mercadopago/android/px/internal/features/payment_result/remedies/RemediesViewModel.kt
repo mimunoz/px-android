@@ -15,6 +15,7 @@ import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PayerCost
 import com.mercadopago.android.px.model.PaymentData
 import com.mercadopago.android.px.model.PaymentRecovery
+import com.mercadopago.android.px.model.internal.Modal
 import com.mercadopago.android.px.model.internal.PaymentConfiguration
 import com.mercadopago.android.px.model.internal.remedies.RemedyPaymentMethod
 import com.mercadopago.android.px.tracking.internal.MPTracker
@@ -41,6 +42,7 @@ internal class RemediesViewModel(
 ) : BaseViewModelWithState<RemediesViewModel.State>(tracker), Remedies.ViewModel {
 
     val remedyState: MutableLiveData<RemedyState> = MutableLiveData()
+    val remedyMessageModal: MutableLiveData<Modal> = MutableLiveData()
     private val isSilverBullet = remediesModel.retryPayment?.isAnotherMethod == true
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
@@ -50,12 +52,18 @@ internal class RemediesViewModel(
         val customOptionId = methodIds.customOptionId
         val methodData = oneTapItemRepository[customOptionId]
         card = fromPayerPaymentMethodToCardMapper.map(
-            PayerPaymentMethodKey(customOptionId, methodIds.typeId))
+            PayerPaymentMethodKey(customOptionId, methodIds.typeId)
+        )
         remediesModel.retryPayment?.let {
             if (isSilverBullet) {
-                val paymentTypeId = previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
+                val paymentTypeId =
+                    previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
                 applicationSelectionRepository[methodData] = methodData.getApplications().first { application ->
                     application.paymentMethod.type == paymentTypeId
+                }
+
+                previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.let { modalMessageRemedies ->
+                    remedyMessageModal.value = modalMessageRemedies
                 }
             }
             remedyState.value = RemedyState.ShowRetryPaymentRemedy(Pair(it, methodData))
@@ -63,8 +71,11 @@ internal class RemediesViewModel(
         remediesModel.highRisk?.let {
             remedyState.value = RemedyState.ShowKyCRemedy(it)
         }
-        paymentConfiguration = PaymentConfiguration(methodIds.methodId, methodIds.typeId, customOptionId,
-            card?.isSecurityCodeRequired() == true, false, getPayerCost(customOptionId))
+
+        paymentConfiguration = PaymentConfiguration(
+            methodIds.methodId, methodIds.typeId, customOptionId,
+            card?.isSecurityCodeRequired() == true, false, getPayerCost(customOptionId)
+        )
     }
 
     override fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback) {
@@ -140,7 +151,8 @@ internal class RemediesViewModel(
                 cardTokenRepository,
                 escManagerBehaviour,
                 state.paymentRecovery,
-                tracker).recoverWithCVV(state.cvv)
+                tracker
+            ).recoverWithCVV(state.cvv)
 
             withContext(Dispatchers.Main) {
                 response.resolve(success = { token ->
@@ -182,8 +194,10 @@ internal class RemediesViewModel(
             }
 
             fun with(remedyPaymentMethod: RemedyPaymentMethod) =
-                MethodIds(remedyPaymentMethod.paymentMethodId, remedyPaymentMethod.paymentTypeId,
-                    remedyPaymentMethod.customOptionId)
+                MethodIds(
+                    remedyPaymentMethod.paymentMethodId, remedyPaymentMethod.paymentTypeId,
+                    remedyPaymentMethod.customOptionId
+                )
         }
     }
 

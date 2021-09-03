@@ -1,10 +1,13 @@
 package com.mercadopago.android.px.internal.features.payment_result.remedies.view
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.R
@@ -15,7 +18,7 @@ import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodLowResDrawer
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
-import com.mercadopago.android.px.internal.util.JsonUtil
+import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
 import com.mercadopago.android.px.model.internal.OneTapItem
@@ -28,6 +31,8 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     private lateinit var cvvRemedy: CvvRemedy
     private lateinit var paymentMethodDescriptor: PaymentMethodDescriptorView
     private lateinit var paymentMethodTitle: MPTextView
+    private lateinit var bottomText: LinkableTextView
+    private lateinit var backgroundteste: ImageView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies_retry_payment, container, false)
@@ -39,6 +44,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         cvvRemedy = view.findViewById(R.id.cvv_remedy)
         paymentMethodDescriptor = view.findViewById(R.id.payment_method_descriptor)
         paymentMethodTitle = view.findViewById(R.id.payment_method_title)
+        bottomText = view.findViewById(R.id.bottom_text)
     }
 
     fun init(model: Model, methodData: OneTapItem?) {
@@ -49,6 +55,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
                 model.bottomMessage?.let { message -> paymentMethodTitle.setText(message) }
                 showPaymentMethodDescriptor(it, model.payerCost)
             }
+            bottomText.updateModel(it.consumerCredits.displayInfo.bottomText)
         }
         model.cvvModel?.let { cvvRemedy.init(it) } ?: cvvRemedy.gone()
     }

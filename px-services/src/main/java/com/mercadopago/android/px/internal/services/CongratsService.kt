@@ -23,9 +23,9 @@ interface CongratsService {
         @Query("merchant_order_id") merchantOrderId: Long?,
         @Query("pref_id") preferenceId: String?): CongratsResponse
 
-    @POST("${BuildConfig.API_ENVIRONMENT_NEW}/px_mobile/v1/remedies/{payment_id}")
+    @POST("https://run.mocky.io/v3/fd435a82-681b-4ae4-995b-a16429f4d534")
     suspend fun getRemedies(
-        @Path(value = "payment_id", encoded = true) paymentId: String,
+        @Query(value = "payment_id", encoded = true) paymentId: String,
         @Query("access_token") accessToken: String,
         @Query("one_tap") oneTap: Boolean,
         @Body body: RemediesBody): RemediesResponse

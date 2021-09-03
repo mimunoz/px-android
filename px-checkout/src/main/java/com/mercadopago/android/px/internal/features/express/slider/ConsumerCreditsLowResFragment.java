@@ -30,7 +30,7 @@ public class ConsumerCreditsLowResFragment extends ConsumerCreditsFragment {
 
     @Override
     protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
-        ((LinkableTextView) view.findViewById(R.id.bottom_text)).updateModel(displayInfo.bottomText);
+
     }
 
     @Override
