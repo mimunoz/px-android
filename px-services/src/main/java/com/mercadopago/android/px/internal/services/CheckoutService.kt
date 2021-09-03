@@ -12,7 +12,7 @@ import java.math.BigDecimal
 
 interface CheckoutService {
 
-    @POST("https://run.mocky.io/v3/4bcbd3d1-1d16-4caf-a9c7-fe2fc709416a")
+    @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     suspend fun checkout(
         @Query("access_token") privateKey: String?,
         @Query("new_card_id") newCardId: String?,
