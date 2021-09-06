@@ -16,6 +16,18 @@ android {
     testOptions {
         unitTests.includeAndroidResources = true
     }
+
+    buildTypes {
+
+        mds {
+            // This build type "mds" can NOT be renamed because the keyword is used from our Mobile Distribution System.
+            debuggable true
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+    }
 }
 
 dependencies {

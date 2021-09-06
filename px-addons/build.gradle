@@ -5,6 +5,21 @@ apply from: "$rootDir/gradle/deploy_addons.gradle"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+android {
+
+    buildTypes {
+        mds {
+            // This build type "mds" can NOT be renamed because the keyword is used from our Mobile Distribution System.
+            debuggable true
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        }
+    }
+
+}
+
 dependencies {
     testImplementation "junit:junit:$junit"
     testImplementation "org.mockito:mockito-core:$mockito"
