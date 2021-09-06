@@ -17,10 +17,12 @@ import com.mercadopago.android.px.internal.extensions.gone
 import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodLowResDrawer
+import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodMiniResDrawer
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
+import com.mercadopago.android.px.model.ConsumerCreditsDisplayInfo
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.internal.Text
 import kotlinx.android.parcel.Parcelize
@@ -32,7 +34,6 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     private lateinit var paymentMethodDescriptor: PaymentMethodDescriptorView
     private lateinit var paymentMethodTitle: MPTextView
     private lateinit var bottomText: LinkableTextView
-    private lateinit var backgroundteste: ImageView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies_retry_payment, container, false)
@@ -68,7 +69,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         childFragmentManager.beginTransaction().apply {
             val drawableFragmentItem = MapperProvider.getPaymentMethodDrawableItemMapper().map(methodData)!!
             drawableFragmentItem.switchModel = null
-            val paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
+            val paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodMiniResDrawer()) as PaymentMethodFragment<*>
             paymentMethodFragment.onFocusIn()
             replace(R.id.card_container, paymentMethodFragment)
             commitAllowingStateLoss()

@@ -1,22 +1,22 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.view.LinkableTextView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.ConsumerCreditsDrawableFragmentItem;
 import com.mercadopago.android.px.model.ConsumerCreditsDisplayInfo;
 
-public class ConsumerCreditsLowResFragment extends ConsumerCreditsFragment {
+public class ConsumerCreditsMiniResFragment extends ConsumerCreditsFragment {
 
     @NonNull
     public static Fragment getInstance(@NonNull final ConsumerCreditsDrawableFragmentItem model) {
-        final ConsumerCreditsLowResFragment instance = new ConsumerCreditsLowResFragment();
+        final ConsumerCreditsMiniResFragment instance = new ConsumerCreditsMiniResFragment();
         instance.storeModel(model);
         return instance;
     }
@@ -29,9 +29,7 @@ public class ConsumerCreditsLowResFragment extends ConsumerCreditsFragment {
     }
 
     @Override
-    protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
-        ((LinkableTextView) view.findViewById(R.id.bottom_text)).updateModel(displayInfo.bottomText);
-    }
+    protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) { }
 
     @Override
     protected void setInstallment(final View view, final int installmentSelected) {
