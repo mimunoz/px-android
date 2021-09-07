@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 import com.mercadolibre.android.andesui.bottomsheet.AndesBottomSheet;
+import com.mercadolibre.android.andesui.snackbar.duration.AndesSnackbarDuration;
+import com.mercadolibre.android.andesui.snackbar.type.AndesSnackbarType;
 import com.mercadolibre.android.cardform.CardForm;
 import com.mercadolibre.android.cardform.internal.CardFormWithFragment;
 import com.mercadolibre.android.cardform.internal.LifecycleListener;
@@ -29,14 +31,14 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.BackHandler;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.BaseFragment;
-import com.mercadopago.android.px.internal.callbacks.From;
-import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
+import com.mercadopago.android.px.internal.callbacks.DeepLinkServiceHandler;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.MapperProvider;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
 import com.mercadopago.android.px.internal.experiments.Variant;
 import com.mercadopago.android.px.internal.experiments.VariantHandler;
+import com.mercadopago.android.px.internal.extensions.ViewExtensionsKt;
 import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
 import com.mercadopago.android.px.internal.features.express.add_new_card.OtherPaymentMethodFragment;
 import com.mercadopago.android.px.internal.features.express.add_new_card.sheet_options.CardFormBottomSheetFragment;
@@ -65,7 +67,6 @@ import com.mercadopago.android.px.internal.features.pay_button.PayButtonFragment
 import com.mercadopago.android.px.internal.features.security_code.SecurityCodeFragment;
 import com.mercadopago.android.px.internal.util.CardFormWrapper;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
-import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.internal.util.Logger;
 import com.mercadopago.android.px.internal.util.VibrationUtils;
 import com.mercadopago.android.px.internal.view.DiscountDetailDialog;
@@ -98,6 +99,8 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ExpressPaymentFragment extends BaseFragment implements ExpressPayment.View, ViewPager.OnPageChangeListener,
     SplitPaymentHeaderAdapter.SplitListener, PaymentMethodFragment.DisabledDetailDialogLauncher,
     OtherPaymentMethodFragment.OnOtherPaymentMethodClickListener, TitlePagerAdapter.InstallmentChanged,
@@ -109,8 +112,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     private static final String EXTRA_RENDER_MODE = "render_mode";
     private static final String EXTRA_NAVIGATION_STATE = "navigation_state";
     private static final String URI = "uri";
-    private static final String FROM = "from";
-    private static final String RESPONSE = "response";
 
     private static final int REQ_CODE_DISABLE_DIALOG = 105;
     private static final float PAGER_NEGATIVE_MARGIN_MULTIPLIER = -1.5f;
@@ -279,7 +280,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     private void configureViews(@NonNull final View view) {
         configurePaymentMethodHeader(view);
-        resolveDeepLinkResponse();
         payButtonFragment = (PayButtonFragment) getChildFragmentManager().findFragmentById(R.id.pay_button);
         payButtonContainer = view.findViewById(R.id.pay_button);
         offlineMethodsFragment =
@@ -310,15 +310,24 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         ));
     }
 
-    private void resolveDeepLinkResponse() {
-        final Uri uri = Objects.requireNonNull(getArguments()).getParcelable(URI);
-        final String from = uri != null && uri.getQueryParameter(FROM) != null ? uri.getQueryParameter(FROM) : From.NONE.getValue();
-        final From fromResponse = From.valueOf(from.toUpperCase());
-        if (fromResponse.equals(From.TOKENIZATION)) {
-            final String response = Objects.requireNonNull(uri).getQueryParameter(RESPONSE);
-            final TokenizationResponse tokenizationResponse = JsonUtil.fromJson(response, TokenizationResponse.class);
-            TokenizationDeepLinkHelper.doAction(Objects.requireNonNull(tokenizationResponse), this);
+    public void resolveDeepLinkResponse(@Nullable final Uri uri) {
+        if (uri != null) {
+            final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(state -> {
+                switch(state) {
+                    case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
+                        break;
+                    case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
+                        break;
+                    case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
+                        break;
+                }
+            });
+            deepLinkServiceHandler.resolveDeepLink(uri);
         }
+    }
+
+    private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {
+        ViewExtensionsKt.showSnackBar(getView(), message, andesSnackbarType, AndesSnackbarDuration.LONG, null);
     }
 
     @Override
@@ -331,6 +340,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         if (arguments == null || !arguments.containsKey(EXTRA_VARIANT)) {
             throw new IllegalStateException("One tap should have a variant to display");
         }
+        resolveDeepLinkResponse(Objects.requireNonNull(arguments).getParcelable(URI));
         final Variant variant = Objects.requireNonNull(arguments.getParcelable(EXTRA_VARIANT));
         ExperimentHelper.INSTANCE.applyExperimentViewBy(
             view.findViewById(R.id.installments_header_experiment_container), variant, getLayoutInflater());

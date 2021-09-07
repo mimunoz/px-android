@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -77,11 +78,19 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getData() != null) {
-            final ExpressPayment.View fragment =
-                (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
-            if (fragment != null) {
-                fragment.onDeepLinkReceived();
+        final Uri data = intent.getData();
+        if (data != null) {
+            if (data.getQueryParameter("from") != null) {
+                final ExpressPaymentFragment fragment = (ExpressPaymentFragment) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
+                if (fragment != null) {
+                    fragment.resolveDeepLinkResponse(data);
+                }
+            } else {
+                final ExpressPayment.View fragment =
+                        (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
+                if (fragment != null) {
+                    fragment.onDeepLinkReceived();
+                }
             }
         } else {
             FragmentUtil.tryRemoveNow(getSupportFragmentManager(), TAG_ONETAP_FRAGMENT);
