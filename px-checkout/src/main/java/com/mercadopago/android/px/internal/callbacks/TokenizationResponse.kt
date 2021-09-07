@@ -14,7 +14,7 @@ internal data class TokenizationResponse(
     }
 
     enum class ErrorType {
-        RECOVERABLE,
-        NON_RECOVERABLE
+        @SerializedName("recoverable") RECOVERABLE,
+        @SerializedName("non_recoverable") NON_RECOVERABLE
     }
 }

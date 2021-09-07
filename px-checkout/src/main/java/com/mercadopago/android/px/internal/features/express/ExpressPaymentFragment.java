@@ -32,6 +32,8 @@ import com.mercadopago.android.px.core.BackHandler;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.BaseFragment;
 import com.mercadopago.android.px.internal.callbacks.DeepLinkServiceHandler;
+import com.mercadopago.android.px.internal.callbacks.DeepLinkServiceListener;
+import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.MapperProvider;
 import com.mercadopago.android.px.internal.di.Session;
@@ -90,6 +92,9 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -98,8 +103,6 @@ import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
-
-import org.jetbrains.annotations.NotNull;
 
 public class ExpressPaymentFragment extends BaseFragment implements ExpressPayment.View, ViewPager.OnPageChangeListener,
     SplitPaymentHeaderAdapter.SplitListener, PaymentMethodFragment.DisabledDetailDialogLauncher,
@@ -312,14 +315,17 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     public void resolveDeepLinkResponse(@Nullable final Uri uri) {
         if (uri != null) {
-            final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(state -> {
-                switch(state) {
-                    case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
-                        break;
-                    case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
-                        break;
-                    case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
-                        break;
+            final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(new DeepLinkServiceListener() {
+                @Override
+                public void onTokenization(@NonNull final TokenizationResponse.State state) {
+                    switch(state) {
+                        case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
+                            break;
+                        case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
+                            break;
+                        case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
+                            break;
+                    }
                 }
             });
             deepLinkServiceHandler.resolveDeepLink(uri);
