@@ -4,22 +4,21 @@ import android.content.SharedPreferences
 
 class AuthorizationProvider(private val sharedPreferences: SharedPreferences) {
 
-    private var internalPrivateKey: String? = null
-    val privateKey: String
+    var privateKey: String? = null
         get() {
-            if (internalPrivateKey == null) {
-                internalPrivateKey = sharedPreferences.getString(PREF_PRIVATE_KEY, null)
+            if (field == null) {
+                privateKey = sharedPreferences.getString(PREF_PRIVATE_KEY, null)
             }
-            return internalPrivateKey!!
+            return field
         }
 
     fun configure(privateKey: String?) {
-        internalPrivateKey = privateKey
+        this.privateKey = privateKey
         sharedPreferences.edit().putString(PREF_PRIVATE_KEY, privateKey).apply()
     }
 
     fun reset() {
-        internalPrivateKey = null
+        privateKey = null
         sharedPreferences.edit().remove(PREF_PRIVATE_KEY).apply()
     }
 

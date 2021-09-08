@@ -510,7 +510,8 @@ import kotlin.Unit;
         case ADD_NEW_CARD:
             getView().setPagerIndex(actionTypeWrapper.getIndexToReturn());
             getView().startAddNewCardFlow(
-                new CardFormWrapper(paymentSettingRepository, trackingRepository, authorizationProvider));
+                new CardFormWrapper(
+                    paymentSettingRepository,trackingRepository, authorizationProvider));
             break;
         default: // do nothing
         }

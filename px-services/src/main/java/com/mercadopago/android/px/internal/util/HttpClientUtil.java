@@ -97,10 +97,7 @@ public final class HttpClientUtil {
             baseClient.addInterceptor(new PlatformInterceptor(context));
             baseClient.addInterceptor(new FlowIdInterceptor(ConfigurationModule.INSTANCE.getTrackingRepository()));
             baseClient.addInterceptor(new LanguageInterceptor(BehaviourProvider.getLocaleBehaviour()));
-
-            if (ConfigurationModule.INSTANCE.getAuthorizationProvider().getPrivateKey() != "") {
-                baseClient.addInterceptor(new AuthorizationInterceptor(ConfigurationModule.INSTANCE.getAuthorizationProvider()));
-            }
+            baseClient.addInterceptor(new AuthorizationInterceptor(ConfigurationModule.INSTANCE.getAuthorizationProvider()));
         }
 
         baseClient.addInterceptor(new StrictModeInterceptor());
