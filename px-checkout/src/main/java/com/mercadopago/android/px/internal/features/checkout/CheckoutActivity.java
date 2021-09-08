@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -129,31 +130,30 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
     @Override
     public void onBackPressed() {
         final FragmentManager fragmentManager = getSupportFragmentManager();
-        if (fragmentManager != null) {
-            final int backStackEntryCount = fragmentManager.getBackStackEntryCount();
 
-            final Fragment fragment = fragmentManager.findFragmentByTag(CardFormWithFragment.TAG);
-            if (fragment != null && fragment.getChildFragmentManager().getBackStackEntryCount() > 0) {
-                fragment.getChildFragmentManager().popBackStack();
-                return;
-            }
+        final int backStackEntryCount = fragmentManager.getBackStackEntryCount();
 
-            if (earlyExitFromBackHandler(fragmentManager.findFragmentByTag(SecurityCodeFragment.TAG))) {
-                return;
-            }
-
-            if (earlyExitFromBackHandler(fragmentManager.findFragmentByTag(TAG_ONETAP_FRAGMENT))) {
-                return;
-            }
-
-            if (backStackEntryCount > 0) {
-                fragmentManager.popBackStack();
-                return;
-            }
-
-            super.onBackPressed();
-            overrideTransitionOut();
+        final Fragment fragment = fragmentManager.findFragmentByTag(CardFormWithFragment.TAG);
+        if (fragment != null && fragment.getChildFragmentManager().getBackStackEntryCount() > 0) {
+            fragment.getChildFragmentManager().popBackStack();
+            return;
         }
+
+        if (earlyExitFromBackHandler(fragmentManager.findFragmentByTag(SecurityCodeFragment.TAG))) {
+            return;
+        }
+
+        if (earlyExitFromBackHandler(fragmentManager.findFragmentByTag(TAG_ONETAP_FRAGMENT))) {
+            return;
+        }
+
+        if (backStackEntryCount > 0) {
+            fragmentManager.popBackStack();
+            return;
+        }
+
+        super.onBackPressed();
+        overrideTransitionOut();
     }
 
     private boolean earlyExitFromBackHandler(@Nullable final Fragment fragment) {
@@ -220,7 +220,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
                 //Business custom exit
                 final int resCode = data.getIntExtra(EXTRA_CLIENT_RES_CODE, RESULT_OK);
                 presenter.onPaymentResultResponse(resCode, backUrl, redirectUrl);
-            } else if (data != null && data.hasExtra(EXTRA_RESULT_CODE)) {
+            } else if (data.hasExtra(EXTRA_RESULT_CODE)) {
                 //Custom exit  - Result screen.
                 final Integer finalResultCode = data.getIntExtra(EXTRA_RESULT_CODE, PAYMENT_RESULT_CODE);
                 customDataBundle = data;
@@ -257,17 +257,21 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
 
     @Override
     public void goToLink(@NonNull final String link) {
-        final Intent intent = MercadoPagoUtil.getIntent(this, link);
-        if (intent != null) {
+        final Intent intent = MercadoPagoUtil.getIntent(link);
+        try {
             startActivity(intent);
+        } catch (final ActivityNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void openInWebView(@NonNull final String link) {
         final Intent intent = MercadoPagoUtil.getNativeOrWebViewIntent(this, link);
-        if (intent != null) {
+        try {
             startActivity(intent);
+        } catch (final ActivityNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

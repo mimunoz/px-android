@@ -1,3 +1,28 @@
+## VERSION 4.88.2
+_07_09_2021_
+* FIX - Changes payment congrats type mapper to use decorator.
+
+## VERSION 4.88.1
+_27_08_2021_
+* FIX - Connection check with VPN in API < 29.
+
+## VERSION 4.87.2
+_27_08_2021_
+* FIX - Connection check with VPN in API < 29.
+
+## VERSION 4.88.0
+_26_08_2021_
+* FEATURE - Migration of Nudata flow to Dynamic Features also update PXBehaviourConfigurer to avoid null sets.
+* FEATURE - Adds notification message in congrats for MLA when using third party cards.
+
+## VERSION 4.87.1
+_25_08_2021_
+* FIX - Crash on congrats with split payments
+
+## VERSION 4.87.0
+_19_08_2021_
+* FEATURE - Added profile id as header in payments api call
+
 ## VERSION 4.86.0
 _12_08_2021_
 * FEATURE - Added support for IDC regulation
