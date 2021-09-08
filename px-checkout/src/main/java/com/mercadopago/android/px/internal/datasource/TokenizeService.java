@@ -48,7 +48,6 @@ public class TokenizeService implements TokenRepository {
 
             gatewayService.createToken(
                 paymentSettingRepository.getPublicKey(),
-                paymentSettingRepository.getPrivateKey(),
                 SavedESCCardToken.createWithEsc(cardId, esc, device)).enqueue(wrap(card, esc, callback));
         };
     }
@@ -61,7 +60,6 @@ public class TokenizeService implements TokenRepository {
 
             gatewayService.createToken(
                 paymentSettingRepository.getPublicKey(),
-                paymentSettingRepository.getPrivateKey(),
                 savedCardToken).enqueue(wrap(card, callback));
         };
     }

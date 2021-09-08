@@ -10,6 +10,7 @@ import com.mercadopago.android.px.configuration.DynamicDialogConfiguration;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.core.internal.TriggerableQueue;
 import com.mercadopago.android.px.internal.base.BasePresenterWithState;
+import com.mercadopago.android.px.internal.core.AuthorizationProvider;
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver;
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase;
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase;
@@ -37,7 +38,6 @@ import com.mercadopago.android.px.internal.repository.AmountConfigurationReposit
 import com.mercadopago.android.px.internal.repository.AmountRepository;
 import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository;
 import com.mercadopago.android.px.internal.repository.ChargeRepository;
-import com.mercadopago.android.px.internal.repository.CheckoutRepository;
 import com.mercadopago.android.px.internal.repository.CustomTextsRepository;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
@@ -69,7 +69,6 @@ import com.mercadopago.android.px.model.PaymentData;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.model.internal.Application;
-import com.mercadopago.android.px.model.internal.CheckoutResponse;
 import com.mercadopago.android.px.model.internal.FromExpressMetadataToPaymentConfiguration;
 import com.mercadopago.android.px.model.internal.Modal;
 import com.mercadopago.android.px.model.internal.OneTapItem;
@@ -77,7 +76,6 @@ import com.mercadopago.android.px.model.internal.PaymentConfiguration;
 import com.mercadopago.android.px.model.internal.SummaryInfo;
 import com.mercadopago.android.px.model.one_tap.CheckoutBehaviour;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
-import com.mercadopago.android.px.services.Callback;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import com.mercadopago.android.px.tracking.internal.events.ConfirmEvent;
 import com.mercadopago.android.px.tracking.internal.events.InstallmentsEventTrack;
@@ -122,6 +120,7 @@ import kotlin.Unit;
     @NonNull private final PayerCostSelectionRepository payerCostSelectionRepository;
     @NonNull private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
     @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
+    @NonNull private final AuthorizationProvider authorizationProvider;
     /* default */ TriggerableQueue triggerableQueue;
 
     /* default */ ExpressPaymentPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
@@ -149,7 +148,8 @@ import kotlin.Unit;
         @NonNull final SummaryInfoMapper summaryInfoMapper,
         @NonNull final ElementDescriptorMapper elementDescriptorMapper,
         @NonNull final FromApplicationToApplicationInfo fromApplicationToApplicationInfo,
-        @NonNull final MPTracker tracker) {
+        @NonNull final MPTracker tracker,
+        @NonNull final AuthorizationProvider authorizationProvider) {
         super(tracker);
         this.paymentSettingRepository = paymentSettingRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
@@ -176,6 +176,7 @@ import kotlin.Unit;
         this.payerPaymentMethodRepository = payerPaymentMethodRepository;
         this.modalRepository = modalRepository;
         this.customOptionIdSolver = customOptionIdSolver;
+        this.authorizationProvider = authorizationProvider;
 
         triggerableQueue = new TriggerableQueue();
     }
@@ -509,7 +510,8 @@ import kotlin.Unit;
         case ADD_NEW_CARD:
             getView().setPagerIndex(actionTypeWrapper.getIndexToReturn());
             getView().startAddNewCardFlow(
-                new CardFormWrapper(paymentSettingRepository, trackingRepository));
+                new CardFormWrapper(
+                    paymentSettingRepository,trackingRepository, authorizationProvider));
             break;
         default: // do nothing
         }

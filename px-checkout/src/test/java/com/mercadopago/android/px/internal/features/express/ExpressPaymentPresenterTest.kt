@@ -6,6 +6,7 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.DynamicDialogConfiguration
 import com.mercadopago.android.px.core.DynamicDialogCreator
 import com.mercadopago.android.px.internal.callbacks.Response
+import com.mercadopago.android.px.internal.core.AuthorizationProvider
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
@@ -142,6 +143,9 @@ class ExpressPaymentPresenterTest {
     @Mock
     private lateinit var customOptionIdSolver: CustomOptionIdSolver
 
+    @Mock
+    private lateinit var authorizationProvider: AuthorizationProvider
+
     private lateinit var checkoutUseCase : CheckoutUseCase
     private lateinit var checkoutWithNewCardUseCase : CheckoutWithNewCardUseCase
 
@@ -178,12 +182,24 @@ class ExpressPaymentPresenterTest {
         `when`(applicationSelectionRepository[CustomOptionIdSolver.defaultCustomOptionId(oneTapItem)]).thenReturn(application)
         `when`(summaryInfoMapper.map(preference)).thenReturn(mock(SummaryInfo::class.java))
         `when`(elementDescriptorMapper.map(any(SummaryInfo::class.java))).thenReturn(mock(ElementDescriptorView.Model::class.java))
-        expressPaymentPresenter = ExpressPaymentPresenter(paymentSettingRepository, disabledPaymentMethodRepository,
-            payerCostSelectionRepository, applicationSelectionRepository, discountRepository, amountRepository,
-            checkoutUseCase, checkoutWithNewCardUseCase, amountConfigurationRepository, chargeRepository, escManagerBehaviour,
-            experimentsRepository, payerComplianceRepository, trackingRepository,
+        expressPaymentPresenter = ExpressPaymentPresenter(
+            paymentSettingRepository,
+            disabledPaymentMethodRepository,
+            payerCostSelectionRepository,
+            applicationSelectionRepository,
+            discountRepository,
+            amountRepository,
+            checkoutUseCase,
+            checkoutWithNewCardUseCase,
+            amountConfigurationRepository,
+            chargeRepository,
+            escManagerBehaviour,
+            experimentsRepository,
+            payerComplianceRepository,
+            trackingRepository,
             mock(CustomTextsRepository::class.java),
-            oneTapItemRepository, payerPaymentMethodRepository,
+            oneTapItemRepository,
+            payerPaymentMethodRepository,
             modalRepository,
             customOptionIdSolver,
             paymentMethodDrawableItemMapper,
@@ -192,7 +208,9 @@ class ExpressPaymentPresenterTest {
             summaryInfoMapper,
             elementDescriptorMapper,
             mock(FromApplicationToApplicationInfo::class.java),
-            tracker)
+            tracker,
+            authorizationProvider
+        )
         verifyAttachView()
     }
 
