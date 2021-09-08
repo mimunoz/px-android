@@ -30,7 +30,6 @@ public class PaymentSettingService implements PaymentSettingRepository {
     private static final String PREF_PUBLIC_KEY = "PREF_PUBLIC_KEY";
     private static final String PREF_SITE = "PREF_SITE";
     private static final String PREF_CURRENCY = "PREF_CURRENCY";
-    private static final String PREF_PRIVATE_KEY = "PREF_PRIVATE_KEY";
     private static final String PREF_TOKEN = "PREF_TOKEN";
     private static final String PREF_SECURITY_TYPE = "PREF_SECURITY_TYPE";
     private static final String PREF_PRODUCT_ID = "PREF_PRODUCT_ID";

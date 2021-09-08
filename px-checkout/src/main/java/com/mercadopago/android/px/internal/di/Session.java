@@ -465,7 +465,9 @@ public final class Session extends ApplicationModule {
         configurationModule.getTrackingRepository().configure(
             TrackingRepositoryModelMapper.INSTANCE.map(checkout.getTrackingConfiguration()));
         configurationModule.getProductIdProvider().configure(productId);
-        configurationModule.getAuthorizationProvider().configure(accessToken);
+        if (TextUtil.isNotEmpty(accessToken)) {
+            configurationModule.getAuthorizationProvider().configure(accessToken);
+        }
     }
 
     public enum State {
