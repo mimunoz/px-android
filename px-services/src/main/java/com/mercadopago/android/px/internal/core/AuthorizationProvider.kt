@@ -13,7 +13,7 @@ class AuthorizationProvider(private val sharedPreferences: SharedPreferences) {
             return internalPrivateKey!!
         }
 
-    fun configure(privateKey: String) {
+    fun configure(privateKey: String?) {
         internalPrivateKey = privateKey
         sharedPreferences.edit().putString(PREF_PRIVATE_KEY, privateKey).apply()
     }
