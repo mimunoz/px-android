@@ -52,7 +52,8 @@ public class OtherPaymentMethodFragment
         final CheckoutConfigurationModule configurationModule = Session.getInstance().getConfigurationModule();
         return new OtherPaymentMethodPresenter(new CardFormWrapper(
             configurationModule.getPaymentSettings(),
-            configurationModule.getTrackingRepository()
+            configurationModule.getTrackingRepository(),
+            configurationModule.getAuthorizationProvider()
         ), Session.getInstance().getTracker());
     }
 

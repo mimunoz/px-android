@@ -61,7 +61,8 @@ internal class CardFormBottomSheetFragment : Fragment() {
         val configurationModule = Session.getInstance().configurationModule
         cardFormWrapper = CardFormWrapper(
             configurationModule.paymentSettings,
-            configurationModule.trackingRepository)
+            configurationModule.trackingRepository,
+            configurationModule.authorizationProvider)
     }
 
     private fun onCardFormOptionSelected(cardFormInitType: CardFormInitType) {
