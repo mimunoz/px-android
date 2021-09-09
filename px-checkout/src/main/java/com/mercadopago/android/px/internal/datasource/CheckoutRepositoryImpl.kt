@@ -84,13 +84,13 @@ internal open class CheckoutRepositoryImpl(
     }
 
     private suspend fun doCheckout(cardId: String?): ResponseCallback<CheckoutResponse> {
-        val body = initRequestBodyMapper.map(paymentSettingRepository)
+        val body = initRequestBodyMapper.map(paymentSettingRepository, cardId)
         val preferenceId = paymentSettingRepository.checkoutPreferenceId
         val apiResponse = networkApi.apiCallForResponse(CheckoutService::class.java) {
             if (preferenceId != null) {
-                it.checkout(preferenceId, cardId, body)
+                it.checkout(preferenceId, body)
             } else {
-                it.checkout(cardId, body)
+                it.checkout(body)
             }
         }
         return when (apiResponse) {
