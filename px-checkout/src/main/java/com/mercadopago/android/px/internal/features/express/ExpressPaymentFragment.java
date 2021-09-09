@@ -316,6 +316,12 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     public void resolveDeepLinkResponse(@Nullable final Uri uri) {
         if (uri != null) {
             final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(new DeepLinkServiceListener() {
+
+                @Override
+                public void onDefault() {
+                    presenter.handleDeepLink();
+                }
+
                 @Override
                 public void onTokenization(@NonNull final TokenizationResponse.State state) {
                     switch(state) {
@@ -731,8 +737,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     @Override
-    public void onDeepLinkReceived() {
-        presenter.handleDeepLink();
+    public void onDeepLinkReceived(@NotNull final Uri uri) {
+        resolveDeepLinkResponse(uri);
     }
 
     @Override

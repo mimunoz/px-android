@@ -78,17 +78,10 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         super.onNewIntent(intent);
         final Uri data = intent.getData();
         if (data != null) {
-            if (data.getQueryParameter("from") != null) {
-                final ExpressPaymentFragment fragment = (ExpressPaymentFragment) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
-                if (fragment != null) {
-                    fragment.resolveDeepLinkResponse(data);
-                }
-            } else {
-                final ExpressPayment.View fragment =
-                        (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
-                if (fragment != null) {
-                    fragment.onDeepLinkReceived();
-                }
+            final ExpressPayment.View fragment =
+                    (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
+            if (fragment != null) {
+                fragment.onDeepLinkReceived(data);
             }
         } else {
             FragmentUtil.tryRemoveNow(getSupportFragmentManager(), TAG_ONETAP_FRAGMENT);
