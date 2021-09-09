@@ -92,9 +92,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.model.internal.Application;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;
 import com.mercadopago.android.px.model.internal.PaymentConfiguration;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -271,6 +269,15 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             }
         };
         getActivity().getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+
+        resolveDeepLink();
+    }
+
+    private void resolveDeepLink() {
+        final Bundle arguments = getArguments();
+        if (arguments != null && arguments.getParcelable(URI) != null) {
+            resolveDeepLinkResponse(arguments.getParcelable(URI));
+        }
     }
 
     @Override
@@ -313,29 +320,27 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         ));
     }
 
-    public void resolveDeepLinkResponse(@Nullable final Uri uri) {
-        if (uri != null) {
-            final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(new DeepLinkServiceListener() {
+    public void resolveDeepLinkResponse(@NotNull final Uri uri) {
+        final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(new DeepLinkServiceListener() {
 
-                @Override
-                public void onDefault() {
-                    presenter.handleDeepLink();
-                }
+            @Override
+            public void onDefault() {
+                presenter.handleDeepLink();
+            }
 
-                @Override
-                public void onTokenization(@NonNull final TokenizationResponse.State state) {
-                    switch(state) {
-                        case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
-                            break;
-                        case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
-                            break;
-                        case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
-                            break;
-                    }
+            @Override
+            public void onTokenization(@NonNull final TokenizationResponse.State state) {
+                switch(state) {
+                    case SUCCESS: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_success), AndesSnackbarType.SUCCESS);
+                        break;
+                    case PENDING: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_pending), AndesSnackbarType.NEUTRAL);
+                        break;
+                    case ERROR: showSnackBar(getResources().getString(R.string.px_tokenization_snackbar_error), AndesSnackbarType.ERROR);
+                        break;
                 }
-            });
-            deepLinkServiceHandler.resolveDeepLink(uri);
-        }
+            }
+        });
+        deepLinkServiceHandler.resolveDeepLink(uri);
     }
 
     private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {
@@ -352,7 +357,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
         if (arguments == null || !arguments.containsKey(EXTRA_VARIANT)) {
             throw new IllegalStateException("One tap should have a variant to display");
         }
-        resolveDeepLinkResponse(Objects.requireNonNull(arguments).getParcelable(URI));
         final Variant variant = Objects.requireNonNull(arguments.getParcelable(EXTRA_VARIANT));
         ExperimentHelper.INSTANCE.applyExperimentViewBy(
             view.findViewById(R.id.installments_header_experiment_container), variant, getLayoutInflater());

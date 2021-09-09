@@ -79,7 +79,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         final Uri data = intent.getData();
         if (data != null) {
             final ExpressPayment.View fragment =
-                    (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
+                (ExpressPayment.View) getSupportFragmentManager().findFragmentByTag(TAG_ONETAP_FRAGMENT);
             if (fragment != null) {
                 fragment.onDeepLinkReceived(data);
             }
