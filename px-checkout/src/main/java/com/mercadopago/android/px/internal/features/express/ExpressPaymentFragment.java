@@ -248,6 +248,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             presenter.restoreState(savedInstanceState.getParcelable(BUNDLE_STATE));
         } else {
             presenter.onFreshStart();
+            resolveDeepLink();
         }
 
         presenter.attachView(this);
@@ -269,8 +270,6 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             }
         };
         getActivity().getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-
-        resolveDeepLink();
     }
 
     private void resolveDeepLink() {
