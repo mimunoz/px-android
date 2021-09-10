@@ -44,7 +44,7 @@ internal class RemediesViewModel(
     private val isSilverBullet = remediesModel.retryPayment?.isAnotherMethod == true
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
-    private var isShowModal = false
+    private var showedModal = false
 
     init {
         val methodIds = getMethodIds()
@@ -83,7 +83,7 @@ internal class RemediesViewModel(
 
     override fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback) {
         previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.takeUnless {
-            isShowModal
+            showedModal
         }?.let {
             remedyState.value = RemedyState.ShowModal(it)
         } ?: callback.call(paymentConfiguration!!)
@@ -170,7 +170,7 @@ internal class RemediesViewModel(
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
             }
             PaymentResultButton.Action.PAY -> {
-                isShowModal = true
+                showedModal = true
                 remedyState.value = RemedyState.Pay
             }
             else -> TODO()
