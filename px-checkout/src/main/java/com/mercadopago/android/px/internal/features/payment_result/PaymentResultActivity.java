@@ -323,7 +323,7 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
     }
 
     @Override
-    public void paymentWithModal() {
+    public void payFromModal() {
         payButtonFragment.stimulate();
     }
 }

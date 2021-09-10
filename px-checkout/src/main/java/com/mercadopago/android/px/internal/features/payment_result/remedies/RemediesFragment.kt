@@ -32,7 +32,6 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
     private lateinit var retryPaymentFragment: RetryPaymentFragment
     private lateinit var retryPaymentContainer: View
     private lateinit var highRisk: HighRiskRemedy
-    private var showModalRemedies: Boolean = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies, container, false)
@@ -84,31 +83,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
     }
 
     override fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback) {
-        if (showModalRemedies) {
-            viewModel.remedyMessageModal.value?.let { dataModal ->
-                showDialog(
-                    childFragmentManager, GenericDialogItem(
-                        dataModal.description.message,
-                        null,
-                        TextLocalized(dataModal.title, 0),
-                        TextLocalized(dataModal.description, 0),
-                        Actionable(
-                            dataModal.mainButton.label, null,
-                            ActionType.valueOf(dataModal.mainButton.action?.name.toString())
-                        ),
-                        dataModal.secondaryButton?.let { secondaryButton ->
-                            Actionable(
-                                secondaryButton.label,
-                                null,
-                                ActionType.valueOf(secondaryButton.action?.name.toString())
-                            )
-                        }
-                    )
-                )
-            }
-        } else {
-            viewModel.onPrePayment(callback)
-        }
+        viewModel.onPrePayment(callback)
     }
 
     override fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback) {
@@ -147,6 +122,32 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 is RemedyState.ChangePaymentMethod -> {
                     listener?.changePaymentMethod()
                 }
+
+                is RemedyState.ShowModal -> {
+                    showDialog(
+                        childFragmentManager, GenericDialogItem(
+                            it.modal.description.message,
+                            null,
+                            TextLocalized(it.modal.title, 0),
+                            TextLocalized(it.modal.description, 0),
+                            Actionable(
+                                it.modal.mainButton.label, null,
+                                ActionType.valueOf(it.modal.mainButton.action?.name.toString())
+                            ),
+                            it.modal.secondaryButton?.let { secondaryButton ->
+                                Actionable(
+                                    secondaryButton.label,
+                                    null,
+                                    ActionType.valueOf(secondaryButton.action?.name.toString())
+                                )
+                            }
+                        )
+                    )
+                }
+
+                is RemedyState.Pay -> {
+                    listener?.payFromModal()
+                }
             }
         }
     }
@@ -176,13 +177,11 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
         if (genericDialogAction is GenericDialogAction.CustomAction) {
             when (genericDialogAction.type) {
                 ActionType.PAY -> {
-                    showModalRemedies = false
-                    listener?.paymentWithModal()
+                    viewModel.onButtonPressed(PaymentResultButton.Action.PAY)
                 }
 
                 ActionType.CHANGE_PM -> {
-                    showModalRemedies = false;
-                    viewModel.onButtonPressed(PaymentResultButton.Action.valueOf(genericDialogAction.type.name))
+                    viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM)
                 }
             }
         }
@@ -193,6 +192,6 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
         fun disablePayButton()
         fun onUserValidation()
         fun changePaymentMethod()
-        fun paymentWithModal()
+        fun payFromModal()
     }
 }

@@ -15,7 +15,6 @@ import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PayerCost
 import com.mercadopago.android.px.model.PaymentData
 import com.mercadopago.android.px.model.PaymentRecovery
-import com.mercadopago.android.px.model.internal.Modal
 import com.mercadopago.android.px.model.internal.PaymentConfiguration
 import com.mercadopago.android.px.model.internal.remedies.RemedyPaymentMethod
 import com.mercadopago.android.px.tracking.internal.MPTracker
@@ -42,10 +41,10 @@ internal class RemediesViewModel(
 ) : BaseViewModelWithState<RemediesViewModel.State>(tracker), Remedies.ViewModel {
 
     val remedyState: MutableLiveData<RemedyState> = MutableLiveData()
-    val remedyMessageModal: MutableLiveData<Modal> = MutableLiveData()
     private val isSilverBullet = remediesModel.retryPayment?.isAnotherMethod == true
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
+    private var isShowModal = false
 
     init {
         val methodIds = getMethodIds()
@@ -60,10 +59,6 @@ internal class RemediesViewModel(
                     previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
                 applicationSelectionRepository[methodData] = methodData.getApplications().first { application ->
                     application.paymentMethod.type == paymentTypeId
-                }
-
-                previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.let { modalMessageRemedies ->
-                    remedyMessageModal.value = modalMessageRemedies
                 }
             }
             remedyState.value = RemedyState.ShowRetryPaymentRemedy(Pair(it, methodData))
@@ -87,7 +82,11 @@ internal class RemediesViewModel(
     }
 
     override fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback) {
-        callback.call(paymentConfiguration!!)
+        previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.takeUnless {
+            isShowModal
+        }?.let {
+            remedyState.value = RemedyState.ShowModal(it)
+        } ?: callback.call(paymentConfiguration!!)
     }
 
     private fun getMethodIds(): MethodIds {
@@ -169,6 +168,10 @@ internal class RemediesViewModel(
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
                 track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
+            }
+            PaymentResultButton.Action.PAY -> {
+                isShowModal = true
+                remedyState.value = RemedyState.Pay
             }
             else -> TODO()
         }

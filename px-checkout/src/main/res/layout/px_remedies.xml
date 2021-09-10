@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/retry_payment_container"
@@ -16,7 +15,6 @@
         <fragment
             android:id="@+id/retry_payment"
             android:name="com.mercadopago.android.px.internal.features.payment_result.remedies.view.RetryPaymentFragment"
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -24,12 +22,11 @@
 
     <com.mercadopago.android.px.internal.features.payment_result.remedies.view.HighRiskRemedy
         android:id="@+id/high_risk"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/ui_3m"
-        android:layout_marginEnd="@dimen/ui_3m"
-
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/ui_3m"
+        android:layout_marginStart="@dimen/ui_3m"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </LinearLayout>
