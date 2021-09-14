@@ -1,15 +1,13 @@
-package com.mercadopago.android.px.internal.features.payment_result.remedies;
+package com.mercadopago.android.px.internal.features.payment_result.remedies.paymentMethod;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import com.mercadopago.android.px.internal.features.express.add_new_card.OtherPaymentMethodLowResFragment;
-import com.mercadopago.android.px.internal.features.express.slider.CardLowResFragment;
 import com.mercadopago.android.px.internal.viewmodel.drawables.ConsumerCreditsDrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.OtherPaymentMethodFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodFragmentDrawer;
 
-public class PaymentMethodRemediesLargeResDrawer implements PaymentMethodFragmentDrawer {
+public class PaymentMethodRemediesMiniResDrawer implements PaymentMethodFragmentDrawer {
 
     @Override
     public Fragment draw(@NonNull final DrawableFragmentItem drawableFragmentItem) {
@@ -23,6 +21,6 @@ public class PaymentMethodRemediesLargeResDrawer implements PaymentMethodFragmen
 
     @Override
     public Fragment draw(@NonNull final ConsumerCreditsDrawableFragmentItem drawableItem) {
-        return ConsumerCreditsLargeResFragment.getInstance(drawableItem);
+        return ConsumerCreditsMiniResFragment.getInstance(drawableItem);
     }
 }

@@ -13,9 +13,9 @@ import com.mercadopago.android.px.internal.experiments.BadgeVariant
 import com.mercadopago.android.px.internal.extensions.gone
 import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
-import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodLowResDrawer
 import com.mercadopago.android.px.internal.features.payment_result.remedies.*
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemedyCardSize
+import com.mercadopago.android.px.internal.features.payment_result.remedies.paymentMethod.*
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView

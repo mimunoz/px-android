@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.features.payment_result.remedies;
+package com.mercadopago.android.px.internal.features.payment_result.remedies.paymentMethod;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,11 +13,11 @@ import com.mercadopago.android.px.internal.view.LinkableTextView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.ConsumerCreditsDrawableFragmentItem;
 import com.mercadopago.android.px.model.ConsumerCreditsDisplayInfo;
 
-public class ConsumerCreditsSmallResFragment extends ConsumerCreditsFragment {
+public class ConsumerCreditsMediumResFragment extends ConsumerCreditsFragment {
 
     @NonNull
     public static Fragment getInstance(@NonNull final ConsumerCreditsDrawableFragmentItem model) {
-        final ConsumerCreditsSmallResFragment instance = new ConsumerCreditsSmallResFragment();
+        final ConsumerCreditsMediumResFragment instance = new ConsumerCreditsMediumResFragment();
         instance.storeModel(model);
         return instance;
     }
@@ -26,7 +26,7 @@ public class ConsumerCreditsSmallResFragment extends ConsumerCreditsFragment {
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable final ViewGroup container,
         @Nullable final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.px_fragment_remedies_consumer_credits_small_res, container, false);
+        return inflater.inflate(R.layout.px_fragment_remedies_consumer_credits_medium_res, container, false);
     }
 
     @Override
