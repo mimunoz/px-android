@@ -181,6 +181,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 }
 
                 ActionType.CHANGE_PM -> {
+                    viewModel.modalSecondaryButton = true
                     viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM)
                 }
             }

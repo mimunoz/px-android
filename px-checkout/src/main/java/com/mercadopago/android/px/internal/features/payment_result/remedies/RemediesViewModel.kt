@@ -7,7 +7,13 @@ import com.mercadopago.android.px.internal.base.BaseViewModelWithState
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
-import com.mercadopago.android.px.internal.repository.*
+import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository
+import com.mercadopago.android.px.internal.repository.ApplicationSelectionRepository
+import com.mercadopago.android.px.internal.repository.CardTokenRepository
+import com.mercadopago.android.px.internal.repository.OneTapItemRepository
+import com.mercadopago.android.px.internal.repository.PayerPaymentMethodKey
+import com.mercadopago.android.px.internal.repository.PaymentRepository
+import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
 import com.mercadopago.android.px.internal.util.CVVRecoveryWrapper
 import com.mercadopago.android.px.internal.util.TokenCreationWrapper
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
@@ -18,6 +24,7 @@ import com.mercadopago.android.px.model.PaymentRecovery
 import com.mercadopago.android.px.model.internal.PaymentConfiguration
 import com.mercadopago.android.px.model.internal.remedies.RemedyPaymentMethod
 import com.mercadopago.android.px.tracking.internal.MPTracker
+import com.mercadopago.android.px.tracking.internal.events.ChangePaymentMethodErrorEvent
 import com.mercadopago.android.px.tracking.internal.events.RemedyEvent
 import com.mercadopago.android.px.tracking.internal.model.RemedyTrackData
 import kotlinx.android.parcel.Parcelize
@@ -45,6 +52,7 @@ internal class RemediesViewModel(
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
     private var showedModal = false
+    var modalSecondaryButton = false
 
     init {
         val methodIds = getMethodIds()
@@ -164,7 +172,14 @@ internal class RemediesViewModel(
 
     override fun onButtonPressed(action: PaymentResultButton.Action) {
         when (action) {
-            PaymentResultButton.Action.CHANGE_PM -> remedyState.value = RemedyState.ChangePaymentMethod
+            PaymentResultButton.Action.CHANGE_PM -> {
+                if(modalSecondaryButton) {
+                    track(ChangePaymentMethodErrorEvent(true))
+                } else {
+                    track(ChangePaymentMethodErrorEvent(false))
+                }
+                remedyState.value = RemedyState.ChangePaymentMethod
+            }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
                 track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
