@@ -31,8 +31,9 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.BackHandler;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.BaseFragment;
-import com.mercadopago.android.px.internal.callbacks.DeepLinkServiceHandler;
-import com.mercadopago.android.px.internal.callbacks.DeepLinkServiceListener;
+import com.mercadopago.android.px.internal.callbacks.DeepLinkHandler;
+import com.mercadopago.android.px.internal.callbacks.DeepLinkListener;
+import com.mercadopago.android.px.internal.callbacks.DeepLinkWrapper;
 import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.MapperProvider;
@@ -320,7 +321,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     public void resolveDeepLinkResponse(@NotNull final Uri uri) {
-        final DeepLinkServiceHandler deepLinkServiceHandler = new DeepLinkServiceHandler(new DeepLinkServiceListener() {
+        final DeepLinkHandler deepLinkHandler = new DeepLinkHandler(new DeepLinkListener() {
 
             @Override
             public void onDefault() {
@@ -339,7 +340,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
                 }
             }
         });
-        deepLinkServiceHandler.resolveDeepLink(uri);
+        deepLinkHandler.resolveDeepLink(DeepLinkWrapper.createWrapper(uri), uri);
     }
 
     private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {
