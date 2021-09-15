@@ -54,6 +54,7 @@ internal class RemediesViewModel(
     private var showedModal = false
     var modalSecondaryButton = false
 
+
     init {
         val methodIds = getMethodIds()
         val customOptionId = methodIds.customOptionId
@@ -134,8 +135,10 @@ internal class RemediesViewModel(
         }
     }
 
+
     private fun startPayment(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION)))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION),
+            showedModal, (showedModal && paymentConfiguration?.paymentMethodId.equals(CONSUMER_CREDITS))))
         remediesModel.retryPayment?.cvvModel?.let {
             CoroutineScope(Dispatchers.IO).launch {
                 val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
@@ -152,7 +155,7 @@ internal class RemediesViewModel(
     }
 
     private fun startCvvRecovery(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST)))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST), showedModal, false))
         CoroutineScope(Dispatchers.IO).launch {
             val response = CVVRecoveryWrapper(
                 cardTokenRepository,
@@ -181,7 +184,10 @@ internal class RemediesViewModel(
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
-                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
+                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST),
+                    showedModal,
+                    false
+                ))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
             }
             PaymentResultButton.Action.PAY -> {
@@ -222,5 +228,9 @@ internal class RemediesViewModel(
     @Parcelize
     class State(var paymentRecovery: PaymentRecovery) : BaseState {
         var cvv = ""
+    }
+
+    companion object {
+        private const val CONSUMER_CREDITS = "consumer_credits"
     }
 }

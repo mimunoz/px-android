@@ -20,12 +20,18 @@ interface CongratsService {
         @Query("payment_type_id") paymentTypeId: String,
         @Query("flow_name") flowName: String,
         @Query("merchant_order_id") merchantOrderId: Long?,
-        @Query("pref_id") preferenceId: String?): CongratsResponse
+        @Query("pref_id") preferenceId: String?
+    ): CongratsResponse
 
+    @POST("https://run.mocky.io/v3/64c7262d-e114-41ae-a687-44a885c72ce2") //mini
+//    @POST("https://run.mocky.io/v3/43ed9a38-5e16-43e0-b941-b3a668967243") //xsmall
+//    @POST("https://run.mocky.io/v3/daa72b6a-ad7f-46b3-bc54-143259045d1b") //small
+//    @POST("https://run.mocky.io/v3/209c835a-260f-432b-89d9-30d6d1c2f510") //medium
+//    @POST("https://run.mocky.io/v3/6ae85d4f-903e-44be-a6cb-58c2ae13e2d0") //large
     //@POST("${BuildConfig.API_ENVIRONMENT_NEW}/px_mobile/v1/remedies/{payment_id}")
-    @POST("https://run.mocky.io/v3/fd435a82-681b-4ae4-995b-a16429f4d534")
     suspend fun getRemedies(
         @Query(value = "payment_id", encoded = true) paymentId: String,
         @Query("one_tap") oneTap: Boolean,
-        @Body body: RemediesBody): RemediesResponse
+        @Body body: RemediesBody
+    ): RemediesResponse
 }

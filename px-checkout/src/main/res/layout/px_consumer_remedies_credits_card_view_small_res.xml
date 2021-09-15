@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
-            app:layout_constraintDimensionRatio="@string/px_card_aspect_ratio_xsmallres"
+            app:layout_constraintDimensionRatio="@string/px_card_aspect_ratio_lowres"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -39,29 +39,12 @@
             android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/px_xs_margin"
             android:src="@drawable/px_consumer_credits_onetap"
-            app:layout_constraintBottom_toTopOf="@id/bottom_text"
+            app:layout_constraintBottom_toBottomOf="@+id/background"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="spread" />
-
-        <com.mercadopago.android.px.internal.view.LinkableTextView
-            android:id="@+id/bottom_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/px_xs_margin"
-            android:layout_marginEnd="@dimen/px_m_margin"
-            android:layout_marginStart="@dimen/px_m_margin"
-            android:gravity="center_horizontal"
-            android:textSize="@dimen/px_xxxs_text"
-            app:layout_constraintBottom_toBottomOf="@id/background"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/logo"
-            app:layout_constraintVertical_chainStyle="spread"
-            tools:text="Al confirmar, aceptás los términos generales y las condiciones particulares de este préstamo." />
 
        <FrameLayout
             android:layout_width="wrap_content"
