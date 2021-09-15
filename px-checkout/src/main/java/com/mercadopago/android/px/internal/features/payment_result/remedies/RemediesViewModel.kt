@@ -138,7 +138,7 @@ internal class RemediesViewModel(
 
     private fun startPayment(callback: PayButton.OnEnqueueResolvedCallback) {
         track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION),
-            showedModal, (showedModal && paymentConfiguration?.paymentMethodId.equals(CONSUMER_CREDITS))))
+            showedModal, (paymentConfiguration?.paymentMethodId.equals(CONSUMER_CREDITS))))
         remediesModel.retryPayment?.cvvModel?.let {
             CoroutineScope(Dispatchers.IO).launch {
                 val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
