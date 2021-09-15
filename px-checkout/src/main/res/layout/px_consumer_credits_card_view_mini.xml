@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:adjustViewBounds="true"
-            app:layout_constraintDimensionRatio="@string/px_card_aspect_ratio_lowres"
+            app:layout_constraintDimensionRatio="@string/px_card_aspect_ratio_minires"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView

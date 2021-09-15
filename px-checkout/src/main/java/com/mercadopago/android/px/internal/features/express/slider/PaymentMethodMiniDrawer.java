@@ -8,11 +8,11 @@ import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentI
 import com.mercadopago.android.px.internal.viewmodel.drawables.OtherPaymentMethodFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodFragmentDrawer;
 
-public class PaymentMethodMiniResDrawer implements PaymentMethodFragmentDrawer {
+public class PaymentMethodMiniDrawer implements PaymentMethodFragmentDrawer {
 
     @Override
     public Fragment draw(@NonNull final DrawableFragmentItem drawableFragmentItem) {
-        return CardMiniResFragment.getInstance(drawableFragmentItem);
+        return CardMiniFragment.getInstance(drawableFragmentItem);
     }
 
     @Override
@@ -22,6 +22,6 @@ public class PaymentMethodMiniResDrawer implements PaymentMethodFragmentDrawer {
 
     @Override
     public Fragment draw(@NonNull final ConsumerCreditsDrawableFragmentItem drawableItem) {
-        return ConsumerCreditsMiniResFragment.getInstance(drawableItem);
+        return ConsumerCreditsMiniFragment.getInstance(drawableItem);
     }
 }

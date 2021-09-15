@@ -12,9 +12,9 @@ import com.mercadopago.android.px.internal.di.MapperProvider
 import com.mercadopago.android.px.internal.experiments.BadgeVariant
 import com.mercadopago.android.px.internal.extensions.gone
 import com.mercadopago.android.px.internal.extensions.visible
-import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
-import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodMiniResDrawer
+import com.mercadopago.android.px.internal.features.express.slider.*
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
+import com.mercadopago.android.px.internal.features.payment_result.remedies.CardSize
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
@@ -46,7 +46,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     fun init(model: Model, methodData: OneTapItem?) {
         message.text = model.message
         methodData?.let {
-            addCard(it)
+            addCard(it, model.cardSize)
             if (model.isAnotherMethod) {
                 model.bottomMessage?.let { message -> paymentMethodTitle.setText(message) }
                 showPaymentMethodDescriptor(it, model.payerCost)
@@ -63,11 +63,11 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         cvvRemedy.listener = listener
     }
 
-    private fun addCard(methodData: OneTapItem) {
+    private fun addCard(methodData: OneTapItem, cardSize: String?) {
         childFragmentManager.beginTransaction().apply {
             val drawableFragmentItem = MapperProvider.getPaymentMethodDrawableItemMapper().map(methodData)!!
             drawableFragmentItem.switchModel = null
-            val paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodMiniResDrawer()) as PaymentMethodFragment<*>
+            val paymentMethodFragment = MapperProvider.getPaymentMethodFragment(drawableFragmentItem, cardSize)
             paymentMethodFragment.onFocusIn()
             replace(R.id.card_container, paymentMethodFragment)
             commitAllowingStateLoss()
@@ -86,6 +86,6 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     }
 
     @Parcelize
-    internal data class Model(val message: String, val isAnotherMethod: Boolean, val cvvModel: CvvRemedy.Model?,
+    internal data class Model(val message: String, val isAnotherMethod: Boolean, val cardSize: String?, val cvvModel: CvvRemedy.Model?,
         val bottomMessage: Text? = null, var payerCost: RemediesPayerCost? = null) : Parcelable
 }
