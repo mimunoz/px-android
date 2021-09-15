@@ -5,7 +5,7 @@ import com.mercadopago.android.px.internal.util.JsonUtil.fromJson
 
 private const val RESPONSE = "response"
 
-internal class TokenizationResponseWrapper : IDeepLinkHandler() {
+internal class TokenizationResponseWrapper : DeepLinkWrapper() {
 
     override fun resolveDeepLink(uri: Uri) {
         uri.getQueryParameter(RESPONSE)?.let {
