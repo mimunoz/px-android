@@ -18,6 +18,7 @@ import com.mercadopago.android.px.model.PaymentRecovery
 import com.mercadopago.android.px.model.internal.PaymentConfiguration
 import com.mercadopago.android.px.model.internal.remedies.RemedyPaymentMethod
 import com.mercadopago.android.px.tracking.internal.MPTracker
+import com.mercadopago.android.px.tracking.internal.events.ChangePaymentMethodEvent
 import com.mercadopago.android.px.tracking.internal.events.RemedyEvent
 import com.mercadopago.android.px.tracking.internal.model.RemedyTrackData
 import kotlinx.android.parcel.Parcelize
@@ -45,6 +46,7 @@ internal class RemediesViewModel(
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
     private var showedModal = false
+    var isFromModel = false
 
     init {
         val methodIds = getMethodIds()
@@ -164,7 +166,10 @@ internal class RemediesViewModel(
 
     override fun onButtonPressed(action: PaymentResultButton.Action) {
         when (action) {
-            PaymentResultButton.Action.CHANGE_PM -> remedyState.value = RemedyState.ChangePaymentMethod
+            PaymentResultButton.Action.CHANGE_PM -> {
+                track(ChangePaymentMethodEvent(null, isFromModel, isFromRemedies = true))
+                remedyState.value = RemedyState.ChangePaymentMethod
+            }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
                 track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)

@@ -12,14 +12,17 @@ import java.math.BigDecimal
 
 interface CheckoutService {
 
-    @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
+    //@POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
+    @POST("https://run.mocky.io/v3/4bcbd3d1-1d16-4caf-a9c7-fe2fc709416a")
     suspend fun checkout(
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 
-    @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
+    //@POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
+    @POST("https://run.mocky.io/v3/4bcbd3d1-1d16-4caf-a9c7-fe2fc709416a")
     suspend fun checkout(
-        @Path(value = "preference_id", encoded = true) preferenceId: String,
+        //@Path(value = "preference_id", encoded = true) preferenceId: String,
+        @Query(value = "preference_id", encoded = true) preferenceId: String,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 

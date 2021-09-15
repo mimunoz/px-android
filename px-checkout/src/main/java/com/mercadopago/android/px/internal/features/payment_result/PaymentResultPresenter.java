@@ -148,7 +148,7 @@ import com.mercadopago.android.px.tracking.internal.views.ResultViewTrack;
             track(new ContinueEvent(resultViewTrack));
             finishWithResult(MercadoPagoCheckout.PAYMENT_RESULT_CODE);
         } else if (action instanceof ChangePaymentMethodAction) {
-            track(new ChangePaymentMethodEvent(resultViewTrack));
+            track(new ChangePaymentMethodEvent(resultViewTrack, false, false));
             getView().changePaymentMethod();
         } else if (action instanceof RecoverPaymentAction) {
             getView().recoverPayment();
