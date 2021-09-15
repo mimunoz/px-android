@@ -33,7 +33,6 @@ import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.BaseFragment;
 import com.mercadopago.android.px.internal.callbacks.DeepLinkHandler;
 import com.mercadopago.android.px.internal.callbacks.DeepLinkListener;
-import com.mercadopago.android.px.internal.callbacks.DeepLinkProvider;
 import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
 import com.mercadopago.android.px.internal.di.MapperProvider;
