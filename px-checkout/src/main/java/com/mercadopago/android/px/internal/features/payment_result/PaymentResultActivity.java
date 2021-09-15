@@ -321,4 +321,9 @@ public class PaymentResultActivity extends PXActivity<PaymentResultPresenter> im
             return Unit.INSTANCE;
         });
     }
+
+    @Override
+    public void payFromModal() {
+        payButtonFragment.stimulate();
+    }
 }

@@ -44,16 +44,19 @@ internal class RemediesViewModel(
     private val isSilverBullet = remediesModel.retryPayment?.isAnotherMethod == true
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
+    private var showedModal = false
 
     init {
         val methodIds = getMethodIds()
         val customOptionId = methodIds.customOptionId
         val methodData = oneTapItemRepository[customOptionId]
         card = fromPayerPaymentMethodToCardMapper.map(
-            PayerPaymentMethodKey(customOptionId, methodIds.typeId))
+            PayerPaymentMethodKey(customOptionId, methodIds.typeId)
+        )
         remediesModel.retryPayment?.let {
             if (isSilverBullet) {
-                val paymentTypeId = previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
+                val paymentTypeId =
+                    previousPaymentModel.remedies.suggestedPaymentMethod?.alternativePaymentMethod?.paymentTypeId
                 applicationSelectionRepository[methodData] = methodData.getApplications().first { application ->
                     application.paymentMethod.type == paymentTypeId
                 }
@@ -63,8 +66,11 @@ internal class RemediesViewModel(
         remediesModel.highRisk?.let {
             remedyState.value = RemedyState.ShowKyCRemedy(it)
         }
-        paymentConfiguration = PaymentConfiguration(methodIds.methodId, methodIds.typeId, customOptionId,
-            card?.isSecurityCodeRequired() == true, false, getPayerCost(customOptionId))
+
+        paymentConfiguration = PaymentConfiguration(
+            methodIds.methodId, methodIds.typeId, customOptionId,
+            card?.isSecurityCodeRequired() == true, false, getPayerCost(customOptionId)
+        )
     }
 
     override fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback) {
@@ -76,7 +82,11 @@ internal class RemediesViewModel(
     }
 
     override fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback) {
-        callback.call(paymentConfiguration!!)
+        previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.takeUnless {
+            showedModal
+        }?.let {
+            remedyState.value = RemedyState.ShowModal(it)
+        } ?: callback.call(paymentConfiguration!!)
     }
 
     private fun getMethodIds(): MethodIds {
@@ -140,7 +150,8 @@ internal class RemediesViewModel(
                 cardTokenRepository,
                 escManagerBehaviour,
                 state.paymentRecovery,
-                tracker).recoverWithCVV(state.cvv)
+                tracker
+            ).recoverWithCVV(state.cvv)
 
             withContext(Dispatchers.Main) {
                 response.resolve(success = { token ->
@@ -157,6 +168,10 @@ internal class RemediesViewModel(
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
                 track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
+            }
+            PaymentResultButton.Action.PAY -> {
+                showedModal = true
+                remedyState.value = RemedyState.Pay
             }
             else -> TODO()
         }
@@ -182,8 +197,10 @@ internal class RemediesViewModel(
             }
 
             fun with(remedyPaymentMethod: RemedyPaymentMethod) =
-                MethodIds(remedyPaymentMethod.paymentMethodId, remedyPaymentMethod.paymentTypeId,
-                    remedyPaymentMethod.customOptionId)
+                MethodIds(
+                    remedyPaymentMethod.paymentMethodId, remedyPaymentMethod.paymentTypeId,
+                    remedyPaymentMethod.customOptionId
+                )
         }
     }
 

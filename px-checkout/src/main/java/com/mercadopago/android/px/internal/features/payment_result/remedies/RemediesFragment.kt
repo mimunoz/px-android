@@ -11,6 +11,8 @@ import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.di.MapperProvider
 import com.mercadopago.android.px.internal.di.Session
 import com.mercadopago.android.px.internal.extensions.visible
+import com.mercadopago.android.px.internal.features.generic_modal.*
+import com.mercadopago.android.px.internal.features.generic_modal.GenericDialog.Companion.showDialog
 import com.mercadopago.android.px.internal.features.pay_button.PayButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultButton
 import com.mercadopago.android.px.internal.features.payment_result.presentation.PaymentResultFooter
@@ -20,8 +22,10 @@ import com.mercadopago.android.px.internal.features.payment_result.remedies.view
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil
 import com.mercadopago.android.px.internal.util.nonNullObserve
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
+import com.mercadopago.android.px.internal.viewmodel.TextLocalized
 
-internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener, PaymentResultFooter.Listener {
+internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener, PaymentResultFooter.Listener,
+    GenericDialog.Listener {
 
     private lateinit var viewModel: RemediesViewModel
     private var listener: Listener? = null
@@ -41,7 +45,8 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             val paymentModel = getParcelable<PaymentModel>(PAYMENT_MODEL)
             val remediesModel = getParcelable<RemediesModel>(REMEDIES_MODEL)
             val session = Session.getInstance()
-            viewModel = RemediesViewModel(remediesModel!!, paymentModel!!, session.paymentRepository,
+            viewModel = RemediesViewModel(
+                remediesModel!!, paymentModel!!, session.paymentRepository,
                 session.configurationModule.paymentSettings, session.cardTokenRepository, session.mercadoPagoESC,
                 session.amountConfigurationRepository, session.configurationModule.applicationSelectionRepository,
                 session.oneTapItemRepository,
@@ -117,6 +122,32 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 is RemedyState.ChangePaymentMethod -> {
                     listener?.changePaymentMethod()
                 }
+
+                is RemedyState.ShowModal -> {
+                    showDialog(
+                        childFragmentManager, GenericDialogItem(
+                            it.modal.description.message,
+                            null,
+                            TextLocalized(it.modal.title, 0),
+                            TextLocalized(it.modal.description, 0),
+                            Actionable(
+                                it.modal.mainButton.label, null,
+                                ActionType.valueOf(it.modal.mainButton.action?.name.toString())
+                            ),
+                            it.modal.secondaryButton?.let { secondaryButton ->
+                                Actionable(
+                                    secondaryButton.label,
+                                    null,
+                                    ActionType.valueOf(secondaryButton.action?.name.toString())
+                                )
+                            }
+                        )
+                    )
+                }
+
+                is RemedyState.Pay -> {
+                    listener?.payFromModal()
+                }
             }
         }
     }
@@ -141,10 +172,26 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
         }
     }
 
+    override fun onAction(genericDialogAction: GenericDialogAction) {
+        super.onAttach(context!!)
+        if (genericDialogAction is GenericDialogAction.CustomAction) {
+            when (genericDialogAction.type) {
+                ActionType.PAY -> {
+                    viewModel.onButtonPressed(PaymentResultButton.Action.PAY)
+                }
+
+                ActionType.CHANGE_PM -> {
+                    viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM)
+                }
+            }
+        }
+    }
+
     interface Listener {
         fun enablePayButton()
         fun disablePayButton()
         fun onUserValidation()
         fun changePaymentMethod()
+        fun payFromModal()
     }
 }
