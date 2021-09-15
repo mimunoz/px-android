@@ -340,7 +340,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
                 }
             }
         });
-        deepLinkHandler.resolveDeepLink(DeepLinkProvider.createWrapper(uri), uri);
+        deepLinkHandler.resolveDeepLink(uri);
     }
 
     private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {

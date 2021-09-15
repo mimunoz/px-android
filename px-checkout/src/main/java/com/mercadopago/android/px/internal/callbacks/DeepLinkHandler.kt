@@ -1,11 +1,12 @@
 package com.mercadopago.android.px.internal.callbacks
 
 import android.net.Uri
+import com.mercadopago.android.px.internal.callbacks.DeepLinkProvider.createWrapper
 
 internal class DeepLinkHandler(private val deepLinkListener: DeepLinkListener) {
 
-    fun resolveDeepLink(wrapper: DeepLinkWrapper, uri: Uri) {
-        with(wrapper) {
+    fun resolveDeepLink(uri: Uri) {
+        with(createWrapper(uri)) {
             listener = deepLinkListener
             resolveDeepLink(uri)
         }

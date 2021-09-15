@@ -5,7 +5,6 @@ import com.mercadopago.android.px.internal.mappers.UriToFromMapper
 
 internal object DeepLinkProvider {
 
-    @JvmStatic
     fun createWrapper(uri: Uri): DeepLinkWrapper =
         when (UriToFromMapper.map(uri)) {
             From.TOKENIZATION -> TokenizationResponseWrapper()
