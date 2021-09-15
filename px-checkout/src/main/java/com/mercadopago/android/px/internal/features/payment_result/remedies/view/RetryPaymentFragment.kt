@@ -51,7 +51,10 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
                 model.bottomMessage?.let { message -> paymentMethodTitle.setText(message) }
                 showPaymentMethodDescriptor(it, model.payerCost)
             }
-            bottomText.updateModel(it.consumerCredits.displayInfo.bottomText)
+
+            it.consumerCredits?.let { consumerCredits ->
+                bottomText.updateModel(consumerCredits.displayInfo.bottomText)
+            }
         }
         model.cvvModel?.let { cvvRemedy.init(it) } ?: cvvRemedy.gone()
     }

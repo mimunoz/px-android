@@ -12,7 +12,7 @@ public class PaymentMethodMiniResDrawer implements PaymentMethodFragmentDrawer {
 
     @Override
     public Fragment draw(@NonNull final DrawableFragmentItem drawableFragmentItem) {
-        return CardLowResFragment.getInstance(drawableFragmentItem);
+        return CardMiniResFragment.getInstance(drawableFragmentItem);
     }
 
     @Override
