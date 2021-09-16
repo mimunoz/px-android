@@ -189,7 +189,7 @@ internal class RemediesViewModel(
     override fun initState() = State(paymentRepository.createPaymentRecovery())
 
     private fun getRemedyTrackData(type: RemedyType) = previousPaymentModel.payment!!.let {
-        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail)
+        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail, if(showedModal) "model" else "view")
     }
 
     private data class MethodIds(val methodId: String, val typeId: String, val customOptionId: String) {
