@@ -20,6 +20,8 @@ import com.mercadopago.android.px.model.internal.remedies.RemedyPaymentMethod
 import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.ChangePaymentMethodEvent
 import com.mercadopago.android.px.tracking.internal.events.RemedyEvent
+import com.mercadopago.android.px.tracking.internal.events.RemedyModalAbortEvent
+import com.mercadopago.android.px.tracking.internal.events.RemedyModalEvent
 import com.mercadopago.android.px.tracking.internal.model.RemedyTrackData
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.CoroutineScope
@@ -87,6 +89,7 @@ internal class RemediesViewModel(
         previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.takeUnless {
             showedModal
         }?.let {
+            track(RemedyModalEvent())
             remedyState.value = RemedyState.ShowModal(it)
         } ?: callback.call(paymentConfiguration!!)
     }
@@ -190,6 +193,10 @@ internal class RemediesViewModel(
 
     private fun getRemedyTrackData(type: RemedyType) = previousPaymentModel.payment!!.let {
         RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail, if(showedModal) "model" else "view")
+    }
+
+    fun setRemedyModalAbortTrack() {
+        track(RemedyModalAbortEvent())
     }
 
     private data class MethodIds(val methodId: String, val typeId: String, val customOptionId: String) {
