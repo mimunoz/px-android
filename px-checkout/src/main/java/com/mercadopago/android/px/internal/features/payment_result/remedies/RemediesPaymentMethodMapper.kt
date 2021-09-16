@@ -13,14 +13,9 @@ internal class RemediesPaymentMethodMapper(
             CardSize.LARGE.getType() -> {
                 return drawableFragmentItem.draw(PaymentMethodHighResDrawer()) as PaymentMethodFragment<*>
             }
-            CardSize.MEDIUM.getType() -> {
-                return drawableFragmentItem.draw(PaymentMethodMediumDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.SMALL.getType() -> {
-                return drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
-            }
+            CardSize.SMALL.getType(),
             CardSize.XSMALL.getType() -> {
-                return drawableFragmentItem.draw(PaymentMethodXSmallDrawer()) as PaymentMethodFragment<*>
+                return drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
             }
             CardSize.MINI.getType() -> {
                 return drawableFragmentItem.draw(PaymentMethodMiniDrawer()) as PaymentMethodFragment<*>
