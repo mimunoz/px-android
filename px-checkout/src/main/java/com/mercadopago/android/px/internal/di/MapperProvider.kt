@@ -133,37 +133,6 @@ internal object MapperProvider {
         )
     }
 
-    fun getPaymentMethodFragment(
-        drawableFragmentItem: DrawableFragmentItem,
-        cardSize: String?
-    ): PaymentMethodFragment<*> {
-        val paymentMethodFragment: PaymentMethodFragment<*>
-        when (cardSize) {
-            CardSize.LARGE.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodHighResDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.MEDIUM.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodMediumDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.SMALL.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.XSMALL.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodXSmallDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.MINI.getType() -> {
-                paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodMiniDrawer()) as PaymentMethodFragment<*>
-            }
-            else -> paymentMethodFragment =
-                drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
-        }
-        return paymentMethodFragment
-    }
-
     val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper
         get() = OneTapItemToDisabledPaymentMethodMapper()
 

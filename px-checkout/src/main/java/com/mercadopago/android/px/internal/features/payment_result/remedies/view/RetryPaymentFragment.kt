@@ -15,6 +15,7 @@ import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.*
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
 import com.mercadopago.android.px.internal.features.payment_result.remedies.CardSize
+import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPaymentMethodMapper
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
@@ -67,7 +68,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
         childFragmentManager.beginTransaction().apply {
             val drawableFragmentItem = MapperProvider.getPaymentMethodDrawableItemMapper().map(methodData)!!
             drawableFragmentItem.switchModel = null
-            val paymentMethodFragment = MapperProvider.getPaymentMethodFragment(drawableFragmentItem, cardSize)
+            val paymentMethodFragment = RemediesPaymentMethodMapper(cardSize).map(drawableFragmentItem)
             paymentMethodFragment.onFocusIn()
             replace(R.id.card_container, paymentMethodFragment)
             commitAllowingStateLoss()
