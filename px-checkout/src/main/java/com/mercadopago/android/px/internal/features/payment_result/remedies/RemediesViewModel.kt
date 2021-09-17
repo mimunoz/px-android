@@ -48,7 +48,6 @@ internal class RemediesViewModel(
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
     private var showedModal = false
-    var isFromModel = false
 
     init {
         val methodIds = getMethodIds()
@@ -170,7 +169,6 @@ internal class RemediesViewModel(
     override fun onButtonPressed(action: PaymentResultButton.Action) {
         when (action) {
             PaymentResultButton.Action.CHANGE_PM -> {
-                track(ChangePaymentMethodEvent(null, isFromModel, isFromRemedies = true))
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
@@ -192,7 +190,7 @@ internal class RemediesViewModel(
     override fun initState() = State(paymentRepository.createPaymentRecovery())
 
     private fun getRemedyTrackData(type: RemedyType) = previousPaymentModel.payment!!.let {
-        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail, if(showedModal) "model" else "view")
+        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail, if(showedModal) "modal" else "view")
     }
 
     fun setRemedyModalAbortTrack() {

@@ -181,8 +181,11 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 }
 
                 ActionType.CHANGE_PM -> {
-                    viewModel.isFromModel = true
                     viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM)
+                }
+
+                ActionType.DISMISS -> {
+                    viewModel.setRemedyModalAbortTrack()
                 }
             }
         }
