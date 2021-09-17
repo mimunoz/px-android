@@ -13,6 +13,6 @@ internal interface Remedies {
         fun onPrePayment(callback: PayButton.OnReadyForPaymentCallback)
         fun onPayButtonPressed(callback: PayButton.OnEnqueueResolvedCallback)
         fun onCvvFilled(cvv: String)
-        fun onButtonPressed(action: PaymentResultButton.Action)
+        fun onButtonPressed(action: PaymentResultButton.Action, isFromModal: Boolean = false)
     }
 }

@@ -166,9 +166,10 @@ internal class RemediesViewModel(
         }
     }
 
-    override fun onButtonPressed(action: PaymentResultButton.Action) {
+    override fun onButtonPressed(action: PaymentResultButton.Action, isFromModal: Boolean) {
         when (action) {
             PaymentResultButton.Action.CHANGE_PM -> {
+                track(ChangePaymentMethodEvent(isFromModal))
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
