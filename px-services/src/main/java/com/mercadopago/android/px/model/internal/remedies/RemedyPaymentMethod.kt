@@ -19,5 +19,5 @@ data class RemedyPaymentMethod(
     val installmentsList: List<Installment>?,
     val escStatus: String?,
     val esc: Boolean,
-    val cardSize: String?
+    val cardSize: CardSize?
 ) : Parcelable

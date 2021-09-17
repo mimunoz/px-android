@@ -7,17 +7,14 @@ import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.internal.datasource.mapper.FromPayerPaymentMethodToCardMapper
 import com.mercadopago.android.px.internal.features.FeatureProviderImpl
 import com.mercadopago.android.px.internal.features.checkout.PostPaymentUrlsMapper
-import com.mercadopago.android.px.internal.features.express.slider.*
 import com.mercadopago.android.px.internal.features.payment_congrats.model.PaymentCongratsModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.instruction.mapper.*
 import com.mercadopago.android.px.internal.features.payment_result.mappers.PaymentResultViewModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
-import com.mercadopago.android.px.internal.features.payment_result.remedies.CardSize
 import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.mappers.*
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
-import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodDrawableItemMapper
 import com.mercadopago.android.px.tracking.internal.mapper.FromApplicationToApplicationInfo
 
@@ -131,37 +128,6 @@ internal object MapperProvider {
             featureProvider,
             session.configurationModule.trackingRepository
         )
-    }
-
-    fun getPaymentMethodFragment(
-        drawableFragmentItem: DrawableFragmentItem,
-        cardSize: String?
-    ): PaymentMethodFragment<*> {
-        val paymentMethodFragment: PaymentMethodFragment<*>
-        when (cardSize) {
-            CardSize.LARGE.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodHighResDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.MEDIUM.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodMediumDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.SMALL.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.XSMALL.getType() -> {
-                paymentMethodFragment =
-                    drawableFragmentItem.draw(PaymentMethodXSmallDrawer()) as PaymentMethodFragment<*>
-            }
-            CardSize.MINI.getType() -> {
-                paymentMethodFragment = drawableFragmentItem.draw(PaymentMethodMiniDrawer()) as PaymentMethodFragment<*>
-            }
-            else -> paymentMethodFragment =
-                drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
-        }
-        return paymentMethodFragment
     }
 
     val oneTapItemToDisabledPaymentMethodMapper: OneTapItemToDisabledPaymentMethodMapper

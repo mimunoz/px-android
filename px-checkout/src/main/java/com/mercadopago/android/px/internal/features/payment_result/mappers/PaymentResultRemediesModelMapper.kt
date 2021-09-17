@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.payment_result.mappers
 
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesModel
-import com.mercadopago.android.px.internal.features.payment_result.remedies.CardSize
+import com.mercadopago.android.px.model.internal.remedies.CardSize
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.CvvRemedy
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.HighRiskRemedy
 import com.mercadopago.android.px.internal.features.payment_result.remedies.view.RetryPaymentFragment
@@ -18,7 +18,7 @@ internal object PaymentResultRemediesModelMapper : Mapper<RemediesResponse, Reme
                 true, it.alternativePaymentMethod.cardSize, getCvvModel(response.cvv), it.bottomMessage)
         } ?: response.cvv?.let {
             title = it.title
-            RetryPaymentFragment.Model(it.message, false, CardSize.SMALL.getType(), getCvvModel(it))
+            RetryPaymentFragment.Model(it.message, false, CardSize.SMALL, getCvvModel(it))
         }
         val highRiskModel = response.highRisk?.let {
             title = it.title
