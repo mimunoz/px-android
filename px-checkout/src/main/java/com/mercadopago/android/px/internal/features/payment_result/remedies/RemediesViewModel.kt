@@ -21,7 +21,7 @@ import com.mercadopago.android.px.tracking.internal.MPTracker
 import com.mercadopago.android.px.tracking.internal.events.ChangePaymentMethodEvent
 import com.mercadopago.android.px.tracking.internal.events.RemedyEvent
 import com.mercadopago.android.px.tracking.internal.events.RemedyModalAbortEvent
-import com.mercadopago.android.px.tracking.internal.events.RemedyModalEvent
+import com.mercadopago.android.px.tracking.internal.events.RemedyModalView
 import com.mercadopago.android.px.tracking.internal.model.RemedyTrackData
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.CoroutineScope
@@ -88,7 +88,7 @@ internal class RemediesViewModel(
         previousPaymentModel.remedies.suggestedPaymentMethod?.modal?.takeUnless {
             showedModal
         }?.let {
-            track(RemedyModalEvent())
+            track(RemedyModalView())
             remedyState.value = RemedyState.ShowModal(it)
         } ?: callback.call(paymentConfiguration!!)
     }
@@ -131,7 +131,7 @@ internal class RemediesViewModel(
     }
 
     private fun startPayment(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION)))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION),showedModal))
         remediesModel.retryPayment?.cvvModel?.let {
             CoroutineScope(Dispatchers.IO).launch {
                 val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
@@ -148,7 +148,7 @@ internal class RemediesViewModel(
     }
 
     private fun startCvvRecovery(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST)))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST),showedModal = false))
         CoroutineScope(Dispatchers.IO).launch {
             val response = CVVRecoveryWrapper(
                 cardTokenRepository,
@@ -173,7 +173,7 @@ internal class RemediesViewModel(
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
-                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST)))
+                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST),showedModal = false))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
             }
             PaymentResultButton.Action.PAY -> {
@@ -191,7 +191,7 @@ internal class RemediesViewModel(
     override fun initState() = State(paymentRepository.createPaymentRecovery())
 
     private fun getRemedyTrackData(type: RemedyType) = previousPaymentModel.payment!!.let {
-        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail, if(showedModal) "modal" else "view")
+        RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail)
     }
 
     fun setRemedyModalAbortTrack() {

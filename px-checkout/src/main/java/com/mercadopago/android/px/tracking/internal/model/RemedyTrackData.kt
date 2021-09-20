@@ -5,6 +5,5 @@ internal data class RemedyTrackData(
     private val extraInfo: Map<String, String>?,
     private val paymentStatus: String? = null,
     private val paymentStatusDetail: String? = null,
-    private val from: String? = null,
     private val index: Int = 0
 ) : TrackingMapModel()
