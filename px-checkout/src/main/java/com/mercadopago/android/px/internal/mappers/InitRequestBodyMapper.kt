@@ -25,17 +25,19 @@ internal class InitRequestBodyMapper (
             checkout.paymentConfiguration,
             checkout.advancedConfiguration,
             checkout.preferenceId,
-            checkout.checkoutPreference
+            checkout.checkoutPreference,
+            null
         )
     }
 
-    fun map(paymentSettingRepository: PaymentSettingRepository): InitRequestBody {
+    fun map(paymentSettingRepository: PaymentSettingRepository, cardId: String?): InitRequestBody {
         return map(
             paymentSettingRepository.publicKey,
             paymentSettingRepository.paymentConfiguration,
             paymentSettingRepository.advancedConfiguration,
             paymentSettingRepository.checkoutPreferenceId,
-            paymentSettingRepository.checkoutPreference
+            paymentSettingRepository.checkoutPreference,
+            cardId
         )
     }
 
@@ -44,7 +46,8 @@ internal class InitRequestBodyMapper (
         paymentConfiguration: PaymentConfiguration,
         advancedConfiguration : AdvancedConfiguration,
         checkoutPreferenceId: String?,
-        checkoutPreference: CheckoutPreference?
+        checkoutPreference: CheckoutPreference?,
+        cardId: String?
     ): InitRequestBody {
         val features = featureProvider.availableFeatures
         return InitRequestBody(
@@ -64,7 +67,8 @@ internal class InitRequestBodyMapper (
             ),
             checkoutPreferenceId,
             checkoutPreference,
-            trackingRepository.flowId
+            trackingRepository.flowId,
+            cardId
         )
     }
 }

@@ -14,14 +14,12 @@ interface CheckoutService {
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout")
     suspend fun checkout(
-        @Query("new_card_id") newCardId: String?,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 
     @POST("$ENVIRONMENT/px_mobile/$CHECKOUT_VERSION/checkout/{preference_id}")
     suspend fun checkout(
         @Path(value = "preference_id", encoded = true) preferenceId: String,
-        @Query("new_card_id") newCardId: String?,
         @Body body: InitRequestBody
     ): Response<CheckoutResponse>
 

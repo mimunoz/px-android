@@ -29,9 +29,9 @@ internal class PrefetchInitService(
         val preferenceId = checkout.preferenceId
         return networkApi.apiCallForResponse(CheckoutService::class.java) {
             if (preferenceId != null) {
-                it.checkout(preferenceId, null, body)
+                it.checkout(preferenceId, body)
             } else {
-                it.checkout(null, body)
+                it.checkout(body)
             }
         }
     }
