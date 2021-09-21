@@ -3,7 +3,7 @@ package com.mercadopago.android.px.tracking.internal.events
 import com.mercadopago.android.px.tracking.internal.TrackFactory
 import com.mercadopago.android.px.tracking.internal.TrackWrapper
 
-class RemedyModalView : TrackWrapper() {
+internal class RemedyModalView : TrackWrapper() {
 
     override fun getTrack() = TrackFactory.withView(PATH).build()
 
