@@ -131,7 +131,7 @@ internal class RemediesViewModel(
     }
 
     private fun startPayment(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION),showedModal))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.PAYMENT_METHOD_SUGGESTION), showedModal))
         remediesModel.retryPayment?.cvvModel?.let {
             CoroutineScope(Dispatchers.IO).launch {
                 val response = TokenCreationWrapper.Builder(cardTokenRepository, escManagerBehaviour)
@@ -148,7 +148,7 @@ internal class RemediesViewModel(
     }
 
     private fun startCvvRecovery(callback: PayButton.OnEnqueueResolvedCallback) {
-        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST),showedModal = false))
+        track(RemedyEvent(getRemedyTrackData(RemedyType.CVV_REQUEST), showedModal))
         CoroutineScope(Dispatchers.IO).launch {
             val response = CVVRecoveryWrapper(
                 cardTokenRepository,
@@ -173,7 +173,7 @@ internal class RemediesViewModel(
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
-                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST),showedModal = false))
+                track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST), showedModal))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
             }
             PaymentResultButton.Action.PAY -> {

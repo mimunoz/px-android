@@ -23,10 +23,8 @@ interface CongratsService {
         @Query("pref_id") preferenceId: String?): CongratsResponse
 
     @POST("gamma/px_mobile/v1/remedies/{payment_id}")
-    //@POST("https://run.mocky.io/v3/64c7262d-e114-41ae-a687-44a885c72ce2")
     suspend fun getRemedies(
         @Path(value = "payment_id", encoded = true) paymentId: String,
-        //@Query(value = "payment_id", encoded = true) paymentId: String,
         @Query("one_tap") oneTap: Boolean,
         @Body body: RemediesBody): RemediesResponse
 }
