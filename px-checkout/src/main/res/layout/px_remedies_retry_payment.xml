@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <com.mercadopago.android.px.internal.view.MPTextView
         android:id="@+id/message"
@@ -79,8 +79,8 @@
         android:id="@+id/bottom_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/ui_3m"
-        android:layout_marginStart="@dimen/ui_3m"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="128dp"
         android:gravity="center_horizontal"
         android:textSize="@dimen/px_xxxs_text"
@@ -88,5 +88,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/payment_method_descriptor"
+        app:layout_constraintVertical_bias="1.0"
         tools:text="Al confirmar, aceptás los términos generales y las condiciones particulares de este préstamo." />
 </androidx.constraintlayout.widget.ConstraintLayout>

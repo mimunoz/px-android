@@ -1,7 +1,10 @@
 package com.mercadopago.android.px.internal.features.payment_result.remedies.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +18,15 @@ import com.mercadopago.android.px.internal.extensions.visible
 import com.mercadopago.android.px.internal.features.express.slider.*
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPaymentMethodMapper
+import com.mercadopago.android.px.internal.util.ParcelableUtil
+import com.mercadopago.android.px.internal.util.TextUtil
+import com.mercadopago.android.px.internal.util.ViewUtils
+import com.mercadopago.android.px.internal.util.parcelableCreator
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
+import com.mercadopago.android.px.model.display_info.LinkablePhrase
+import com.mercadopago.android.px.model.display_info.LinkableText
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.internal.Text
 import com.mercadopago.android.px.model.internal.remedies.CardSize
@@ -55,6 +64,16 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
 
             it.consumerCredits?.let { consumerCredits ->
                 bottomText.updateModel(consumerCredits.displayInfo.bottomText)
+                ViewUtils.setTextColor(bottomText, "#000000")
+
+                for (linkablePhrase in consumerCredits.displayInfo.bottomText.linkablePhrases) {
+                    val spannableText: Spannable = SpannableStringBuilder(consumerCredits.displayInfo.bottomText.text)
+                    val start = if (TextUtil.isNotEmpty(linkablePhrase.phrase))
+                                    consumerCredits.displayInfo.bottomText.text.indexOf(linkablePhrase.phrase)
+                                else -1
+                    val end: Int = start + linkablePhrase.phrase.length
+                    ViewUtils.setColorInSpannable("#000000", start, end, spannableText)
+                }
             }
         }
         model.cvvModel?.let { cvvRemedy.init(it) } ?: cvvRemedy.gone()
@@ -87,6 +106,8 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     }
 
     @Parcelize
-    internal data class Model(val message: String, val isAnotherMethod: Boolean, val cardSize: CardSize?, val cvvModel: CvvRemedy.Model?,
-        val bottomMessage: Text? = null, var payerCost: RemediesPayerCost? = null) : Parcelable
+    internal data class Model(
+        val message: String, val isAnotherMethod: Boolean, val cardSize: CardSize?, val cvvModel: CvvRemedy.Model?,
+        val bottomMessage: Text? = null, var payerCost: RemediesPayerCost? = null
+    ) : Parcelable
 }
