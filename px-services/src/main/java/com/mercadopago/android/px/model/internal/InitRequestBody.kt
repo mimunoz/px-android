@@ -12,5 +12,6 @@ data class InitRequestBody(
     val features: CheckoutFeaturesDM,
     val preferenceId: String?,
     val preference: CheckoutPreference?,
-    val flow: String?
+    val flow: String?,
+    val newCardId: String?
 )
