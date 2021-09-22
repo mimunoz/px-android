@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.meli.android.carddrawer.model.CardDrawerView;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.view.LinkableTextView;
 import com.mercadopago.android.px.internal.viewmodel.DisableConfiguration;
@@ -71,8 +72,9 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
     protected void updateCardDrawerView(@NonNull final CardDrawerView cardDrawerView) { }
 
     protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
-        topText.updateModel(displayInfo.topText);
-        bottomText.updateModel(displayInfo.bottomText);
+        final RemediesLinkableMapper remediesLinkableMapper = new RemediesLinkableMapper();
+        topText.updateModel(remediesLinkableMapper.map(displayInfo.topText));
+        bottomText.updateModel(remediesLinkableMapper.map(displayInfo.bottomText));
     }
 
     public void updateInstallment(final int installmentSelected) {

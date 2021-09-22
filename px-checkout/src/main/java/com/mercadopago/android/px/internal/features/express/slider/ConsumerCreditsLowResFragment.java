@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper;
 import com.mercadopago.android.px.internal.view.LinkableTextView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.ConsumerCreditsDrawableFragmentItem;
 import com.mercadopago.android.px.model.ConsumerCreditsDisplayInfo;
@@ -30,7 +31,8 @@ public class ConsumerCreditsLowResFragment extends ConsumerCreditsFragment {
 
     @Override
     protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
-        ((LinkableTextView) view.findViewById(R.id.bottom_text)).updateModel(displayInfo.bottomText);
+        final RemediesLinkableMapper remediesLinkableMapper = new RemediesLinkableMapper();
+        ((LinkableTextView) view.findViewById(R.id.bottom_text)).updateModel(remediesLinkableMapper.map(displayInfo.bottomText));
     }
 
     @Override
