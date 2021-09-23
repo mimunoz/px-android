@@ -12,5 +12,7 @@ internal class ChangePaymentMethodEvent(showedModal: Boolean) : TrackWrapper() {
 
     companion object {
         private const val PATH = "${BASE_PATH}/result/error/change_payment_method"
+        private const val MODAL = "modal"
+        private const val VIEW = "view"
     }
 }

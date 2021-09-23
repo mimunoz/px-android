@@ -10,7 +10,5 @@ abstract class TrackWrapper {
         const val BASE_PATH = "/px_checkout"
         const val ADD_PAYMENT_METHOD_PATH = "/add_payment_method"
         const val PAYMENTS_PATH = "/payments"
-        const val MODAL = "modal"
-        const val VIEW = "view"
     }
 }

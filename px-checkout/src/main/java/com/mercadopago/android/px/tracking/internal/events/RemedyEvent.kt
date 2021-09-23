@@ -11,4 +11,9 @@ internal class RemedyEvent(private val data: RemedyTrackData, showedModal: Boole
     override fun getTrack() = TrackFactory.withEvent("$BASE_PATH/result/error/remedy")
         .addData(data.toMap())
         .addData(body).build()
+
+    companion object {
+        private const val MODAL = "modal"
+        private const val VIEW = "view"
+    }
 }
