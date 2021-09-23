@@ -10,18 +10,20 @@ internal class RemediesPaymentMethodMapper(
 ) : Mapper<DrawableFragmentItem, PaymentMethodFragment<*>>() {
 
     override fun map(drawableFragmentItem: DrawableFragmentItem): PaymentMethodFragment<*> {
-        when (cardSize) {
+        return when (cardSize) {
             CardSize.LARGE -> {
-                return drawableFragmentItem.draw(PaymentMethodHighResDrawer()) as PaymentMethodFragment<*>
+                PaymentMethodHighResDrawer()
             }
             CardSize.SMALL,
             CardSize.XSMALL -> {
-                return drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
+                PaymentMethodLowResDrawer()
             }
             CardSize.MINI -> {
-                return drawableFragmentItem.draw(PaymentMethodMiniDrawer()) as PaymentMethodFragment<*>
+                PaymentMethodMiniDrawer()
             }
-            else -> return drawableFragmentItem.draw(PaymentMethodLowResDrawer()) as PaymentMethodFragment<*>
+            else -> PaymentMethodLowResDrawer()
+        }.let {
+            drawableFragmentItem.draw(it) as PaymentMethodFragment<*>
         }
     }
 }

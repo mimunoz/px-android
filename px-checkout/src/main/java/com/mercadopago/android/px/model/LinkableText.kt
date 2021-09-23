@@ -1,19 +1,18 @@
-package com.mercadopago.android.px.internal.features.payment_result.remedies
+package com.mercadopago.android.px.model
 
 import android.os.Parcelable
-import com.mercadopago.android.px.model.display_info.LinkablePhrase
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class LinkableTextRemedies(
+data class LinkableText(
     val text: String,
     val textColor: String,
-    val linkablePhrases: List<LinkablePhraseRemedies>,
+    val linkablePhrases: List<LinkablePhrase>,
     val links: Map<String?, String?>?
 ) : Parcelable {
 
     @Parcelize
-    data class LinkablePhraseRemedies(
+    data class LinkablePhrase(
         val phrase: String,
         val textColor: String,
         val link: String,

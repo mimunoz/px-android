@@ -1,15 +1,15 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import com.meli.android.carddrawer.model.CardDrawerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper;
@@ -27,6 +27,7 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
     private LinkableTextView topText;
     private LinkableTextView bottomText;
     protected Integer installment = -1;
+    private final RemediesLinkableMapper remediesLinkableMapper = new RemediesLinkableMapper();
 
     private static String INSTALLMENT_SELECTED_EXTRA = "installment_selected";
 
@@ -49,7 +50,7 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         super.onViewCreated(view, savedInstanceState);
         if (savedInstanceState != null) {
             installment = savedInstanceState.getInt(INSTALLMENT_SELECTED_EXTRA, -1);
-            setInstallment(view, installment);
+            setInstallment(installment);
         }
     }
 
@@ -64,17 +65,21 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         bottomText = view.findViewById(R.id.bottom_text);
         final ConsumerCreditsDisplayInfo displayInfo = model.metadata.displayInfo;
         tintBackground(background, displayInfo.color);
-        showDisplayInfo(view, displayInfo);
+        showDisplayInfo(displayInfo);
         view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
     }
 
     @Override
     protected void updateCardDrawerView(@NonNull final CardDrawerView cardDrawerView) { }
 
-    protected void showDisplayInfo(final View view, @NonNull final ConsumerCreditsDisplayInfo displayInfo) {
-        final RemediesLinkableMapper remediesLinkableMapper = new RemediesLinkableMapper();
-        topText.updateModel(remediesLinkableMapper.map(displayInfo.topText));
-        bottomText.updateModel(remediesLinkableMapper.map(displayInfo.bottomText));
+    public void showDisplayInfo(@NonNull final ConsumerCreditsDisplayInfo displayInfo) {
+        if (topText != null) {
+            topText.updateModel(remediesLinkableMapper.map(displayInfo.topText));
+        }
+
+        if (bottomText != null) {
+            bottomText.updateModel(remediesLinkableMapper.map(displayInfo.bottomText));
+        }
     }
 
     public void updateInstallment(final int installmentSelected) {
@@ -82,16 +87,20 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
         if (view != null) {
             view.post(() -> {
                 if (installment != installmentSelected) {
-                    setInstallment(view, installmentSelected);
+                    setInstallment(installmentSelected);
                 }
             });
         }
     }
 
-    protected void setInstallment(final View view, final int installmentSelected) {
-        installment = installmentSelected;
-        topText.updateInstallment(installment);
-        bottomText.updateInstallment(installment);
+    public void setInstallment(final int installmentSelected) {
+        if (topText != null) {
+            topText.updateInstallment(installmentSelected);
+        }
+
+        if (bottomText != null) {
+            bottomText.updateInstallment(installmentSelected);
+        }
     }
 
     @Override

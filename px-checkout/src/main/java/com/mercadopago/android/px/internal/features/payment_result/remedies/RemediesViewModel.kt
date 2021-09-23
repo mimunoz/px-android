@@ -176,7 +176,7 @@ internal class RemediesViewModel(
                 track(RemedyEvent(getRemedyTrackData(RemedyType.KYC_REQUEST), showedModal))
                 remedyState.value = RemedyState.GoToKyc(it.deepLink)
             }
-            PaymentResultButton.Action.PAY -> {
+            PaymentResultButton.Action.MODAL_PAY -> {
                 showedModal = true
                 remedyState.value = RemedyState.Pay
             }

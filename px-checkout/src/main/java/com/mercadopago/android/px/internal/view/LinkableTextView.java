@@ -11,21 +11,21 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.features.TermsAndConditionsActivity;
-import com.mercadopago.android.px.internal.features.payment_result.remedies.LinkableTextRemedies;
+import com.mercadopago.android.px.model.LinkableText;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import java.util.Map;
 
 public class LinkableTextView extends androidx.appcompat.widget.AppCompatTextView {
 
-    private LinkableTextRemedies model;
+    private LinkableText model;
     private int installmentSelected = -1;
 
     public LinkableTextView(@NonNull final Context context, @NonNull final AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public void updateModel(@Nullable final LinkableTextRemedies model) {
+    public void updateModel(@Nullable final LinkableText model) {
         if (model != null) {
             this.model = model;
             render();
@@ -39,7 +39,7 @@ public class LinkableTextView extends androidx.appcompat.widget.AppCompatTextVie
     private void render() {
         if (TextUtil.isNotEmpty(model.getText())) {
             final Spannable spannableText = new SpannableStringBuilder(model.getText());
-            for (final LinkableTextRemedies.LinkablePhraseRemedies linkablePhrase : model.getLinkablePhrases()) {
+            for (final LinkableText.LinkablePhrase linkablePhrase : model.getLinkablePhrases()) {
                 addLinkToSpannable(spannableText, linkablePhrase);
             }
             ViewUtils.setTextColor(this, model.getTextColor());
@@ -48,7 +48,7 @@ public class LinkableTextView extends androidx.appcompat.widget.AppCompatTextVie
         }
     }
 
-    private void addLinkToSpannable(@NonNull final Spannable spannable, @NonNull final LinkableTextRemedies.LinkablePhraseRemedies link) {
+    private void addLinkToSpannable(@NonNull final Spannable spannable, @NonNull final LinkableText.LinkablePhrase link) {
         final String phrase = link.getPhrase();
         final int start = TextUtil.isNotEmpty(phrase) ? model.getText().indexOf(phrase) : -1;
         if (start >= 0) {
@@ -63,7 +63,7 @@ public class LinkableTextView extends androidx.appcompat.widget.AppCompatTextVie
         }
     }
 
-    /* default */ void onLinkClicked(@NonNull final LinkableTextRemedies.LinkablePhraseRemedies linkablePhrase) {
+    /* default */ void onLinkClicked(@NonNull final LinkableText.LinkablePhrase linkablePhrase) {
         String data = "";
         Map<String, String> links = model.getLinks();
         if (!links.isEmpty() && installmentSelected != -1) {

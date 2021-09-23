@@ -9,7 +9,7 @@ import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentI
 import com.mercadopago.android.px.internal.viewmodel.drawables.OtherPaymentMethodFragmentItem
 import com.mercadopago.android.px.internal.viewmodel.drawables.PaymentMethodFragmentDrawer
 
-class PaymentMethodMiniDrawer : PaymentMethodFragmentDrawer {
+internal class PaymentMethodMiniDrawer : PaymentMethodFragmentDrawer {
     override fun draw(drawableFragmentItem: DrawableFragmentItem): Fragment {
         return getInstance(drawableFragmentItem)
     }

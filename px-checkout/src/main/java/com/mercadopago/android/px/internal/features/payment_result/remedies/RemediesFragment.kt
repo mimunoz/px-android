@@ -154,6 +154,25 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
         }
     }
 
+    override fun onAction(genericDialogAction: GenericDialogAction) {
+        super.onAttach(context!!)
+        if (genericDialogAction is GenericDialogAction.CustomAction) {
+            when (genericDialogAction.type) {
+                ActionType.PAY -> {
+                    viewModel.onButtonPressed(PaymentResultButton.Action.MODAL_PAY)
+                }
+
+                ActionType.CHANGE_PM -> {
+                    viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM, isFromModal)
+                }
+
+                ActionType.DISMISS -> {
+                    viewModel.setRemedyModalAbortTrack()
+                }
+            }
+        }
+    }
+
     companion object {
         const val TAG = "remedies"
         private const val PAYMENT_MODEL = "payment_model"
@@ -170,25 +189,6 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
             arguments = Bundle().apply {
                 putParcelable(PAYMENT_MODEL, paymentModel)
                 putParcelable(REMEDIES_MODEL, remediesModel)
-            }
-        }
-    }
-
-    override fun onAction(genericDialogAction: GenericDialogAction) {
-        super.onAttach(context!!)
-        if (genericDialogAction is GenericDialogAction.CustomAction) {
-            when (genericDialogAction.type) {
-                ActionType.PAY -> {
-                    viewModel.onButtonPressed(PaymentResultButton.Action.PAY)
-                }
-
-                ActionType.CHANGE_PM -> {
-                    viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM, isFromModal)
-                }
-
-                ActionType.DISMISS -> {
-                    viewModel.setRemedyModalAbortTrack()
-                }
             }
         }
     }
