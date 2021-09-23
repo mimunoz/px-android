@@ -11,6 +11,7 @@ import com.mercadopago.android.px.internal.features.payment_congrats.model.Payme
 import com.mercadopago.android.px.internal.features.payment_result.instruction.mapper.*
 import com.mercadopago.android.px.internal.features.payment_result.mappers.PaymentResultViewModelMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.AlternativePayerPaymentMethodsMapper
+import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper
 import com.mercadopago.android.px.internal.features.security_code.RenderModeMapper
 import com.mercadopago.android.px.internal.features.security_code.mapper.BusinessSecurityCodeDisplayDataMapper
 import com.mercadopago.android.px.internal.mappers.*
@@ -168,4 +169,7 @@ internal object MapperProvider {
 
     val fromSecurityCodeDisplayDataToBusinessSecurityCodeDisplayData: BusinessSecurityCodeDisplayDataMapper
         get() = BusinessSecurityCodeDisplayDataMapper()
+
+    val remediesLinkableMapper: RemediesLinkableMapper
+        get() = RemediesLinkableMapper()
 }

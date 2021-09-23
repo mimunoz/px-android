@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import com.meli.android.carddrawer.model.CardDrawerView;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.internal.di.MapperProvider;
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.view.LinkableTextView;
@@ -27,7 +28,7 @@ public class ConsumerCreditsFragment extends PaymentMethodFragment<ConsumerCredi
     private LinkableTextView topText;
     private LinkableTextView bottomText;
     protected Integer installment = -1;
-    private final RemediesLinkableMapper remediesLinkableMapper = new RemediesLinkableMapper();
+    private RemediesLinkableMapper remediesLinkableMapper = MapperProvider.INSTANCE.getRemediesLinkableMapper();
 
     private static String INSTALLMENT_SELECTED_EXTRA = "installment_selected";
 
