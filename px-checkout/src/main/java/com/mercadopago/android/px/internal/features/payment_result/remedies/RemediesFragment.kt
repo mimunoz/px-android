@@ -167,7 +167,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 }
 
                 ActionType.DISMISS -> {
-                    viewModel.setRemedyModalAbortTrack()
+                    viewModel.trackRemedyModalAbort()
                 }
             }
         }

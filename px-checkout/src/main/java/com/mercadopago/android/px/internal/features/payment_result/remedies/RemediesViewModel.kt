@@ -194,7 +194,7 @@ internal class RemediesViewModel(
         RemedyTrackData(type.getType(), remediesModel.trackingData, it.paymentStatus, it.paymentStatusDetail)
     }
 
-    fun setRemedyModalAbortTrack() {
+    fun trackRemedyModalAbort() {
         track(RemedyModalAbortEvent())
     }
 
