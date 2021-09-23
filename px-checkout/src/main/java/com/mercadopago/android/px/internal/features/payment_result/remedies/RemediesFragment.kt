@@ -32,7 +32,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
     private lateinit var retryPaymentFragment: RetryPaymentFragment
     private lateinit var retryPaymentContainer: View
     private lateinit var highRisk: HighRiskRemedy
-    private var isFromModal: Boolean = false
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies, container, false)
@@ -125,7 +125,6 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 }
 
                 is RemedyState.ShowModal -> {
-                    isFromModal = true
                     showDialog(
                         childFragmentManager, GenericDialogItem(
                             it.modal.description.message,
@@ -163,7 +162,7 @@ internal class RemediesFragment : Fragment(), Remedies.View, CvvRemedy.Listener,
                 }
 
                 ActionType.CHANGE_PM -> {
-                    viewModel.onButtonPressed(PaymentResultButton.Action.CHANGE_PM, isFromModal)
+                    viewModel.onButtonPressed(PaymentResultButton.Action.MODAL_CHANGE_PM)
                 }
 
                 ActionType.DISMISS -> {

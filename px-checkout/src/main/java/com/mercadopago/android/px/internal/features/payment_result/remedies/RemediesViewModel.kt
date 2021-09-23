@@ -11,6 +11,7 @@ import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.CVVRecoveryWrapper
 import com.mercadopago.android.px.internal.util.TokenCreationWrapper
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
+import com.mercadopago.android.px.model.Action
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PayerCost
 import com.mercadopago.android.px.model.PaymentData
@@ -48,6 +49,7 @@ internal class RemediesViewModel(
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
     private var showedModal = false
+
 
     init {
         val methodIds = getMethodIds()
@@ -166,10 +168,10 @@ internal class RemediesViewModel(
         }
     }
 
-    override fun onButtonPressed(action: PaymentResultButton.Action, isFromModal: Boolean) {
+    override fun onButtonPressed(action: PaymentResultButton.Action) {
         when (action) {
-            PaymentResultButton.Action.CHANGE_PM -> {
-                track(ChangePaymentMethodEvent(isFromModal))
+            PaymentResultButton.Action.CHANGE_PM, PaymentResultButton.Action.MODAL_CHANGE_PM -> {
+                track(ChangePaymentMethodEvent(action == PaymentResultButton.Action.MODAL_CHANGE_PM))
                 remedyState.value = RemedyState.ChangePaymentMethod
             }
             PaymentResultButton.Action.KYC -> remediesModel.highRisk?.let {
@@ -180,6 +182,7 @@ internal class RemediesViewModel(
                 showedModal = true
                 remedyState.value = RemedyState.Pay
             }
+
             else -> TODO()
         }
     }
