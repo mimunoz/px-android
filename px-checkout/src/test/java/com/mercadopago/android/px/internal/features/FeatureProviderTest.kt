@@ -3,8 +3,8 @@ package com.mercadopago.android.px.internal.features
 import com.mercadopago.android.px.addons.TokenDeviceBehaviour
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
-import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.core.internal.ConfigurationProvider
+import com.mercadopago.android.px.core.v2.PaymentProcessor
 import com.mercadopago.android.px.model.internal.Application
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import org.junit.Assert
@@ -28,7 +28,7 @@ internal class FeatureProviderTest {
     lateinit var paymentConfiguration: PaymentConfiguration
 
     @Mock
-    lateinit var splitPaymentProcessor: SplitPaymentProcessor
+    lateinit var splitPaymentProcessor: PaymentProcessor
 
     @Mock
     lateinit var checkoutPreference: CheckoutPreference
@@ -40,7 +40,7 @@ internal class FeatureProviderTest {
     fun setUp() {
         whenever(configurationProvider.paymentConfiguration).thenReturn(paymentConfiguration)
         whenever(configurationProvider.checkoutPreference).thenReturn(checkoutPreference)
-        whenever(paymentConfiguration.paymentProcessor).thenReturn(splitPaymentProcessor)
+        whenever(paymentConfiguration.paymentProcessorV2).thenReturn(splitPaymentProcessor)
         whenever(mercadoPagoCheckout.paymentConfiguration).thenReturn(paymentConfiguration)
         whenever(mercadoPagoCheckout.checkoutPreference).thenReturn(checkoutPreference)
     }
