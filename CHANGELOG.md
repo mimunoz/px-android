@@ -1,3 +1,7 @@
+## VERSION 4.90.0
+_23_09_2021_
+* FEATURE - Support custom scheduled payments.
+
 ## VERSION 4.89.0
 _09_09_2021_
 * FEATURE - Migrates to min api 21 and target api 30.
