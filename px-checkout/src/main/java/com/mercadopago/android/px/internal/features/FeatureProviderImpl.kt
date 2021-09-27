@@ -34,6 +34,8 @@ internal class FeatureProviderImpl(
                 .setHybridCard(true)
                 .setPix(true)
                 .setCustomTaxesCharges(true)
+                .setCardsCustomTaxesCharges(true)
+                .setTaxableCharges(true)
                 .addValidationProgram(Application.KnownValidationProgram.STP.value)
 
             if (tokenDeviceBehaviour.isFeatureAvailable) {

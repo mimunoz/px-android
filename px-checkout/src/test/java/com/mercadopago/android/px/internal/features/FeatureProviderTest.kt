@@ -53,6 +53,8 @@ internal class FeatureProviderTest {
         Assert.assertTrue(checkoutFeatures.hybridCard)
         Assert.assertTrue(checkoutFeatures.odrFlag)
         Assert.assertTrue(checkoutFeatures.customTaxesCharges)
+        Assert.assertTrue(checkoutFeatures.cardsCustomTaxesCharges)
+        Assert.assertTrue(checkoutFeatures.taxableCharges)
     }
 
     @Test
