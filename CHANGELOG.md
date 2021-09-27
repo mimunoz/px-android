@@ -1,7 +1,3 @@
-## VERSION 4.91.0
-_27_09_2021_
-* FEATURE - Support taxable charges and label customization
-
 ## VERSION 4.90.0
 _23_09_2021_
 * FEATURE - Support custom scheduled payments.
