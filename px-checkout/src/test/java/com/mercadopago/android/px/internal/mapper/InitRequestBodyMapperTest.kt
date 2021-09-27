@@ -13,6 +13,7 @@ import com.mercadopago.android.px.internal.tracking.TrackingRepository
 import com.mercadopago.android.px.model.PaymentTypes
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
 import com.mercadopago.android.px.model.internal.CheckoutFeatures
+import com.mercadopago.android.px.model.internal.CheckoutType
 import com.mercadopago.android.px.model.internal.PaymentTypeChargeRuleDM
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import com.mercadopago.android.px.utils.StubCheckoutPreferenceUtils
@@ -71,6 +72,7 @@ class InitRequestBodyMapperTest {
         whenever(advancedConfiguration.discountParamsConfiguration).thenReturn(discountParamsConfiguration)
         whenever(paymentSettingRepository.advancedConfiguration).thenReturn(advancedConfiguration)
         whenever(paymentSettingRepository.publicKey).thenReturn("test_pk")
+        whenever(paymentConfiguration.getCheckoutType()).thenReturn(CheckoutType.REGULAR)
     }
 
     @Test
