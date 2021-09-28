@@ -11,7 +11,6 @@ import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.CVVRecoveryWrapper
 import com.mercadopago.android.px.internal.util.TokenCreationWrapper
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
-import com.mercadopago.android.px.model.Action
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PayerCost
 import com.mercadopago.android.px.model.PaymentData
@@ -49,7 +48,6 @@ internal class RemediesViewModel(
     private var paymentConfiguration: PaymentConfiguration? = null
     private var card: Card? = null
     private var showedModal = false
-
 
     init {
         val methodIds = getMethodIds()

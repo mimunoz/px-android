@@ -2,8 +2,6 @@ package com.mercadopago.android.px.internal.features.payment_result.remedies.vie
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,24 +12,17 @@ import com.mercadopago.android.px.internal.di.MapperProvider
 import com.mercadopago.android.px.internal.experiments.BadgeVariant
 import com.mercadopago.android.px.internal.extensions.gone
 import com.mercadopago.android.px.internal.extensions.visible
-import com.mercadopago.android.px.internal.features.express.slider.*
+import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesLinkableMapper
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPayerCost
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemediesPaymentMethodMapper
-import com.mercadopago.android.px.internal.mappers.Mapper
-import com.mercadopago.android.px.internal.util.ParcelableUtil
-import com.mercadopago.android.px.internal.util.TextUtil
-import com.mercadopago.android.px.internal.util.ViewUtils
-import com.mercadopago.android.px.internal.util.parcelableCreator
 import com.mercadopago.android.px.internal.view.LinkableTextView
 import com.mercadopago.android.px.internal.view.MPTextView
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView
-import com.mercadopago.android.px.model.display_info.LinkableText.CREATOR
 import com.mercadopago.android.px.model.internal.OneTapItem
 import com.mercadopago.android.px.model.internal.Text
 import com.mercadopago.android.px.model.internal.remedies.CardSize
 import kotlinx.android.parcel.Parcelize
-import com.mercadopago.android.px.model.display_info.LinkableText as LinkableText
 
 internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.DisabledDetailDialogLauncher {
 
