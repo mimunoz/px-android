@@ -66,13 +66,14 @@
         </View>
     </FrameLayout>
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/helper"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical|end|right"
         android:layout_marginEnd="@dimen/px_m_alternative_1_margin"
         android:layout_marginRight="@dimen/px_m_alternative_1_margin"
-        android:src="@drawable/blue_helper"
+        android:src="@drawable/px_helper"
+        android:tint="@color/px_checkout_helper_icon"
         android:visibility="gone" />
 </merge>
