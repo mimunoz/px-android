@@ -148,6 +148,7 @@
     <color name="px_white">@color/ui_components_white_color</color>
     <color name="px_white_smoke">#ccededed</color>
     <color name="px_med_light_gray">@color/ui_components_light_grey_color</color>
+    <color name="px_remedies_link_blue">#009EE3</color>
 
     <!-- Customized colors -->
     <!-- Toolbar and status bar default -->
