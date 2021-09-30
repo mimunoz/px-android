@@ -1,3 +1,8 @@
+## VERSION 4.92.0
+_30_09_2021_
+* FEATURE - Summary and offline methods restyling
+* FEATURE - Improvements in remedies screen and modal implementation when offering consumer credits
+
 ## VERSION 4.91.0
 _27_09_2021_
 * FEATURE - Support taxable charges and label customization
