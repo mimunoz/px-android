@@ -244,27 +244,6 @@ public final class ViewUtils {
         Logger.debug(TAG, "Cannot parse color" + color);
     }
 
-    public static void loadTextListOrGone(@NonNull final MPTextView textView,
-        @Nullable final List<Text> texts, @ColorInt final int color) {
-        if (texts != null && !texts.isEmpty()) {
-            final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-            int startIndex = 0, endIndex;
-
-            for (Text text : texts) {
-                spannableStringBuilder.append(text.getMessage()).append(" ");
-                endIndex = spannableStringBuilder.length();
-                ViewUtils.setFontInSpannable(textView.getContext(), PxFont.from(text.getWeight()), spannableStringBuilder, startIndex, endIndex);
-                ViewUtils.setColorInSpannable(color, startIndex, endIndex, spannableStringBuilder);
-                startIndex = spannableStringBuilder.length();
-            }
-
-            textView.setText(spannableStringBuilder);
-            textView.setVisibility(VISIBLE);
-        } else {
-            textView.setVisibility(GONE);
-        }
-    }
-
     public static void setFontInSpannable(@NonNull final Context context, @NonNull final PxFont font,
         @NonNull final Spannable spannable) {
         setFontInSpannable(context, font, spannable, 0, spannable.length());

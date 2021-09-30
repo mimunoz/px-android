@@ -19,6 +19,7 @@ import com.mercadopago.android.px.internal.experiments.KnownVariant;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
 import com.mercadopago.android.px.internal.experiments.Variant;
 import com.mercadopago.android.px.internal.experiments.VariantHandler;
+import com.mercadopago.android.px.internal.features.AmountDescriptorViewModelFactory;
 import com.mercadopago.android.px.internal.features.express.installments.InstallmentRowHolder;
 import com.mercadopago.android.px.internal.features.express.offline_methods.OfflineMethods;
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
@@ -120,6 +121,7 @@ import kotlin.Unit;
     @NonNull private final PayerCostSelectionRepository payerCostSelectionRepository;
     @NonNull private final PaymentMethodDrawableItemMapper paymentMethodDrawableItemMapper;
     @NonNull private final FromApplicationToApplicationInfo fromApplicationToApplicationInfo;
+    @NonNull private final AmountDescriptorViewModelFactory amountDescriptorViewModelFactory;
     @NonNull private final AuthorizationProvider authorizationProvider;
     /* default */ TriggerableQueue triggerableQueue;
 
@@ -148,8 +150,9 @@ import kotlin.Unit;
         @NonNull final SummaryInfoMapper summaryInfoMapper,
         @NonNull final ElementDescriptorMapper elementDescriptorMapper,
         @NonNull final FromApplicationToApplicationInfo fromApplicationToApplicationInfo,
-        @NonNull final MPTracker tracker,
-        @NonNull final AuthorizationProvider authorizationProvider) {
+        @NonNull final AuthorizationProvider authorizationProvider,
+        @NonNull final AmountDescriptorViewModelFactory amountDescriptorViewModelFactory,
+        @NonNull final MPTracker tracker) {
         super(tracker);
         this.paymentSettingRepository = paymentSettingRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
@@ -176,6 +179,7 @@ import kotlin.Unit;
         this.payerPaymentMethodRepository = payerPaymentMethodRepository;
         this.modalRepository = modalRepository;
         this.customOptionIdSolver = customOptionIdSolver;
+        this.amountDescriptorViewModelFactory = amountDescriptorViewModelFactory;
         this.authorizationProvider = authorizationProvider;
 
         triggerableQueue = new TriggerableQueue();
@@ -197,9 +201,9 @@ import kotlin.Unit;
         final ElementDescriptorView.Model elementDescriptorModel = elementDescriptorMapper.map(summaryInfo);
         final List<OneTapItem> oneTapItemList = oneTapItemRepository.getValue();
         final List<SummaryModel> summaryModels =
-            new SummaryViewModelMapper(paymentSettingRepository.getCurrency(), discountRepository, amountRepository,
-                elementDescriptorModel, this, chargeRepository, amountConfigurationRepository,
-                customTextsRepository, summaryDetailDescriptorMapper, applicationSelectionRepository)
+            new SummaryViewModelMapper(discountRepository, amountRepository, elementDescriptorModel, this,
+                chargeRepository, amountConfigurationRepository, customTextsRepository, summaryDetailDescriptorMapper,
+                applicationSelectionRepository, amountDescriptorViewModelFactory)
                 .map(oneTapItemList);
 
         final List<PaymentMethodDescriptorModelByApplication> paymentModels =

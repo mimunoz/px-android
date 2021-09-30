@@ -17,6 +17,7 @@ internal class CheckoutFeatures(builder: Builder) {
     val hybridCard: Boolean
     val pix: Boolean
     val customTaxesCharges: Boolean
+    val styleVersion: String
     val taxableCharges: Boolean
     val cardsCustomTaxesCharges: Boolean
 
@@ -33,6 +34,7 @@ internal class CheckoutFeatures(builder: Builder) {
         pix = builder.pix
         customTaxesCharges = builder.customTaxesCharges
         validationPrograms = builder.validationPrograms
+        styleVersion = STYLE_VERSION
         taxableCharges = builder.taxableCharges
         cardsCustomTaxesCharges = builder.cardsCustomTaxesCharges
     }
@@ -74,5 +76,9 @@ internal class CheckoutFeatures(builder: Builder) {
         fun addValidationProgram(validationProgram: String) = apply { validationPrograms.add(validationProgram) }
 
         fun build() = CheckoutFeatures(this)
+    }
+
+    companion object {
+        const val STYLE_VERSION = "v1"
     }
 }

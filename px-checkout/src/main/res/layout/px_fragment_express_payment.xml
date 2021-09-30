@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/px_checkout_background"
     tools:context=".internal.features.checkout.CheckoutActivity">
 
     <com.mercadopago.android.px.internal.view.SummaryView
@@ -20,6 +21,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/px_m_margin"
         android:paddingRight="@dimen/px_m_margin"
+        android:background="@color/px_checkout_split_background"
         app:layout_constraintBottom_toTopOf="@id/installments_header_experiment_container"
         app:layout_constraintTop_toBottomOf="@id/summary_view" />
 

@@ -1,11 +1,13 @@
 package com.mercadopago.android.px.internal.features
 
 import com.mercadopago.android.px.addons.TokenDeviceBehaviour
+import com.mercadopago.android.px.assertEquals
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
 import com.mercadopago.android.px.core.internal.ConfigurationProvider
 import com.mercadopago.android.px.core.v2.PaymentProcessor
 import com.mercadopago.android.px.model.internal.Application
+import com.mercadopago.android.px.model.internal.CheckoutFeatures
 import com.mercadopago.android.px.preferences.CheckoutPreference
 import org.junit.Assert
 import org.junit.Before
@@ -53,6 +55,7 @@ internal class FeatureProviderTest {
         Assert.assertTrue(checkoutFeatures.hybridCard)
         Assert.assertTrue(checkoutFeatures.odrFlag)
         Assert.assertTrue(checkoutFeatures.customTaxesCharges)
+        checkoutFeatures.styleVersion.assertEquals(CheckoutFeatures.STYLE_VERSION)
         Assert.assertTrue(checkoutFeatures.cardsCustomTaxesCharges)
         Assert.assertTrue(checkoutFeatures.taxableCharges)
     }

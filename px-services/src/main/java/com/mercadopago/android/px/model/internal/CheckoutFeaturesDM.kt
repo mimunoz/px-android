@@ -14,6 +14,7 @@ data class CheckoutFeaturesDM(
     val customTaxesCharges: Boolean,
     val cardsCustomTaxesCharges: Boolean,
     val taxableCharges: Boolean,
+    val styleVersion: String,
     @SerializedName("validations_programs")
     val validationPrograms: List<String>
 )

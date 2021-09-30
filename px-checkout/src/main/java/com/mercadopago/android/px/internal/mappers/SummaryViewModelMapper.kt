@@ -1,24 +1,20 @@
 package com.mercadopago.android.px.internal.mappers
 
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
+import com.mercadopago.android.px.internal.features.AmountDescriptorViewModelFactory
 import com.mercadopago.android.px.internal.repository.*
 import com.mercadopago.android.px.internal.util.ChargeRuleHelper
 import com.mercadopago.android.px.internal.view.AmountDescriptorView
 import com.mercadopago.android.px.internal.view.ElementDescriptorView
 import com.mercadopago.android.px.internal.view.SummaryDetailDescriptorMapper
 import com.mercadopago.android.px.internal.view.SummaryView
-import com.mercadopago.android.px.internal.viewmodel.AmountLocalized
 import com.mercadopago.android.px.internal.viewmodel.SummaryModel
-import com.mercadopago.android.px.internal.viewmodel.SummaryViewDefaultColor
-import com.mercadopago.android.px.internal.viewmodel.TotalLocalized
 import com.mercadopago.android.px.model.AmountConfiguration
-import com.mercadopago.android.px.model.Currency
 import com.mercadopago.android.px.model.DiscountConfigurationModel
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
 import com.mercadopago.android.px.model.internal.OneTapItem
 
 internal class SummaryViewModelMapper(
-    private val currency: Currency,
     private val discountRepository: DiscountRepository,
     private val amountRepository: AmountRepository,
     private val elementDescriptorViewModel: ElementDescriptorView.Model,
@@ -27,7 +23,8 @@ internal class SummaryViewModelMapper(
     private val amountConfigurationRepository: AmountConfigurationRepository,
     private val customTextsRepository: CustomTextsRepository,
     private val summaryDetailDescriptorMapper: SummaryDetailDescriptorMapper,
-    private val applicationSelectionRepository: ApplicationSelectionRepository
+    private val applicationSelectionRepository: ApplicationSelectionRepository,
+    private val amountDescriptorViewModelFactory: AmountDescriptorViewModelFactory
 ) : Mapper<OneTapItem, SummaryModel>() {
 
     private val cache = mutableMapOf<Key, SummaryView.Model>()
@@ -77,10 +74,10 @@ internal class SummaryViewModelMapper(
         val chargeRule = chargeRepository.getChargeRule(paymentTypeId)
         val summaryDetailList = summaryDetailDescriptorMapper.map(
             SummaryDetailDescriptorMapper.Model(discountModel, chargeRule, amountConfiguration, onClickListener))
-        val totalRow = AmountDescriptorView.Model(
-            TotalLocalized(customTextsRepository),
-            AmountLocalized(amountRepository.getAmountToPay(paymentTypeId, discountModel), currency),
-            SummaryViewDefaultColor())
+
+        val totalRow = amountDescriptorViewModelFactory.create(
+            customTextsRepository, amountRepository.getAmountToPay(paymentTypeId, discountModel)
+        )
         return SummaryView.Model(elementDescriptorViewModel, summaryDetailList, totalRow)
     }
 
