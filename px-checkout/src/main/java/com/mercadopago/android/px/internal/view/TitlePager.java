@@ -99,8 +99,4 @@ public abstract class TitlePager extends FrameLayout implements ViewTreeObserver
         previousView.setX(-currentWidth);
         nextView.setX(currentWidth);
     }
-
-    public abstract void showInstallments();
-
-    public abstract void hideInstallments();
 }

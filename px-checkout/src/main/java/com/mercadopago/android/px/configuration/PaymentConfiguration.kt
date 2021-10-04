@@ -4,23 +4,29 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.mercadopago.android.px.core.PaymentMethodPlugin
 import com.mercadopago.android.px.core.PaymentProcessor
+import com.mercadopago.android.px.core.ScheduledPaymentProcessor
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.core.internal.CheckoutDataMapper
+import com.mercadopago.android.px.core.internal.NoOpPaymentProcessor
 import com.mercadopago.android.px.core.internal.PaymentListenerMapper
 import com.mercadopago.android.px.core.internal.PaymentProcessorMapper
 import com.mercadopago.android.px.model.commission.PaymentTypeChargeRule
+import com.mercadopago.android.px.model.internal.CheckoutType
 import java.util.*
+import com.mercadopago.android.px.core.v2.PaymentProcessor as PaymentProcessorV2
 
 class PaymentConfiguration private constructor(val charges: ArrayList<PaymentTypeChargeRule>,
-    val paymentProcessor: SplitPaymentProcessor) : Parcelable {
+    val paymentProcessor: SplitPaymentProcessor,
+    internal val paymentProcessorV2: PaymentProcessorV2) : Parcelable {
 
     private constructor(builder: Builder): this(
-        builder.charges, builder.paymentProcessor
+        builder.charges, builder.paymentProcessor, builder.paymentProcessorV2
     )
 
     constructor(parcel: Parcel) : this(
         parcel.createTypedArrayList(PaymentTypeChargeRule.CREATOR)!!,
-        parcel.readParcelable(SplitPaymentProcessor::class.java.classLoader)!!
+        parcel.readParcelable(SplitPaymentProcessor::class.java.classLoader)!!,
+        parcel.readParcelable(PaymentProcessorV2::class.java.classLoader)!!
     )
 
     @Deprecated("")
@@ -29,15 +35,33 @@ class PaymentConfiguration private constructor(val charges: ArrayList<PaymentTyp
     @Deprecated("")
     val paymentMethodPluginList:Collection<PaymentMethodPlugin> = ArrayList()
 
+    internal fun getCheckoutType(): CheckoutType {
+        return when(paymentProcessorV2) {
+            is ScheduledPaymentProcessor -> CheckoutType.SCHEDULED
+            else -> CheckoutType.REGULAR
+        }
+    }
+
     class Builder {
+        internal val paymentProcessorV2: PaymentProcessorV2
         val paymentProcessor: SplitPaymentProcessor
         val charges: ArrayList<PaymentTypeChargeRule>
 
         /**
          * @param paymentProcessor your custom payment processor.
          */
+        constructor(paymentProcessor: PaymentProcessorV2) {
+            this.paymentProcessor = NoOpPaymentProcessor()
+            this.paymentProcessorV2 = paymentProcessor
+            charges = ArrayList()
+        }
+
+        /**
+         * @param paymentProcessor your custom payment processor.
+         */
         constructor(paymentProcessor: SplitPaymentProcessor) {
             this.paymentProcessor = paymentProcessor
+            this.paymentProcessorV2 = paymentProcessor
             charges = ArrayList()
         }
 
@@ -88,6 +112,7 @@ class PaymentConfiguration private constructor(val charges: ArrayList<PaymentTyp
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeTypedList(charges)
         parcel.writeParcelable(paymentProcessor, flags)
+        parcel.writeParcelable(paymentProcessorV2, flags)
     }
 
     override fun describeContents() = 0

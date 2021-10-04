@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.datasource
 
 import com.mercadopago.android.px.configuration.PaymentConfiguration
-import com.mercadopago.android.px.core.SplitPaymentProcessor
+import com.mercadopago.android.px.core.v2.PaymentProcessor
 import com.mercadopago.android.px.internal.adapters.NetworkApi
 import com.mercadopago.android.px.internal.callbacks.ApiResponse
 import com.mercadopago.android.px.internal.mappers.CustomChargeToPaymentTypeChargeMapper
@@ -83,7 +83,7 @@ class CheckoutRepositoryImplTest {
     private lateinit var customChargeToPaymentTypeChargeMapper: CustomChargeToPaymentTypeChargeMapper
 
     @Mock
-    private lateinit var splitPaymentProcessor: SplitPaymentProcessor
+    private lateinit var splitPaymentProcessor: PaymentProcessor
 
     @Mock
     private lateinit var checkoutResponse: CheckoutResponse

@@ -168,7 +168,7 @@ public class CheckoutActivity extends PXActivity<CheckoutPresenter>
         final CheckoutConfigurationModule configurationModule = session.getConfigurationModule();
         final PaymentSettingRepository configuration = configurationModule.getPaymentSettings();
 
-        privateKey = configuration.getPrivateKey();
+        privateKey = configurationModule.getAuthorizationProvider().getPrivateKey();
 
         merchantPublicKey = configuration.getPublicKey();
 

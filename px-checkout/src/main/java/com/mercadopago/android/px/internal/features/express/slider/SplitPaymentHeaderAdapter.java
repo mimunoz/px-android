@@ -1,11 +1,11 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.CompoundButton;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
@@ -60,12 +60,12 @@ public class SplitPaymentHeaderAdapter extends HubableAdapter<List<SplitPaymentH
 
         @Override
         public void visit(final LabeledSwitch labeledSwitch) {
-
             // ${amount} semibold, color black
             final Spannable amount =
                 new AmountLabeledFormatter(new SpannableStringBuilder(), labeledSwitch.getContext())
                     .withSemiBoldStyle()
-                    .withTextColor(ContextCompat.getColor(labeledSwitch.getContext(), R.color.ui_meli_black))
+                    .withTextColor(
+                        ContextCompat.getColor(labeledSwitch.getContext(), R.color.px_expressCheckoutTextColor))
                     .apply(TextFormatter
                         .withCurrency(currency)
                         .amount(split.secondaryPaymentMethod.getVisibleAmountToPay())
@@ -78,7 +78,7 @@ public class SplitPaymentHeaderAdapter extends HubableAdapter<List<SplitPaymentH
 
             // added color
             ViewUtils.setColorInSpannable(ContextCompat.getColor(labeledSwitch.getContext(),
-                R.color.ui_meli_grey), 0, message.length(),
+                R.color.px_checkout_secondary_color), 0, message.length(),
                 message);
             // build definitive message
             labeledSwitch.setText(new SpannableStringBuilder(amount).append(message));
