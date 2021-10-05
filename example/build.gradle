@@ -45,7 +45,11 @@ android {
         release {
             debuggable true
             minifyEnabled true
-            shrinkResources true
+            /*
+              fix me: temporary solution for crash in congrats screen
+              that occurs in example app
+             */
+            //shrinkResources true //
             signingConfig signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
