@@ -10,6 +10,7 @@ data class InitRequestBody(
     @SerializedName("discount_configuration")
     val discountParamsConfiguration: DiscountParamsConfigurationDM,
     val features: CheckoutFeaturesDM,
+    val checkoutType: CheckoutType,
     val preferenceId: String?,
     val preference: CheckoutPreference?,
     val flow: String?,

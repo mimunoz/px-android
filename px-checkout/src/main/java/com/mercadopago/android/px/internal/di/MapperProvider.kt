@@ -57,12 +57,6 @@ internal object MapperProvider {
         )
     }
 
-    fun getAmountDescriptorMapper(): AmountDescriptorMapper {
-        return AmountDescriptorMapper(
-            Session.getInstance().experimentsRepository
-        )
-    }
-
     fun getPostPaymentUrlsMapper() = PostPaymentUrlsMapper
 
     fun getAlternativePayerPaymentMethodsMapper(): AlternativePayerPaymentMethodsMapper {
@@ -98,8 +92,7 @@ internal object MapperProvider {
         return SummaryDetailDescriptorMapper(
             session.amountRepository,
             getSummaryInfoMapper().map(paymentSettings.checkoutPreference!!),
-            paymentSettings.currency,
-            getAmountDescriptorMapper()
+            FactoryProvider.amountDescriptorViewModelFactory
         )
     }
 

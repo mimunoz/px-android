@@ -10,6 +10,7 @@ import com.mercadopago.android.px.internal.core.AuthorizationProvider
 import com.mercadopago.android.px.internal.datasource.CustomOptionIdSolver
 import com.mercadopago.android.px.internal.domain.CheckoutUseCase
 import com.mercadopago.android.px.internal.domain.CheckoutWithNewCardUseCase
+import com.mercadopago.android.px.internal.features.AmountDescriptorViewModelFactory
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter
 import com.mercadopago.android.px.internal.mappers.ElementDescriptorMapper
 import com.mercadopago.android.px.internal.mappers.PaymentMethodDescriptorMapper
@@ -144,6 +145,9 @@ class ExpressPaymentPresenterTest {
     private lateinit var customOptionIdSolver: CustomOptionIdSolver
 
     @Mock
+    private lateinit var amountDescriptorViewModelFactory: AmountDescriptorViewModelFactory
+
+    @Mock
     private lateinit var authorizationProvider: AuthorizationProvider
 
     private lateinit var checkoutUseCase : CheckoutUseCase
@@ -208,8 +212,9 @@ class ExpressPaymentPresenterTest {
             summaryInfoMapper,
             elementDescriptorMapper,
             mock(FromApplicationToApplicationInfo::class.java),
-            tracker,
-            authorizationProvider
+            authorizationProvider,
+            amountDescriptorViewModelFactory,
+            tracker
         )
         verifyAttachView()
     }

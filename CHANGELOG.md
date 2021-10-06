@@ -1,3 +1,20 @@
+## VERSION 4.92.1
+_05_10_2021_
+* FIX - Summary nav bar arrow color
+
+## VERSION 4.92.0
+_30_09_2021_
+* FEATURE - Summary and offline methods restyling
+* FEATURE - Improvements in remedies screen and modal implementation when offering consumer credits
+
+## VERSION 4.91.0
+_27_09_2021_
+* FEATURE - Support taxable charges and label customization
+
+## VERSION 4.90.0
+_23_09_2021_
+* FEATURE - Support custom scheduled payments.
+
 ## VERSION 4.89.0
 _09_09_2021_
 * FEATURE - Migrates to min api 21 and target api 30.

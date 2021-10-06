@@ -4,6 +4,7 @@ import com.mercadopago.android.px.addons.ESCManagerBehaviour
 import com.mercadopago.android.px.configuration.AdvancedConfiguration
 import com.mercadopago.android.px.configuration.PaymentConfiguration
 import com.mercadopago.android.px.core.MercadoPagoCheckout
+import com.mercadopago.android.px.internal.extensions.isZero
 import com.mercadopago.android.px.internal.features.FeatureProvider
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository
 import com.mercadopago.android.px.internal.tracking.TrackingRepository
@@ -54,7 +55,12 @@ internal class InitRequestBodyMapper (
             publicKey,
             escManagerBehaviour.escCardIds,
             paymentConfiguration.charges.map {
-                PaymentTypeChargeRuleDM(it.paymentTypeId, it.charge(), it.message)
+                PaymentTypeChargeRuleDM(
+                    it.paymentTypeId,
+                    it.charge(),
+                    if (it.charge().isZero()) it.message else it.label,
+                    it.taxable
+                )
             },
             DiscountParamsConfigurationDM(
                 advancedConfiguration.discountParamsConfiguration.labels,
@@ -62,9 +68,11 @@ internal class InitRequestBodyMapper (
                 advancedConfiguration.discountParamsConfiguration.additionalParams
             ),
             CheckoutFeaturesDM(
-                features.express, features.split, features.odrFlag, features.comboCard,
-                features.hybridCard, features.pix, features.customTaxesCharges, features.validationPrograms
+                features.express, features.split, features.odrFlag, features.comboCard, features.hybridCard,
+                features.pix, features.customTaxesCharges, features.cardsCustomTaxesCharges, features.taxableCharges,
+                features.styleVersion, features.validationPrograms
             ),
+            paymentConfiguration.getCheckoutType(),
             checkoutPreferenceId,
             checkoutPreference,
             trackingRepository.flowId,
