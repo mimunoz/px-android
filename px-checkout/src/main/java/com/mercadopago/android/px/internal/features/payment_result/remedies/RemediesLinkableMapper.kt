@@ -1,11 +1,15 @@
 package com.mercadopago.android.px.internal.features.payment_result.remedies
 
+import android.content.Context
+import androidx.core.content.ContextCompat
 import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.mappers.Mapper
+import com.mercadopago.android.px.internal.viewmodel.LazyString
 import com.mercadopago.android.px.model.LinkableText
+
 typealias LinkableTextDisplayInfo = com.mercadopago.android.px.model.display_info.LinkableText
 
-internal class RemediesLinkableMapper : Mapper<LinkableTextDisplayInfo, LinkableText>() {
+internal class RemediesLinkableMapper(val context: Context) : Mapper<LinkableTextDisplayInfo, LinkableText>() {
 
     override fun map(value: LinkableTextDisplayInfo): LinkableText {
 
@@ -39,7 +43,7 @@ internal class RemediesLinkableMapper : Mapper<LinkableTextDisplayInfo, Linkable
 
         return LinkableText(
             value.text,
-            R.color.px_real_black.toString(),
+            LazyString(R.color.px_payment_result_component_remedies).get(context).toString(),
             linkablePhraselist,
             value.links
         )

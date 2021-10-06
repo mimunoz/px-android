@@ -55,7 +55,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
             }
 
             it.consumerCredits?.let { consumerCredits ->
-                bottomText.updateModel(RemediesLinkableMapper().mapRemedies(consumerCredits.displayInfo.bottomText))
+                bottomText.updateModel(RemediesLinkableMapper(this.requireContext()).mapRemedies(consumerCredits.displayInfo.bottomText))
             }
         }
         model.cvvModel?.let { cvvRemedy.init(it) } ?: cvvRemedy.gone()
