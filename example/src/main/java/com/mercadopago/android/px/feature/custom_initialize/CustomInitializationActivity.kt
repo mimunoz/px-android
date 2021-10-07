@@ -66,12 +66,9 @@ class CustomInitializationActivity : AppCompatActivity() {
 
     private fun loadData(initializationData: InitializationData) {
         localeInput.setText(initializationData.locale.value)
-//        publicKeyInput.setText(initializationData.publicKey.value)
-//        preferenceIdInput.setText(initializationData.preferenceId.value)
-//        accessTokenInput.setText(initializationData.accessToken.value)
-        publicKeyInput.setText("TEST-a256eb18-dbcd-48a3-b295-e3963982e100")
-        preferenceIdInput.setText("798236160-53c644d5-45a2-4f4d-b13f-f7346a69aeb5")
-        accessTokenInput.setText("TEST-2198381344604919-070114-01119616a657f9c7eff7dff0de0bfeb3-600016421")
+        publicKeyInput.setText(initializationData.publicKey.value)
+        preferenceIdInput.setText(initializationData.preferenceId.value)
+        accessTokenInput.setText(initializationData.accessToken.value)
         oneTapCheck.isChecked = initializationData.oneTap.value
         defaultProcessor.isChecked = initializationData.processor.value == ProcessorType.DEFAULT
         visualProcessor.isChecked = initializationData.processor.value == ProcessorType.VISUAL

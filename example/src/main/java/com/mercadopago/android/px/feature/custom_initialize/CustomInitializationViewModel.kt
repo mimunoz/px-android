@@ -12,7 +12,6 @@ import com.mercadopago.android.px.di.preference.InitializationDataPreferences
 import com.mercadopago.android.px.internal.datasource.MercadoPagoPaymentConfiguration
 import com.mercadopago.android.px.internal.util.TextUtil
 import com.mercadopago.android.px.utils.PaymentUtils.getGenericPaymentApproved
-import com.mercadopago.android.px.utils.PaymentUtils.getGenericPaymentRejected
 
 internal class CustomInitializationViewModel(private val preferences: InitializationDataPreferences) : ViewModel() {
 
@@ -66,20 +65,13 @@ internal class CustomInitializationViewModel(private val preferences: Initializa
             .setExpressPaymentEnable(initializationData.oneTap.value)
             .build()
 
-//        val paymentConfiguration: PaymentConfiguration = when (initializationData.processor.value) {
-//            ProcessorType.DEFAULT -> MercadoPagoPaymentConfiguration.create()
-//            ProcessorType.VISUAL ->
-//                PaymentConfiguration.Builder(SamplePaymentProcessor(true, getGenericPaymentApproved())).build()
-//            ProcessorType.NO_VISUAL ->
-//                PaymentConfiguration.Builder(SamplePaymentProcessor(false, getGenericPaymentApproved())).build()
-//        }
-        val paymentConfiguration = PaymentConfiguration.Builder(
-            SamplePaymentProcessor(
-                false,
-                getGenericPaymentRejected(),
-                getGenericPaymentApproved()
-            )
-        ).build()
+        val paymentConfiguration: PaymentConfiguration = when (initializationData.processor.value) {
+            ProcessorType.DEFAULT -> MercadoPagoPaymentConfiguration.create()
+            ProcessorType.VISUAL ->
+                PaymentConfiguration.Builder(SamplePaymentProcessor(true, getGenericPaymentApproved())).build()
+            ProcessorType.NO_VISUAL ->
+                PaymentConfiguration.Builder(SamplePaymentProcessor(false, getGenericPaymentApproved())).build()
+        }
 
         val builder = MercadoPagoCheckout.Builder(
             initializationData.publicKey.value.replace(TAGGED_INPUT_REGEX, TextUtil.EMPTY),

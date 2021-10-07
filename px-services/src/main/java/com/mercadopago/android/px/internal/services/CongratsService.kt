@@ -22,8 +22,7 @@ interface CongratsService {
         @Query("merchant_order_id") merchantOrderId: Long?,
         @Query("pref_id") preferenceId: String?): CongratsResponse
 
-    @Headers("x-public: true")
-    @POST("gamma/px_mobile/v1/remedies/{payment_id}")
+    @POST("${BuildConfig.API_ENVIRONMENT_NEW}/px_mobile/v1/remedies/{payment_id}")
     suspend fun getRemedies(
         @Path(value = "payment_id", encoded = true) paymentId: String,
         @Query("one_tap") oneTap: Boolean,
