@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_result.remedies
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.core.content.ContextCompat
 import com.mercadopago.android.px.R
@@ -30,6 +31,7 @@ internal class RemediesLinkableMapper(val context: Context) : Mapper<LinkableTex
         )
     }
 
+    @SuppressLint("ResourceType")
     fun mapRemedies(value: LinkableTextDisplayInfo): LinkableText {
 
         val linkablePhraselist: ArrayList<LinkableText.LinkablePhrase> = ArrayList()
@@ -43,7 +45,7 @@ internal class RemediesLinkableMapper(val context: Context) : Mapper<LinkableTex
 
         return LinkableText(
             value.text,
-            LazyString(R.color.px_payment_result_component_remedies).get(context).toString(),
+            context.resources.getString(R.color.px_payment_result_component_remedies),
             linkablePhraselist,
             value.links
         )
