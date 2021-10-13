@@ -1,3 +1,7 @@
+## VERSION 4.92.1
+_05_10_2021_
+* FIX - Summary nav bar arrow color
+
 ## VERSION 4.92.0
 _30_09_2021_
 * FEATURE - Summary and offline methods restyling
