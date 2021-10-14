@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.di.MapperProvider
+import com.mercadopago.android.px.internal.di.MapperProvider.remediesLinkableMapper
 import com.mercadopago.android.px.internal.experiments.BadgeVariant
 import com.mercadopago.android.px.internal.extensions.gone
 import com.mercadopago.android.px.internal.extensions.visible
@@ -31,6 +32,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
     private lateinit var paymentMethodDescriptor: PaymentMethodDescriptorView
     private lateinit var paymentMethodTitle: MPTextView
     private lateinit var bottomText: LinkableTextView
+    private val remediesLinkableMapper = MapperProvider.remediesLinkableMapper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.px_remedies_retry_payment, container, false)
@@ -55,7 +57,7 @@ internal class RetryPaymentFragment : Fragment(), PaymentMethodFragment.Disabled
             }
 
             it.consumerCredits?.let { consumerCredits ->
-                bottomText.updateModel(RemediesLinkableMapper().mapRemedies(consumerCredits.displayInfo.bottomText))
+                bottomText.updateModel(remediesLinkableMapper.mapRemedies(consumerCredits.displayInfo.bottomText))
             }
         }
         model.cvvModel?.let { cvvRemedy.init(it) } ?: cvvRemedy.gone()

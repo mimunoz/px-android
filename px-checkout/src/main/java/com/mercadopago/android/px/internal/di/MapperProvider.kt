@@ -164,5 +164,5 @@ internal object MapperProvider {
         get() = BusinessSecurityCodeDisplayDataMapper()
 
     val remediesLinkableMapper: RemediesLinkableMapper
-        get() = RemediesLinkableMapper()
+        get() = RemediesLinkableMapper(Session.getInstance().applicationContext)
 }
