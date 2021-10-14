@@ -1,3 +1,8 @@
+## VERSION 4.93.0
+_14_10_2021_
+* FIX - Duplicated custom charges on IDC
+* ENHANCEMENT - Remedies screen adjustments
+
 ## VERSION 4.92.1
 _05_10_2021_
 * FIX - Summary nav bar arrow color
