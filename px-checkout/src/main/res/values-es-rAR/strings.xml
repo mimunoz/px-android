@@ -17,7 +17,7 @@
     <string name="px_card_installments_title">¿En cuántas cuotas?</string>
     <string name="px_select_installments_title">Selecciona la cuota</string>
     <string name="px_terms_and_conditions_message">Al pagar, afirmo que soy mayor de edad y acepto los</string>
-    <string name="px_terms_and_conditions">Términos y Condiciones</string>
+    <string name="px_terms_and_conditions">Términos y condiciones</string>
     <string name="px_discount_terms_and_conditions_message">Descuento exclusivo de Mercado Libre y Mercado Pago.</string>
     <string name="px_discount_terms_and_conditions_linked_message">Ver condiciones</string>
     <string name="px_invalid_card_number_incomplete">Ingresa todos los números de la tarjeta</string>
@@ -131,7 +131,7 @@
     <string name="px_button_continue">Continuar</string>
     <string name="px_continue_shopping">Continuar</string>
     <string name="px_refresh_message">Reintentar</string>
-    <string name="px_title_activity_terms_and_conditions">Términos y Condiciones</string>
+    <string name="px_title_activity_terms_and_conditions">Términos y condiciones</string>
     <string name="px_no_connection_message">Sin conexión</string>
     <string name="px_instant_accreditation_time">Se acreditará instantáneamente</string>
     <string name="px_what_can_do">¿Qué puedo hacer?</string>

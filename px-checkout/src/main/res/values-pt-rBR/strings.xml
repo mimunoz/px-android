@@ -63,7 +63,7 @@
     <string name="px_copied_to_clipboard_ack">Pronto! Copiado.</string>
     <string name="px_title_activity_call_for_authorize">O emissor do cartão não autorizou o pagamento</string>
     <string name="px_text_authorized_call_for_authorize">Já autorizei o pagamento</string>
-    <string name="px_title_pending_payment">Estamos processando seu pagamento</string>
+    <string name="px_title_pending_payment">Estamos processando o seu pagamento</string>
     <string name="px_pending_label">Não perca tempo!</string>
     <string name="px_error_description_contingency">Se for, avisaremos você por e-mail em algumas horas.</string>
     <string name="px_error_description_review_manual">Dentro das próximas 24 horas te avisaremos por e-mail se foi aprovado.</string>
