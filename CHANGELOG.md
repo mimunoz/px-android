@@ -1,3 +1,28 @@
+## VERSION 4.92.0
+_30_09_2021_
+* FEATURE - Summary and offline methods restyling
+* FEATURE - Improvements in remedies screen and modal implementation when offering consumer credits
+
+## VERSION 4.91.0
+_27_09_2021_
+* FEATURE - Support taxable charges and label customization
+
+## VERSION 4.90.0
+_23_09_2021_
+* FEATURE - Support custom scheduled payments.
+
+## VERSION 4.89.0
+_09_09_2021_
+* FEATURE - Migrates to min api 21 and target api 30.
+* FEATURE - Sends access token in header instead of query param.
+* ENHANCEMENT - Uses card bottom label from card drawer.
+* FIX - Bug in TyC url.
+* FIX - New card id in body instead of query param.
+
+## VERSION 4.88.2
+_07_09_2021_
+* FIX - Changes payment congrats type mapper to use decorator.
+
 ## VERSION 4.88.1
 _27_08_2021_
 * FIX - Connection check with VPN in API < 29.

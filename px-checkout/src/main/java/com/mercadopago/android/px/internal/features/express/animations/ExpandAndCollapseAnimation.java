@@ -22,7 +22,7 @@ public class ExpandAndCollapseAnimation {
         targetView = view;
         expandAnimation = AnimationUtils.loadAnimation(view.getContext(), R.anim.px_anim_expand);
         collapseAnimation = AnimationUtils.loadAnimation(view.getContext(), R.anim.px_anim_collapse);
-        collapseAnimation.setAnimationListener(new FadeAnimationListener(view, INVISIBLE));
+        collapseAnimation.setAnimationListener(new FadeAnimationListener(view, View.GONE));
     }
 
     /**
@@ -52,5 +52,9 @@ public class ExpandAndCollapseAnimation {
             targetView.clearAnimation();
             targetView.setVisibility(View.GONE);
         }
+    }
+
+    public boolean shouldCollapse() {
+        return targetView.getVisibility() != View.GONE;
     }
 }

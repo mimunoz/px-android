@@ -35,6 +35,7 @@ import com.mercadopago.android.px.internal.callbacks.DeepLinkHandler;
 import com.mercadopago.android.px.internal.callbacks.DeepLinkListener;
 import com.mercadopago.android.px.internal.callbacks.TokenizationResponse;
 import com.mercadopago.android.px.internal.di.CheckoutConfigurationModule;
+import com.mercadopago.android.px.internal.di.FactoryProvider;
 import com.mercadopago.android.px.internal.di.MapperProvider;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.experiments.ScrolledVariant;
@@ -80,6 +81,7 @@ import com.mercadopago.android.px.internal.view.SummaryView;
 import com.mercadopago.android.px.internal.view.TitlePager;
 import com.mercadopago.android.px.internal.view.animator.OneTapTransition;
 import com.mercadopago.android.px.internal.view.experiments.ExperimentHelper;
+import com.mercadopago.android.px.internal.viewmodel.GenericColor;
 import com.mercadopago.android.px.internal.viewmodel.PostPaymentAction;
 import com.mercadopago.android.px.internal.viewmodel.SplitSelectionState;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
@@ -415,6 +417,11 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             .addItemDecoration(new DividerItemDecoration(view.getContext(), linearLayoutManager.getOrientation()));
 
         installmentsRecyclerView.setAdapter(installmentsAdapter);
+
+        paymentMethodHeaderView.setBackgroundColor(
+            new GenericColor(R.color.px_checkout_payment_method_header_background).getColor(requireContext()));
+        installmentsRecyclerView.setBackgroundColor(
+            new GenericColor(R.color.px_checkout_payment_method_header_background).getColor(requireContext()));
     }
 
     private ExpressPaymentPresenter createPresenter() {
@@ -441,6 +448,8 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             MapperProvider.INSTANCE.getSummaryInfoMapper(),
             MapperProvider.INSTANCE.getElementDescriptorMapper(),
             MapperProvider.INSTANCE.getFromApplicationToApplicationInfo(),
+            configurationModule.getAuthorizationProvider(),
+            FactoryProvider.INSTANCE.getAmountDescriptorViewModelFactory(),
             session.getTracker()
         );
     }
@@ -577,10 +586,10 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     @Override
     public void collapseInstallmentsSelection() {
-        paymentMethodPager.startAnimation(slideUpAndFadeAnimation);
-        fadeAnimation.fadeIn(payButtonContainer);
-        fadeAnimation.fadeIn(indicator);
-        if (expandAndCollapseAnimation != null) {
+        if (expandAndCollapseAnimation != null && expandAndCollapseAnimation.shouldCollapse()) {
+            paymentMethodPager.startAnimation(slideUpAndFadeAnimation);
+            fadeAnimation.fadeIn(payButtonContainer);
+            fadeAnimation.fadeIn(indicator);
             expandAndCollapseAnimation.collapse();
         }
         paymentMethodFragmentAdapter.notifyDataSetChanged();

@@ -18,7 +18,6 @@ internal interface PaymentSettingRepository : ConfigurationProvider {
     val currency: Currency
     val transactionId: String
     val advancedConfiguration: AdvancedConfiguration
-    val privateKey: String?
     val configuration: Configuration
     val token: Token?
     val securityType: SecurityType
@@ -35,7 +34,6 @@ internal interface PaymentSettingRepository : ConfigurationProvider {
     fun configure(token: Token)
     fun configure(secondFactor: SecurityType)
     fun configurePreferenceId(preferenceId: String?)
-    fun configurePrivateKey(privateKey: String?)
     fun clearToken()
     fun reset()
 }

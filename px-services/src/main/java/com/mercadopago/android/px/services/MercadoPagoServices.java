@@ -1,10 +1,8 @@
 package com.mercadopago.android.px.services;
 
 import android.content.Context;
-import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import com.mercadopago.android.px.addons.BehaviourProvider;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.internal.services.BankDealService;
@@ -79,7 +77,7 @@ public class MercadoPagoServices {
     public void getInstructions(final Long paymentId, final String paymentTypeId,
         final Callback<Instructions> callback) {
         final InstructionsClient service = retrofitClient.create(InstructionsClient.class);
-        service.getInstructions(API_ENVIRONMENT, paymentId, publicKey, privateKey,
+        service.getInstructions(API_ENVIRONMENT, paymentId, publicKey,
             paymentTypeId).enqueue(callback);
     }
 
@@ -117,36 +115,35 @@ public class MercadoPagoServices {
     public void createToken(final CardToken cardToken, final Callback<Token> callback) {
         cardToken.setDevice(context);
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.createToken(publicKey, privateKey, cardToken).enqueue(callback);
+        service.createToken(publicKey, cardToken).enqueue(callback);
     }
 
     public void createToken(final SavedCardToken savedCardToken, final Callback<Token> callback) {
         savedCardToken.setDevice(context);
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.createToken(publicKey, privateKey, savedCardToken).enqueue(callback);
+        service.createToken(publicKey, savedCardToken).enqueue(callback);
     }
 
     public void createToken(final SavedESCCardToken savedESCCardToken, final Callback<Token> callback) {
         savedESCCardToken.setDevice(context);
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.createToken(publicKey, privateKey, savedESCCardToken).enqueue(callback);
+        service.createToken(publicKey, savedESCCardToken).enqueue(callback);
     }
 
     public void cloneToken(final String tokenId, final Callback<Token> callback) {
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.cloneToken(tokenId, publicKey, privateKey).enqueue(callback);
+        service.cloneToken(tokenId, publicKey).enqueue(callback);
     }
 
     public void putSecurityCode(final String tokenId, final SecurityCodeIntent securityCodeIntent,
         final Callback<Token> callback) {
         final GatewayService service = retrofitClient.create(GatewayService.class);
-        service.updateToken(tokenId, publicKey, privateKey, securityCodeIntent).enqueue(callback);
+        service.updateToken(tokenId, publicKey, securityCodeIntent).enqueue(callback);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void getBankDeals(final Callback<List<BankDeal>> callback) {
         final BankDealService service = retrofitClient.create(BankDealService.class);
-        service.getBankDeals(publicKey, privateKey, BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag())
+        service.getBankDeals(publicKey, BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag())
             .enqueue(callback);
     }
 
@@ -165,10 +162,9 @@ public class MercadoPagoServices {
     public void getIdentificationTypes(final String accessToken, final Callback<List<IdentificationType>> callback) {
         final IdentificationService service =
             retrofitClient.create(IdentificationService.class);
-        service.getIdentificationTypesForAuthUser(accessToken).enqueue(callback);
+        service.getIdentificationTypesForAuthUser().enqueue(callback);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void getInstallments(final String bin,
         final BigDecimal amount,
         final Long issuerId,
@@ -176,7 +172,7 @@ public class MercadoPagoServices {
         @Nullable final Integer differentialPricingId,
         final Callback<List<Installment>> callback) {
         final InstallmentService service = retrofitClient.create(InstallmentService.class);
-        service.getInstallments(API_ENVIRONMENT, publicKey, privateKey, bin, amount, issuerId, paymentMethodId,
+        service.getInstallments(API_ENVIRONMENT, publicKey, bin, amount, issuerId, paymentMethodId,
             BehaviourProvider.getLocaleBehaviour().getLocale().toLanguageTag(),
             processingMode.asQueryParamName(), differentialPricingId).enqueue(callback);
     }
@@ -184,7 +180,7 @@ public class MercadoPagoServices {
     public void getIssuers(final String paymentMethodId, final String bin, final Callback<List<Issuer>> callback) {
         final IssuersService service = retrofitClient.create(IssuersService.class);
         service
-            .getIssuers(API_ENVIRONMENT, publicKey, privateKey, paymentMethodId, bin,
+            .getIssuers(API_ENVIRONMENT, publicKey, paymentMethodId, bin,
                 processingMode.asQueryParamName()).enqueue(callback);
     }
 
@@ -234,9 +230,7 @@ public class MercadoPagoServices {
         final Map<String, Object> paymentData, final Callback<Payment> callback) {
         final Map<String, String> queryParams = new HashMap<>();
         queryParams.put("public_key", publicKey);
-        if (TextUtil.isNotEmpty(privateKey)) {
-            queryParams.put("access_token", privateKey);
-        }
+
         final PaymentService paymentService = retrofitClient.create(PaymentService.class);
         final String profileId = BehaviourProvider.getAuthenticationBehaviour().getDeviceProfileId();
         paymentService.createPayment(transactionId, securityType, profileId, paymentData, queryParams)
@@ -264,6 +258,6 @@ public class MercadoPagoServices {
         @NonNull final Callback<CheckoutPreference> callback) {
         final PreferenceService preferenceService =
             retrofitClient.create(PreferenceService.class);
-        preferenceService.createPreference(preferenceBuilder.build(), privateKey).enqueue(callback);
+        preferenceService.createPreference(preferenceBuilder.build()).enqueue(callback);
     }
 }
