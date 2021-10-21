@@ -1,3 +1,8 @@
+## VERSION 4.94.0
+_21_10_2021_
+* FIX - Network error
+* ENHANCEMENT - Feature flag for threeds sdk version
+
 ## VERSION 4.93.0
 _14_10_2021_
 * FIX - Duplicated custom charges on IDC
