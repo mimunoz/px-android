@@ -149,6 +149,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
 
     private PayButtonFragment payButtonFragment;
     private OfflineMethodsFragment offlineMethodsFragment;
+    private DeepLinkListener deepLinkListener;
 
     public static Fragment getInstance(@NonNull final Variant variant, @Nullable final Uri uri) {
         final ExpressPaymentFragment expressPaymentFragment = new ExpressPaymentFragment();
@@ -241,6 +242,9 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
             paymentMethodHeaderView, indicator, splitPaymentView);
 
         presenter = createPresenter();
+
+        deepLinkListener = createDeepLinkListener();
+
         if (savedInstanceState != null) {
             renderMode = (RenderMode) savedInstanceState.getSerializable(EXTRA_RENDER_MODE);
             navigationState =
@@ -320,8 +324,13 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
     }
 
     public void resolveDeepLinkResponse(@NotNull final Uri uri) {
-        final DeepLinkHandler deepLinkHandler = new DeepLinkHandler(new DeepLinkListener() {
+        final DeepLinkHandler deepLinkHandler = new DeepLinkHandler();
+        deepLinkHandler.setDeepLinkListener(deepLinkListener);
+        deepLinkHandler.resolveDeepLink(uri);
+    }
 
+    private DeepLinkListener createDeepLinkListener() {
+        return new DeepLinkListener() {
             @Override
             public void onDefault() {
                 presenter.handleDeepLink();
@@ -338,8 +347,7 @@ public class ExpressPaymentFragment extends BaseFragment implements ExpressPayme
                         break;
                 }
             }
-        });
-        deepLinkHandler.resolveDeepLink(uri);
+        };
     }
 
     private void showSnackBar(@NotNull final String message, @NotNull final AndesSnackbarType andesSnackbarType) {

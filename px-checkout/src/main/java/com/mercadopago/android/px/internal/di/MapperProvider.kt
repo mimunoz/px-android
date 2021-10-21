@@ -168,4 +168,10 @@ internal object MapperProvider {
 
     val fromSecurityCodeDisplayDataToBusinessSecurityCodeDisplayData: BusinessSecurityCodeDisplayDataMapper
         get() = BusinessSecurityCodeDisplayDataMapper()
+
+    val uriToFromMapper: UriToFromMapper
+        get() = UriToFromMapper()
+
+    val uriToDeepLinkWrapperMapper: UriToDeepLinkWrapperMapper
+        get() = UriToDeepLinkWrapperMapper()
 }

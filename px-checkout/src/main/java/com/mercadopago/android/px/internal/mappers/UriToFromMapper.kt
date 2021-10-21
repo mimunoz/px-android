@@ -6,10 +6,9 @@ import java.util.Locale
 
 private const val FROM = "from"
 
-internal object UriToFromMapper {
-
-    fun map(uri: Uri): From {
-        val from = uri.getQueryParameter(FROM) ?: From.NONE.value
+internal class UriToFromMapper : Mapper<Uri, From>() {
+    override fun map(value: Uri): From {
+        val from = value.getQueryParameter(FROM) ?: From.NONE.value
         return From.valueOf(from.toUpperCase(Locale.ROOT))
     }
 }
