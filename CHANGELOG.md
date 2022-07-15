@@ -1,3 +1,11 @@
+## VERSION 4.53.2
+_15_07_2022_
+* ENHANCEMENT - Migration target api 32.
+* ENHANCEMENT - Migration min api 21.
+* ENHANCEMENT - Migration Kotlin 1.5.32.
+* ENHANCEMENT - Migration Gradle 7.5.
+* ENHANCEMENT - Migration AndroidX.
+
 ## VERSION 4.53.1
 _03_08_2020_
 * FIX - Added keep rules for renderer's contructor in R8 fullmode
