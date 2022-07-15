@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.tracking.internal.model;
 
-import android.support.annotation.Keep;
-import android.support.annotation.Nullable;
+import androidx.annotation.Keep;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.Campaign;
 import com.mercadopago.android.px.model.Discount;
 import java.math.BigDecimal;

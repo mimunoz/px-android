@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
 import kotlin.Pair;

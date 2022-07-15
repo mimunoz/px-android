@@ -1,11 +1,12 @@
 package com.mercadopago.android.px.internal.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.features.uicontrollers.issuers.IssuersView;
@@ -33,6 +34,7 @@ public class IssuersAdapter extends RecyclerView.Adapter<IssuersAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());

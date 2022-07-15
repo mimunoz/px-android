@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.features.express.installments.InstallmentRowHolder;
 import com.mercadopago.android.px.internal.util.BenefitsHelper;
 import com.mercadopago.android.px.model.BenefitsMetadata;

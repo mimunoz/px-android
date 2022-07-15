@@ -3,17 +3,16 @@ apply plugin:'kotlin-android'
 apply plugin:'kotlin-android-extensions'
 
 android {
-    compileSdkVersion api_level as int
-    buildToolsVersion build_tools_version
+    compileSdkVersion apiLevel as int
 
     testBuildType "release"
 
     defaultConfig {
         applicationId "com.mercadopago.example"
-        minSdkVersion min_api_level as int
-        targetSdkVersion api_level as int
+        minSdkVersion minApiLevel as int
+        targetSdkVersion apiLevel as int
         versionCode 1
-        versionName version_to_deploy as String
+        versionName "1.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -59,23 +58,18 @@ android {
 dependencies {
     implementation project(':px-checkout')
     implementation project(':px-addons')
-    implementation "com.android.support:multidex:$multidex"
+    implementation "androidx.multidex:multidex:$multidex"
     implementation "com.google.code.gson:gson:$gson"
     implementation "com.facebook.stetho:stetho:$stetho"
     implementation "com.facebook.stetho:stetho-okhttp3:$stetho"
-    implementation "com.android.support:appcompat-v7:$support_library_version"
-    implementation "com.android.support:design:$support_library_version"
-    implementation "com.squareup.picasso:picasso:2.71828" // intended to maintain compatibility
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "com.mercadolibre.android:ui:$meli_ui_lib"
+    implementation "androidx.appcompat:appcompat:$appcompat"
+    implementation "com.google.android.material:material:$material"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin"
+    implementation "com.mercadolibre.android:ui:$ui"
+    implementation "com.facebook.fresco:fresco:$fresco"
 
-    implementation "com.android.support.constraint:constraint-layout:$constraint_layout"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_cannary"
-    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leak_cannary"
-    androidTestImplementation project(':px-testlib')
-    androidTestImplementation project(':testlib')
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
 
-    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
-    implementation "android.arch.lifecycle:livedata-core:$lifecycle_version"
-    implementation "android.arch.lifecycle:viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-core:$lifecycle"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
 }

@@ -1,11 +1,11 @@
 package com.mercadopago.android.px.internal.features.express.add_new_card;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mercadopago.android.px.R;
 import java.util.List;
 

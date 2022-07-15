@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.base;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.tracking.internal.TrackWrapper;
 import com.mercadopago.android.px.tracking.internal.TrackingContract;
 import com.mercadopago.android.px.tracking.internal.events.AbortEvent;

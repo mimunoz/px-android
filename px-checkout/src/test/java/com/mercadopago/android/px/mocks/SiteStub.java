@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.mocks;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.utils.ResourcesUtil;

@@ -13,13 +13,12 @@ import android.os.Environment;
 import android.os.Looper;
 import android.os.StatFs;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,6 +29,7 @@ import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONException;
@@ -134,7 +134,7 @@ public class Fingerprint {
     }
 
     public static String getAndroidId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        return UUID.randomUUID().toString();
     }
 
     public Location getLocation(Context context) {

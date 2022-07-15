@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.tracking.internal.model;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 import com.mercadopago.android.px.model.Issuer;
 
 @SuppressWarnings("unused")

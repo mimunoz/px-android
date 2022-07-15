@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.tracking;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.internal.TrackingDefaultBehaviour;
 import com.mercadopago.android.px.addons.model.Track;
 import com.mercadopago.android.px.addons.tracking.Tracker;

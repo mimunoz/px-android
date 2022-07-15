@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.tracking.internal.mapper;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.viewmodel.mappers.NonNullMapper;
 import com.mercadopago.android.px.model.AccountMoneyMetadata;
 import com.mercadopago.android.px.model.BenefitsMetadata;

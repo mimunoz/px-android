@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.model.exceptions;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class InvalidFieldException extends Exception {
     public static final int INVALID_IDENTIFICATION_LENGHT = 0;

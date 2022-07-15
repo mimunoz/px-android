@@ -2,12 +2,12 @@ package com.mercadopago.android.px.internal.features.uicontrollers.identificatio
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.ScaleUtil;
 import com.mercadopago.android.px.internal.view.MPTextView;

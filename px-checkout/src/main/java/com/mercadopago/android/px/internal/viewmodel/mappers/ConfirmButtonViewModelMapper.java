@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.model.ExpressMetadata;

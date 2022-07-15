@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.util;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.PaymentData;
 import java.math.BigDecimal;
 import java.util.Collection;

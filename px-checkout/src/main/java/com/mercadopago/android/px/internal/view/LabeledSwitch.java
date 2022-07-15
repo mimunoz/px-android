@@ -1,19 +1,19 @@
 package com.mercadopago.android.px.internal.view;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.SwitchCompat;
 import com.mercadopago.android.px.R;
 
 public class LabeledSwitch extends LinearLayoutCompat implements CompoundButton.OnCheckedChangeListener {
 
     private final TextView label;
-    private final Switch lSwitch;
+    private final SwitchCompat lSwitch;
     private CompoundButton.OnCheckedChangeListener listener;
 
     public LabeledSwitch(final Context context) {

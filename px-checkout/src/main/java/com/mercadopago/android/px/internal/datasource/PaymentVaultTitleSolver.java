@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface PaymentVaultTitleSolver {
 

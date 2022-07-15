@@ -4,17 +4,15 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import androidx.core.content.ContextCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.features.uicontrollers.card.BackCardView;
 import com.mercadopago.android.px.internal.features.uicontrollers.card.CardView;
@@ -28,8 +26,7 @@ public final class MPAnimationUtils {
     private MPAnimationUtils() {
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void fadeInLollipop(final int color, final ImageView imageView) {
+    public static void fadeIn(final int color, final ImageView imageView) {
         ViewUtils.runWhenViewIsFullyMeasured(imageView, () -> {
             imageView.setColorFilter(ContextCompat.getColor(imageView.getContext(), color),
                 PorterDuff.Mode.SRC_ATOP);
@@ -44,8 +41,7 @@ public final class MPAnimationUtils {
         });
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void fadeOutLollipop(final int color, final ImageView imageView) {
+    public static void fadeOut(final int color, final ImageView imageView) {
         ViewUtils.runWhenViewIsFullyMeasured(imageView, () -> {
             final int width = imageView.getWidth();
             final Animator anim = ViewAnimationUtils.createCircularReveal(imageView, -width, 0,
@@ -78,62 +74,9 @@ public final class MPAnimationUtils {
         });
     }
 
-    public static void fadeIn(final int color, final ImageView imageView) {
-        ViewUtils.runWhenViewIsFullyMeasured(imageView, () -> {
-            final Animation mAnimFadeIn = AnimationUtils.loadAnimation(imageView.getContext(), R.anim.px_fade_in);
-            mAnimFadeIn.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(final Animation animation) {
-                    //Do something
-                }
-
-                @Override
-                public void onAnimationEnd(final Animation animation) {
-                    imageView.clearAnimation();
-                }
-
-                @Override
-                public void onAnimationRepeat(final Animation animation) {
-                    //Do something
-                }
-            });
-            imageView.setBackgroundColor(ContextCompat.getColor(imageView.getContext(), color));
-            imageView.startAnimation(mAnimFadeIn);
-        });
-    }
-
-    public static void fadeOut(final int color, final ImageView imageView) {
-        ViewUtils.runWhenViewIsFullyMeasured(imageView, () -> {
-            final Animation mAnimFadeOut = AnimationUtils.loadAnimation(imageView.getContext(), R.anim.px_fade_out);
-            mAnimFadeOut.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(final Animation animation) {
-                    //Do something
-                }
-
-                @Override
-                public void onAnimationEnd(final Animation animation) {
-                    imageView.setBackgroundColor(ContextCompat.getColor(imageView.getContext(), color));
-                    imageView.clearAnimation();
-                }
-
-                @Override
-                public void onAnimationRepeat(final Animation animation) {
-                    //Do something
-                }
-            });
-            imageView.startAnimation(mAnimFadeOut);
-        });
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void setImageViewColorLollipop(final ImageView imageView, final int color) {
+    public static void setImageViewColor(final ImageView imageView, final int color) {
         imageView.setColorFilter(ContextCompat.getColor(imageView.getContext(), color),
             PorterDuff.Mode.SRC_ATOP);
-    }
-
-    public static void setImageViewColor(final ImageView imageView, final int color) {
-        imageView.setBackgroundColor(ContextCompat.getColor(imageView.getContext(), color));
     }
 
     public static void flipToBack(final float cameraDistance, final View frontView, final View backView,

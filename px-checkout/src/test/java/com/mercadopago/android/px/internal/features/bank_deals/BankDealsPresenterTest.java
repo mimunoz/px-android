@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.bank_deals;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.repository.BankDealsRepository;
 import com.mercadopago.android.px.mocks.BankDealsUtils;

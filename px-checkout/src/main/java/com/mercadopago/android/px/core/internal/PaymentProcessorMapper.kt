@@ -3,7 +3,7 @@ package com.mercadopago.android.px.core.internal
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.R
 import com.mercadopago.android.px.core.PaymentProcessor
 import com.mercadopago.android.px.core.SplitPaymentProcessor

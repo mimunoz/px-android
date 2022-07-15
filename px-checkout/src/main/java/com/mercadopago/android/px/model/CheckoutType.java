@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.model;
 
-import android.support.annotation.StringDef;
+import androidx.annotation.StringDef;
 import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;

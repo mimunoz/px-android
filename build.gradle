@@ -1,56 +1,9 @@
-import org.gradle.internal.jvm.Jvm
-
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath "com.android.tools.build:gradle:$gradle_plugin_version"
-        classpath 'org.jacoco:org.jacoco.core:0.8.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath 'com.monits:static-code-analysis-plugin:2.6.11'
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.3'
-        classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+    id 'com.android.application' version "$androidPlugin" apply false
+    id 'com.android.library' version "$androidPlugin" apply false
+    id 'org.jetbrains.kotlin.android' version "$kotlin" apply false
 }
 
 ext {
     dateNow = project.hasProperty('production') ? "" : new Date().format("ddMMyyyyHHmmssS")
-}
-
-subprojects {
-    repositories {
-        mavenLocal()
-        google()
-        jcenter()
-    }
-}
-
-// Aggregate javadoc task
-rootProject.gradle.projectsEvaluated {
-    task javadoc(type:Javadoc) { Javadoc self ->
-        failOnError = false
-        options.encoding = 'UTF-8'
-
-        // JDK 1.8 is more strict then 1.7. Have JDK 1.8 behave like 1.7 for javadoc generation
-        if (Jvm.current().getJavaVersion().isJava8Compatible()) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
-
-        destinationDir = file("$buildDir/docs/javadoc")
-
-        subprojects.each {
-            it.tasks.withType(Javadoc).all { task ->
-                self.dependsOn += task.dependsOn
-                self.source += task.source
-                self.classpath += task.classpath
-                self.excludes += task.excludes
-            }
-        }
-    }
 }

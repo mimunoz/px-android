@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.callbacks
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.mercadopago.android.px.internal.viewmodel.PaymentModel
 import com.mercadopago.android.px.model.Card
 import com.mercadopago.android.px.model.PaymentRecovery

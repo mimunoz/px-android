@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.datasource;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.addons.model.EscDeleteReason;
 import com.mercadopago.android.px.internal.repository.EscPaymentManager;

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.services;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.model.Instructions;
 import retrofit2.http.GET;

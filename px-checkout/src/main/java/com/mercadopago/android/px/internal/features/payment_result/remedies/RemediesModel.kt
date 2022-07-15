@@ -12,7 +12,9 @@ internal data class RemediesModel(val title: String, val retryPayment: RetryPaym
         parcel.readParcelable(RetryPaymentFragment.Model::class.java.classLoader),
         parcel.readParcelable(HighRiskRemedy.Model::class.java.classLoader),
         HashMap()) {
-        parcel.readMap(trackingData, String::class.java.classLoader)
+        if (trackingData != null) {
+            parcel.readMap(trackingData, String::class.java.classLoader)
+        }
     }
 
     fun hasRemedies() = retryPayment != null || highRisk != null

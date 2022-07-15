@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.installments;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.internal.features.express.installments.InstallmentRowHolder;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;

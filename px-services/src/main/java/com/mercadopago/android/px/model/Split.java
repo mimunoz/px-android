@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.model;
 
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 import java.io.Serializable;
 
 /**

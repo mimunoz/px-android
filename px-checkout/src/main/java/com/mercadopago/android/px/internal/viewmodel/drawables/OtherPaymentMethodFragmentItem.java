@@ -1,13 +1,11 @@
 package com.mercadopago.android.px.internal.viewmodel.drawables;
 
 import android.os.Parcel;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.model.NewCardMetadata;
 import com.mercadopago.android.px.model.OfflinePaymentTypesMetadata;
-
-import static com.mercadopago.android.px.internal.util.TextUtil.isEmpty;
 
 public class OtherPaymentMethodFragmentItem extends DrawableFragmentItem {
 

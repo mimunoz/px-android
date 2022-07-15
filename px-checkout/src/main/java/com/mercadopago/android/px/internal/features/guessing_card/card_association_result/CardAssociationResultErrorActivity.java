@@ -3,8 +3,9 @@ package com.mercadopago.android.px.internal.features.guessing_card.card_associat
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import com.mercadolibre.android.ui.widgets.MeliButton;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
@@ -58,7 +59,7 @@ public class CardAssociationResultErrorActivity extends PXActivity {
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(PARAM_ACCESS_TOKEN, accessToken);
     }

@@ -2,14 +2,13 @@ package com.mercadopago.android.px.internal.view;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.util.DiscountHelper;
@@ -87,12 +86,8 @@ public class AmountView extends LinearLayoutCompat {
     }
 
     private void configureElevation() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setElevation(getContext().getResources().getDimension(R.dimen.px_xxs_margin));
-            line.setVisibility(GONE);
-        } else {
-            line.setVisibility(VISIBLE);
-        }
+        setElevation(getContext().getResources().getDimension(R.dimen.px_xxs_margin));
+        line.setVisibility(GONE);
     }
 
     private void showWithDiscount(@NonNull final DiscountConfigurationModel discountModel,

@@ -6,7 +6,7 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -15,7 +15,7 @@
 
         <include layout="@layout/px_view_progress_bar_small"/>
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/mpsdkInstallmentesAppBar"
             android:layout_width="match_parent"
             android:layout_height="240dp"
@@ -25,9 +25,9 @@
             app:elevation="0dp">
 
             <include layout="@layout/px_scrolling_toolbar"/>
-        </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -56,7 +56,7 @@
                         tools:text="Este es el texto de advertencia"/>
                 </FrameLayout>
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/mpsdkActivityInstallmentsView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -65,9 +65,9 @@
                     android:visibility="visible"
                     tools:listitem="@layout/px_view_payer_cost_item"/>
             </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.mercadopago.android.px.internal.view.AmountView
         android:id="@+id/amount_view"

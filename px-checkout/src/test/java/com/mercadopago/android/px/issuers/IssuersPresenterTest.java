@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.issuers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.features.IssuersActivityView;
 import com.mercadopago.android.px.internal.features.IssuersPresenter;

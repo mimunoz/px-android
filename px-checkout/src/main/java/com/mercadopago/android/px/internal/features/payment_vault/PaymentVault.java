@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.payment_vault;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public interface PaymentVault {
 

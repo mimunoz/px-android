@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.util.textformatter;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Spannable;
 import android.text.SpannableString;
 import com.mercadopago.android.px.model.Currency;

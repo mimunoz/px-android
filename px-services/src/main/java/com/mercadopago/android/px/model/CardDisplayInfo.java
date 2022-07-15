@@ -2,7 +2,7 @@ package com.mercadopago.android.px.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.io.Serializable;
 
 public class CardDisplayInfo implements Parcelable, Serializable {

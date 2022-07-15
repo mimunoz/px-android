@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_result.model;
 
-import android.support.annotation.StringDef;
+import androidx.annotation.StringDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

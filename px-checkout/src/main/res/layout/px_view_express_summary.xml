@@ -8,14 +8,14 @@
     tools:orientation="vertical"
     tools:parentTag="android.widget.LinearLayout">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -46,7 +46,7 @@
                 app:px_element_title_text_color="@color/px_expressCheckoutTextColor"
                 tools:visibility="visible" />
 
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
         <com.mercadopago.android.px.internal.view.ElementDescriptorView
             android:id="@+id/bigElementDescriptor"
@@ -68,7 +68,7 @@
             app:px_element_title_size="@dimen/px_l_text"
             app:px_element_title_text_color="@color/px_expressCheckoutTextColor" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/separator"

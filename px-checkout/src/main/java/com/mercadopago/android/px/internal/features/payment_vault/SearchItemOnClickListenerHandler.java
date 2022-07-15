@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_vault;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.CustomSearchItem;
 import com.mercadopago.android.px.model.PaymentMethodSearchItem;
 import com.mercadopago.android.px.model.internal.DisabledPaymentMethod;

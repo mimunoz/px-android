@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.tracking.internal.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import java.util.Map;
 

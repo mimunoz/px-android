@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_result.props;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Created by vaserber on 11/13/17.

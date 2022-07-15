@@ -1,52 +1,47 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = '0.8.1'
+    toolVersion = "$jacoco"
 }
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
+    // See related issue https://github.com/gradle/gradle/issues/5184#issuecomment-457865951
+    jacoco.excludes = ['jdk.internal.*']
 }
 
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+    dependsOn 'createDebugCoverageReport'
 
-task jacocoTestReport(type:JacocoReport, dependsOn:['testDebugUnitTest', 'createDebugCoverageReport']) {
+    // See related issue https://github.com/gradle/gradle/issues/14132
+    dependsOn 'connectedDebugAndroidTest'
+    tasks.findByName('createDebugAndroidTestCoverageReport').mustRunAfter 'connectedDebugAndroidTest'
 
     reports {
         xml.enabled = true
         html.enabled = true
     }
 
-    def fileFilter = ['**/R.class',
-                      '**/R$*.class',
-                      '**/BuildConfig.*',
-                      '**/Manifest*.*',
-                      '**/*Test*.*',
-                      'android/**/*.*',
-                      '**/model/*.*',
-                      '**/model/**',
-                      '**/models/*.*',
-                      '**/models/**',
-                      '**/viewmodel/*.*',
-                      '**/viewmodel/**']
+    def fileFilter = ['**/px/internal/actions/**',
+                      '**/px/internal/viewmodel/**',
+                      '**/px/tracking/internal/model/**',
+                      '**/px/model/**',
+                      '**/px/configuration/**',
+                      '**/px/addons/model/**',
+                      '**/PaymentCongratsModel.*',
+                      '**/*Builder*']
 
-    def debugTree = fileTree(dir:"$project.buildDir/intermediates/classes/debug", excludes:fileFilter)
-    def mainSrc = "$project.projectDir/src/main/java"
+    def sourceFilter = ['**/*.java', '**/*.kt']
 
-    sourceDirectories = files([mainSrc])
-    classDirectories = files([debugTree])
-    executionData = fileTree(dir:project.buildDir, includes:[
-        'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
-    ])
-}
+    def javaClasses = fileTree(dir: "${buildDir}/intermediates/javac/debug/classes/", excludes: fileFilter)
+    def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug/", excludes: fileFilter)
+    def mainSrc = fileTree(dir: "${project.projectDir}/src/main/java", includes: sourceFilter)
 
-/**
- * When building on travis and running connectedDebugAndroidTest task
- * sometimes trigger Execution failed for task ':sdk:connectedDebugAndroidTest'.
- * When certain test take too long to finish.
- * TODO fix the test that generates the delay checking reports
- */
-project.gradle.taskGraph.whenReady {
-    connectedDebugAndroidTest {
-        ignoreFailures = true
-    }
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([
+        javaClasses,
+        kotlinClasses
+    ]))
+    executionData.from = "${project.projectDir}/jacoco.exec"
 }

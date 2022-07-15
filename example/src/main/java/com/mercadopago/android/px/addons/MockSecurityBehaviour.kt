@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.addons
 
 import android.app.Activity
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.addons.internal.SecurityDefaultBehaviour
 import com.mercadopago.android.px.addons.internal.SecurityValidationHandler
 import com.mercadopago.android.px.addons.model.SecurityValidationData

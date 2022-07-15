@@ -12,6 +12,7 @@
 
         <activity
             android:name="com.mercadopago.CheckoutExampleActivity"
+            android:exported="true"
             android:label="@string/title_activity_checkout_example">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,9 +22,11 @@
         </activity>
         <activity
             android:name="com.mercadopago.SelectCheckoutActivity"
+            android:exported="false"
             android:label="@string/title_activity_checkout_example" />
         <activity android:name="com.mercadopago.android.px.feature.custom_initialize.CustomInitializationActivity" />
-        <activity android:name="com.mercadopago.FakeKycActivity">
+        <activity android:name="com.mercadopago.FakeKycActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -35,6 +38,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.mercadopago.android.px.addons.MockFingerprintActivity"
+            android:exported="false"
             android:theme="@style/Theme.AppCompat.Translucent"/>
     </application>
 

@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.model;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import androidx.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.model.exceptions.CardTokenException;

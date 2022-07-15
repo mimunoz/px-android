@@ -1,5 +1,0 @@
-apply plugin: 'com.monits.staticCodeAnalysis'
-
-staticCodeAnalysis {
-    ignoreErrors = false
-}

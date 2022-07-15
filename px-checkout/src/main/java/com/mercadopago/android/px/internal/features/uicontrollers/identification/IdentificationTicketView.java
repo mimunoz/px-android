@@ -1,11 +1,11 @@
 package com.mercadopago.android.px.internal.features.uicontrollers.identification;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import androidx.core.content.ContextCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.MPCardMaskUtil;
 import com.mercadopago.android.px.internal.util.TextUtil;

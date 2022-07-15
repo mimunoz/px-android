@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.util.textformatter;
 
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import android.text.Spannable;
 import android.view.View;
 import android.widget.TextView;

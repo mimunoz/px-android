@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.tracking.internal.model;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public final class DiscountItemData extends TrackingMapModel {
 

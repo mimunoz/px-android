@@ -1,9 +1,5 @@
 package com.mercadopago.android.px.internal.util;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.annotation.NonNull;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.NoConnectivityException;
 import java.io.IOException;

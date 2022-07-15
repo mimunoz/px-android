@@ -2,9 +2,9 @@ package com.mercadopago.android.px.utils;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.util.Pair;
+import android.util.Pair;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import com.mercadopago.SampleDialog;
 import com.mercadopago.SamplePaymentProcessor;
 import com.mercadopago.android.px.configuration.PaymentConfiguration;

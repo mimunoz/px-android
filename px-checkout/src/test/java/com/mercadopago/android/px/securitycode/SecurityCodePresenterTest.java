@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.securitycode;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
 import com.mercadopago.android.px.internal.features.SecurityCodeActivityView;
 import com.mercadopago.android.px.internal.features.SecurityCodePresenter;

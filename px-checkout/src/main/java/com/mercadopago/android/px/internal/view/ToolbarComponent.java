@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.view;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class ToolbarComponent extends Component<ToolbarComponent.Props, Void> {
 

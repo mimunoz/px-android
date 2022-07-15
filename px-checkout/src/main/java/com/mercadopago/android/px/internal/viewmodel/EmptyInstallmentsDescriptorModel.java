@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 import com.mercadopago.android.px.internal.util.TextUtil;

@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.feature.custom_initialize
 
-import android.arch.lifecycle.MutableLiveData
 import android.os.Bundle
+import androidx.lifecycle.MutableLiveData
 import com.mercadopago.SamplePaymentProcessor
 import com.mercadopago.android.px.addons.FakeLocaleBehaviourImpl
 import com.mercadopago.android.px.configuration.AdvancedConfiguration

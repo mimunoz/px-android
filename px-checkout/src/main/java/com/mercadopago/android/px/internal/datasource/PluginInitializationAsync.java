@@ -2,7 +2,7 @@ package com.mercadopago.android.px.internal.datasource;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.core.PaymentMethodPlugin;
 
 public class PluginInitializationAsync extends PluginInitSync {

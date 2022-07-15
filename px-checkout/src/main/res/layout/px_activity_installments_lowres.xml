@@ -11,7 +11,7 @@
 
     <include layout="@layout/px_view_progress_bar"/>
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -50,7 +50,7 @@
                 <include layout="@layout/px_new_card_installments"/>
             </FrameLayout>
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.mercadopago.android.px.internal.view.AmountView
         android:id="@+id/amount_view"

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import org.mockito.ArgumentMatchers;
 
 public final class ReflectionArgumentMatchers {

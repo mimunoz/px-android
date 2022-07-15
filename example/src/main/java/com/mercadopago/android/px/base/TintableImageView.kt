@@ -2,8 +2,8 @@ package com.mercadopago.android.px.base
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatImageView
 
 class TintableImageView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     AppCompatImageView(context, attrs, defStyleAttr) {

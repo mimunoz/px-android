@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.model;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.exceptions.CardTokenException;
 
 public class SavedCardToken {

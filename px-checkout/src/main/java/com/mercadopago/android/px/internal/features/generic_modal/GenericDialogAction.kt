@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.features.generic_modal
 
-import android.support.annotation.StringDef
+import androidx.annotation.StringDef
 
-sealed class GenericDialogAction() {
+sealed class GenericDialogAction {
     class DeepLinkAction(val deepLink: String) : GenericDialogAction()
     class CustomAction(@ActionType val type: String) : GenericDialogAction()
 }

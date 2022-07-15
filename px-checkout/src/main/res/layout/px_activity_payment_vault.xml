@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical">
 
-    <android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -15,7 +15,7 @@
 
         <include layout="@layout/px_view_progress_bar"/>
 
-        <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/mpsdkAppBar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/px_appbar_height"
@@ -23,7 +23,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:layout_behavior="com.mercadopago.android.px.internal.view.FixAppBarLayoutBehavior">
 
-            <android.support.design.widget.CollapsingToolbarLayout
+            <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:id="@+id/mpsdkCollapsingToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -36,7 +36,7 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:toolbarId="@+id/mpsdkToolbar">
 
-                <android.support.v7.widget.Toolbar
+                <androidx.appcompat.widget.Toolbar
                     android:id="@+id/mpsdkToolbar"
                     android:layout_width="match_parent"
                     android:theme="@style/ToolbarTheme"
@@ -58,13 +58,13 @@
                         app:customStyle="monospace"
                         tools:text="10.123123"/>
 
-                </android.support.v7.widget.Toolbar>
+                </androidx.appcompat.widget.Toolbar>
 
-            </android.support.design.widget.CollapsingToolbarLayout>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-        </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mpsdkGroupsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -76,7 +76,7 @@
             android:paddingRight="10dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.mercadopago.android.px.internal.view.AmountView
         android:id="@+id/amount_view"
@@ -86,8 +86,3 @@
         android:background="@color/px_white"/>
 
 </LinearLayout>
-
-
-
-
-

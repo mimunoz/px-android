@@ -1,12 +1,12 @@
 package com.mercadopago.android.px.internal.adapters;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.util.TextUtil;
@@ -26,6 +26,7 @@ public class BankDealsAdapter extends RecyclerView.Adapter<BankDealsAdapter.View
         this.listener = listener;
     }
 
+    @NonNull
     @Override
     public BankDealsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext())
@@ -91,7 +92,7 @@ public class BankDealsAdapter extends RecyclerView.Adapter<BankDealsAdapter.View
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(final Exception e) {
                         logoName.setVisibility(View.VISIBLE);
                         bankImageView.setVisibility(View.GONE);
                     }

@@ -1,10 +1,10 @@
 package com.mercadopago.android.px.configuration;
 
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.core.DynamicFragmentCreator;
 import com.mercadopago.android.px.model.ExternalFragment;
 import java.io.Serializable;

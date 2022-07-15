@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.bank_deal_detail;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.tracking.internal.MPTracker;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class BankDealDetailPresenterTest {
 
     @Test
     public void whenGetViewCallbackOnErrorThenHideLogo(){
-        presenter.onError();
+        presenter.onError(mock(RuntimeException.class));
 
         verify(view).hideLogo();
         verifyNoMoreInteractions(view);

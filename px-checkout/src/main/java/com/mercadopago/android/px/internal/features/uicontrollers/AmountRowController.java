@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.uicontrollers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 
 public class AmountRowController {

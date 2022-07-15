@@ -2,7 +2,7 @@ package com.mercadopago.android.px.internal.viewmodel
 
 import android.content.Context
 import android.os.Parcel
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
 import com.mercadopago.android.px.internal.extensions.isNotNullNorEmpty
 import com.mercadopago.android.px.internal.util.KParcelable
 import com.mercadopago.android.px.internal.util.parcelableCreator

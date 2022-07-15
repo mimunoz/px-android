@@ -1,8 +1,7 @@
 package com.mercadopago.android.px.internal.repository;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.AmountConfiguration;
-import javax.annotation.Nonnull;
 
 public interface PayerCostRepository {
 
@@ -23,5 +22,5 @@ public interface PayerCostRepository {
      * @return The payer cost configuration, returns null if don't have a configuration or ID is invalid.
      */
     @NonNull
-    AmountConfiguration getConfigurationFor(@Nonnull final String cardId);
+    AmountConfiguration getConfigurationFor(@NonNull final String cardId);
 }

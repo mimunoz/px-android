@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.navigation;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.configuration.InternalConfiguration;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.viewmodel.CheckoutStateModel;

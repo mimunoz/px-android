@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.util.textformatter;
 
-import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
+import androidx.annotation.NonNull;
 
 public final class SpanAdjuster extends MetricAffectingSpan {
 

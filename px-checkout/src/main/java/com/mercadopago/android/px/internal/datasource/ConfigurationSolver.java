@@ -1,9 +1,8 @@
 package com.mercadopago.android.px.internal.datasource;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.AmountConfiguration;
-import javax.annotation.Nonnull;
 
 public interface ConfigurationSolver {
 
@@ -14,7 +13,7 @@ public interface ConfigurationSolver {
      * @return The hash associated to the discount configuration.
      */
     @NonNull
-    String getConfigurationHashFor(@Nonnull final String customOptionId);
+    String getConfigurationHashFor(@NonNull final String customOptionId);
 
     /**
      * Retrieves the general discount hash

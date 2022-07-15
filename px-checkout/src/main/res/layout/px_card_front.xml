@@ -24,13 +24,7 @@
                 android:background="@drawable/px_new_card_layout">
 
                 <ImageView
-                    android:id="@+id/mpsdkCardLowApiImageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/px_white"/>
-
-                <ImageView
-                    android:id="@+id/mpsdkCardLollipopImageView"
+                    android:id="@+id/mpsdkCardImageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@color/px_white"/>

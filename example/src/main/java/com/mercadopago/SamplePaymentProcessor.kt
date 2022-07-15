@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.mercadopago.android.px.core.SplitPaymentProcessor
 import com.mercadopago.android.px.model.IParcelablePaymentDescriptor
 import com.mercadopago.android.px.model.IPayment

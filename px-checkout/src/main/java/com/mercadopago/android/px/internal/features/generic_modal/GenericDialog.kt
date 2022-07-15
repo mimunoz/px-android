@@ -2,9 +2,9 @@ package com.mercadopago.android.px.internal.features.generic_modal
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.FragmentManager
 import android.view.View
 import android.widget.Button
+import androidx.fragment.app.FragmentManager
 import com.mercadolibre.android.picassodiskcache.loadImage
 import com.mercadolibre.android.ui.widgets.MeliDialog
 import com.mercadopago.android.px.R
@@ -67,7 +67,6 @@ class GenericDialog : MeliDialog() {
                 }
             }
         }
-
     }
 
     private fun loadView(item: GenericDialogItem) {

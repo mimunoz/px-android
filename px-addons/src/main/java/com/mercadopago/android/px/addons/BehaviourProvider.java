@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.addons;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.internal.ESCManagerDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.FlowDefaultBehaviour;
 import com.mercadopago.android.px.addons.internal.LocaleDefaultBehaviour;

@@ -18,7 +18,7 @@
         <FrameLayout
             android:layout_width="@dimen/px_card_size_big_shadow_width"
             android:layout_height="@dimen/px_card_size_medium_height_no_border"
-            android:background="@drawable/px_card_back_shadow"></FrameLayout>
+            android:background="@drawable/px_card_back_shadow" />
 
         <LinearLayout
             android:layout_width="match_parent"

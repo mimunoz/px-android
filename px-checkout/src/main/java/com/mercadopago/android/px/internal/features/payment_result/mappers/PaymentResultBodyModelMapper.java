@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.payment_result.mappers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.configuration.PaymentResultScreenConfiguration;
 import com.mercadopago.android.px.internal.features.business_result.BusinessPaymentResultTracker;
 import com.mercadopago.android.px.internal.features.business_result.CongratsResponseMapper;

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.BusinessPayment;
 import com.mercadopago.android.px.model.ExitAction;
 import com.mercadopago.android.px.model.GenericPayment;

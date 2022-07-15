@@ -4,14 +4,14 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.CallSuper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.BaseFragment;
 import com.mercadopago.android.px.internal.di.Session;
@@ -148,7 +148,7 @@ public abstract class PaymentMethodFragment<T extends DrawableFragmentItem>
         final View rootView = getView();
         final DynamicHeightViewPager parent;
         if (rootView != null && rootView.getParent() instanceof DynamicHeightViewPager &&
-            (parent = (DynamicHeightViewPager) rootView.getParent()).hasAccessibilityFocus()) {
+            (parent = (DynamicHeightViewPager) rootView.getParent()).isAccessibilityFocused()) {
             parent.announceForAccessibility(description);
         }
         if (handler != null) {

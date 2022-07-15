@@ -2,7 +2,7 @@ package com.mercadopago.android.px.internal.core;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.exceptions.NoConnectivityException;
 import java.io.IOException;
 import okhttp3.Interceptor;

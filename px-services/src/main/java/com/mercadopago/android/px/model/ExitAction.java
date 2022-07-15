@@ -3,7 +3,7 @@ package com.mercadopago.android.px.model;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.io.Serializable;
 
 public class ExitAction extends Action implements Parcelable, Serializable {

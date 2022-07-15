@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.LocaleList;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public final class LocaleUtil {
 
@@ -19,9 +19,7 @@ public final class LocaleUtil {
             if (!locales.isEmpty()) {
                 return locales.get(0).toLanguageTag();
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return configuration.locale.toLanguageTag();
         }
-        return configuration.locale.getLanguage();
+        return configuration.locale.toLanguageTag();
     }
 }

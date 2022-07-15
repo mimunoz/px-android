@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.model;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -117,7 +117,7 @@ public final class PaymentData implements Serializable {
      * modify this class.
      */
     @Deprecated
-    public void setToken(final Token token) {
+    public void setToken(@NonNull final Token token) {
         this.token = token;
     }
 

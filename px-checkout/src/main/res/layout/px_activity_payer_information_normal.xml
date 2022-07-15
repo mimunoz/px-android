@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".android.px.PayerInformationActivity">
+    tools:context=".internal.features.payer_information.PayerInformationActivity">
 
     <ScrollView
         android:id="@+id/mpsdkScrollViewContainer"

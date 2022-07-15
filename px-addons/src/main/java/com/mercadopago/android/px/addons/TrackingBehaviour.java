@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.addons;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.model.Track;
 import java.util.Map;
 

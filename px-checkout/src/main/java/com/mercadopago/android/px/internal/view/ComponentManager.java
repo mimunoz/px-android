@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.view;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.ViewGroup;
 import com.mercadopago.android.px.model.Action;
 

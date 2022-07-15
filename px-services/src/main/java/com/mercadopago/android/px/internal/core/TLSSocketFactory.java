@@ -1,6 +1,5 @@
 package com.mercadopago.android.px.internal.core;
 
-import android.support.annotation.Keep;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;

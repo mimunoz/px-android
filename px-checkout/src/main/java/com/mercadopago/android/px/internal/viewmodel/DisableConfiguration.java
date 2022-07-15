@@ -3,7 +3,7 @@ package com.mercadopago.android.px.internal.viewmodel;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.R;
 
 public class DisableConfiguration implements Parcelable {

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.configuration;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.core.ProductIdProvider;
 import java.io.Serializable;
 

@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.PXActivity;
 import com.mercadopago.android.px.internal.di.Session;
@@ -136,6 +136,7 @@ public class CardVaultActivity extends PXActivity<CardVaultPresenter> implements
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE_GUESSING_CARD) {
             resolveGuessingCardRequest(resultCode, data);
         } else if (requestCode == REQ_CODE_ISSUERS) {
@@ -150,7 +151,7 @@ public class CardVaultActivity extends PXActivity<CardVaultPresenter> implements
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         if (presenter != null) {
             outState.putSerializable(EXTRA_CARD, presenter.getCard());

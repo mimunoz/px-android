@@ -6,14 +6,14 @@
     android:layout_width="match_parent"
     android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/mpsdkAppBar"
         app:elevation="0dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/Theme.MercadoPagoTheme.NoActionBar">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/mpsdkToolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/px_toolbar_height"
@@ -29,8 +29,8 @@
                 android:text="@string/px_title_activity_terms_and_conditions"
                 android:textColor="@color/px_toolbar_text"
                 android:layout_gravity="center"/>
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <RelativeLayout
         android:layout_height="match_parent"

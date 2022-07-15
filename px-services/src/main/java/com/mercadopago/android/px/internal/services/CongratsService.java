@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.services;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.internal.CongratsResponse;
 import com.mercadopago.android.px.model.internal.remedies.RemediesBody;
 import com.mercadopago.android.px.model.internal.remedies.RemediesResponse;

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.addons.validator.internal;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.List;
 
 public abstract class RuleSet<T> implements Rule<T> {

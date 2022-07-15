@@ -1,14 +1,15 @@
 package com.mercadopago.android.px.internal.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.TypedArray;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.mercadopago.android.px.R;
 
 public final class ToolbarCancel extends Toolbar {
@@ -25,6 +26,7 @@ public final class ToolbarCancel extends Toolbar {
         super(context, attrs, defStyleAttr);
 
         final int[] systemAttrs = {android.R.attr.layout_height};
+        @SuppressLint("ResourceType")
         final TypedArray a = context.obtainStyledAttributes(attrs, systemAttrs);
         //Needs to be the same as height so icons are centered
         setMinimumHeight(a.getDimensionPixelSize(0, 0));

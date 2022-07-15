@@ -11,7 +11,9 @@ data class RemediesResponse(val cvv: CvvRemedyResponse?, val highRisk: HighRiskR
         parcel.readParcelable(HighRiskRemedyResponse::class.java.classLoader) as HighRiskRemedyResponse?,
         parcel.readParcelable(SuggestedPaymentMethod::class.java.classLoader) as SuggestedPaymentMethod?,
         HashMap()) {
-        parcel.readMap(trackingData, String::class.java.classLoader)
+        if (trackingData != null) {
+            parcel.readMap(trackingData, String::class.java.classLoader)
+        }
     }
 
     fun hasRemedies() = suggestedPaymentMethod != null || highRisk != null || cvv != null

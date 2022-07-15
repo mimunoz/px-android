@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.payment_result.components;
 
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import com.mercadopago.android.px.R;

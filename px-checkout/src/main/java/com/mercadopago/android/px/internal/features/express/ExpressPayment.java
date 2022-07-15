@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.express;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.core.DynamicDialogCreator;
 import com.mercadopago.android.px.internal.base.MvpView;
 import com.mercadopago.android.px.internal.experiments.Variant;

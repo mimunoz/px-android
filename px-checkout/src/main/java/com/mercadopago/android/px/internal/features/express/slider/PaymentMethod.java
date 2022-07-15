@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.express.slider;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.base.MvpView;
 
 public interface PaymentMethod {

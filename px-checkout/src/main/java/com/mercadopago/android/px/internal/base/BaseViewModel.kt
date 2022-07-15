@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.base
 
-import android.arch.lifecycle.ViewModel
 import android.os.Bundle
+import androidx.lifecycle.ViewModel
 
 abstract class BaseViewModel : ViewModel() {
     open fun recoverFromBundle(bundle: Bundle) = Unit

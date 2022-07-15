@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.core.internal;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.core.PaymentProcessor;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.internal.viewmodel.mappers.Mapper;

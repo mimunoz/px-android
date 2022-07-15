@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.tracking.internal.model;
 
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.Cause;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;

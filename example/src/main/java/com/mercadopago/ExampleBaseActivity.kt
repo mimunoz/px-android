@@ -1,7 +1,7 @@
 package com.mercadopago
 
 import android.content.Context
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.mercadopago.android.px.addons.BehaviourProvider
 
 internal abstract class ExampleBaseActivity: AppCompatActivity() {

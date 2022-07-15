@@ -6,20 +6,14 @@ import android.content.Context;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.core.ConnectionHelper;
 
 public class PxCheckoutInitProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        //Fix for loading some vector images in api < 21
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        }
         NetworkModule.initialize(getContext());
         Session.initialize(getContext(), NetworkModule.INSTANCE);
         ConnectionHelper.getInstance().initialize(getContext());

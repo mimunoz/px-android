@@ -1,8 +1,6 @@
 package com.mercadopago;
 
-import android.app.Application;
-import android.content.Context;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.mercadopago.android.px.addons.ESCManagerBehaviour;
@@ -13,16 +11,9 @@ import com.mercadopago.android.px.addons.PXBehaviourConfigurer;
 import com.mercadopago.android.px.di.Dependencies;
 import com.mercadopago.android.px.font.FontConfigurator;
 import com.mercadopago.android.px.internal.util.HttpClientUtil;
-import com.squareup.leakcanary.LeakCanary;
 import okhttp3.OkHttpClient;
 
-public class SampleApplication extends Application {
-
-    @Override
-    protected void attachBaseContext(final Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
-    }
+public class SampleApplication extends MultiDexApplication {
 
     @Override
     public void onCreate() {
@@ -32,10 +23,6 @@ public class SampleApplication extends Application {
     }
 
     private void initializeLeakCanary() {
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-        LeakCanary.install(this);
         Stetho.initializeWithDefaults(this);
 
         // Create client base, add interceptors

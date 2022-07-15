@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/px_s_margin"
         android:gravity="center_horizontal"
-        tools:text="@string/lorem_ipsum"/>
+        tools:text="lorem ipsum" />
 
     <com.mercadopago.android.px.internal.view.MPTextView
         android:id="@+id/time"
@@ -33,6 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/px_s_margin"
         android:gravity="center"
-        tools:text="@string/lorem_ipsum"/>
+        tools:text="lorem ipsum" />
 
 </LinearLayout>

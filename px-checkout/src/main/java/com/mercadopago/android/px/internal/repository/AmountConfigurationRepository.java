@@ -1,9 +1,8 @@
 package com.mercadopago.android.px.internal.repository;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.model.AmountConfiguration;
-import javax.annotation.Nonnull;
 
 public interface AmountConfigurationRepository {
 
@@ -24,5 +23,5 @@ public interface AmountConfigurationRepository {
      * @return The payer cost configuration, returns null if don't have a configuration or ID is invalid.
      */
     @Nullable
-    AmountConfiguration getConfigurationFor(@Nonnull final String customOptionId);
+    AmountConfiguration getConfigurationFor(@NonNull final String customOptionId);
 }

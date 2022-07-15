@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:clickable="true"
     android:focusable="true"
-    tools:parentTag="android.support.v7.widget.LinearLayoutCompat">
+    tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat">
 
     <View
         android:id="@+id/line"
@@ -95,7 +95,7 @@
             android:layout_gravity="right|end|center_vertical"
             android:layout_marginStart="@dimen/px_xxs_margin"
             app:srcCompat="@drawable/px_arrow_right"
-            android:tint="@color/px_darkest_gray"
+            app:tint="@color/px_darkest_gray"
             android:orientation="vertical"
             android:visibility="visible"/>
 

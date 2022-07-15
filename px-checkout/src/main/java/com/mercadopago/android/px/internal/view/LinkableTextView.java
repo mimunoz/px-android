@@ -1,8 +1,6 @@
 package com.mercadopago.android.px.internal.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -10,15 +8,17 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
 import com.mercadopago.android.px.internal.features.TermsAndConditionsActivity;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.model.display_info.LinkablePhrase;
 import com.mercadopago.android.px.model.display_info.LinkableText;
-import java.util.Collections;
 import java.util.Map;
 
-public class LinkableTextView extends android.support.v7.widget.AppCompatTextView {
+public class LinkableTextView extends AppCompatTextView {
 
     private LinkableText model;
     private int installmentSelected = -1;

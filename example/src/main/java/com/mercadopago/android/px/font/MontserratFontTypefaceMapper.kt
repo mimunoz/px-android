@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.font
 
-import android.support.annotation.FontRes
+import androidx.annotation.FontRes
 import com.mercadolibre.android.ui.font.Font
 import com.mercadopago.example.R
 

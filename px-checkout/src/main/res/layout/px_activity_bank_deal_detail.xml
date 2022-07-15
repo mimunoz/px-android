@@ -5,7 +5,7 @@
               android:layout_height="match_parent"
               android:background="@color/px_light_gray"
               android:orientation="vertical"
-              tools:context=".android.px.BankDealDetailActivity">
+              tools:context=".internal.features.bank_deal_detail.BankDealDetailActivity">
 
     <include layout="@layout/px_toolbar_primary_with_title"/>
 

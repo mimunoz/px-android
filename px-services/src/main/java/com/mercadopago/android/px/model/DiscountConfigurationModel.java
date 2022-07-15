@@ -2,7 +2,7 @@ package com.mercadopago.android.px.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import java.math.BigDecimal;
 
 public class DiscountConfigurationModel implements Parcelable {

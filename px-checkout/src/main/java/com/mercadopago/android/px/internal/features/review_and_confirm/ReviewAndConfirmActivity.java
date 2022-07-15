@@ -2,18 +2,17 @@ package com.mercadopago.android.px.internal.features.review_and_confirm;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.configuration.ReviewAndConfirmConfiguration;
@@ -227,11 +226,9 @@ public final class ReviewAndConfirmActivity extends PXActivity<ReviewAndConfirmP
     }
 
     private void setFloatingElevationVisibility(final View floatingConfirmLayout, final boolean visible) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final float elevationInPixels =
-                visible ? getBaseContext().getResources().getDimension(R.dimen.px_xxs_margin) : 0;
-            floatingConfirmLayout.setElevation(elevationInPixels);
-        }
+        final float elevationInPixels =
+            visible ? getBaseContext().getResources().getDimension(R.dimen.px_xxs_margin) : 0;
+        floatingConfirmLayout.setElevation(elevationInPixels);
     }
 
     @Override

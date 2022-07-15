@@ -3,14 +3,14 @@ package com.mercadopago.android.px.internal.features.payment_result.remedies.vie
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.design.widget.TextInputEditText
-import android.support.design.widget.TextInputLayout
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.mercadopago.android.px.R
 
 internal class CvvRemedy(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :

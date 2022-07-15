@@ -4,9 +4,9 @@
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="vertical"
-       tools:parentTag="android.support.v7.widget.LinearLayoutCompat">
+       tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat">
 
-    <android.support.v7.widget.LinearLayoutCompat
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/px_s_margin"
@@ -23,7 +23,7 @@
             android:importantForAccessibility="no"
             tools:text="Account money label super large money label super large"/>
 
-        <Switch
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/lSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
             android:layout_marginStart="@dimen/px_s_margin"
             android:gravity="center_vertical"/>
 
-    </android.support.v7.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <View
         android:layout_width="match_parent"

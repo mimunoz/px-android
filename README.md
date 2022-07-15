@@ -4,6 +4,7 @@
 ![GitHub tag](https://img.shields.io/github/tag/mercadopago/px-android.svg)
 ![GitHub top language](https://img.shields.io/github/languages/top/mercadopago/px-android.svg)
 
+#### ⚠️ PX-Android 4.53.1 is the last version with minimum API level 19 ⚠️
 #### ⚠️ PX-Android 4.28.0 is the last version with minimum API level 16 ⚠️
 
 ![Screenshot MercadoPago](https://i.imgur.com/ZaqavRJ.jpg)
@@ -36,6 +37,15 @@ The MercadoPago Android Payment Experience makes it easy to collect your user's 
 
 ### Android Studio
 
+Make sure you have this repository:
+
+    repositories {
+        ...
+        maven {
+            url 'https://artifacts.mercadolibre.com/repository/android-releases/'
+        }
+    }
+
 Add this line to your app's `build.gradle` inside the `dependencies` section:
 
     implementation 'com.mercadopago.android.px:checkout:4.+'
@@ -44,7 +54,7 @@ Add this line to your app's `build.gradle` inside the `dependencies` section:
 
 With this command you can generate a local version for testing:
 
-    ./gradlew publishAar
+    ./gradlew publishLocal
 
 ## 🐒 How to use?
 

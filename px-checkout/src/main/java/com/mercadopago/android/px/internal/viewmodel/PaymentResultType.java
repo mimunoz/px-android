@@ -1,9 +1,9 @@
 package com.mercadopago.android.px.internal.viewmodel;
 
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.model.BusinessPayment;
 

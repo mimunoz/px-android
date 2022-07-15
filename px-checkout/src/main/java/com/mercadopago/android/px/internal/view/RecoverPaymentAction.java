@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.view;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.model.Action;
 
 public class RecoverPaymentAction extends Action {

@@ -1,25 +1,22 @@
 apply plugin:'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 if (project.hasProperty('production')) {
     apply plugin:'com.getkeepsafe.dexcount'
 }
 
-
 android {
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    compileSdkVersion api_level as int
-    buildToolsVersion build_tools_version as String
+    compileSdkVersion apiLevel as int
 
     defaultConfig {
-        minSdkVersion min_api_level as int
-        targetSdkVersion api_level as int
-        versionCode 1
-        versionName version_to_deploy as String
+        minSdkVersion minApiLevel as int
+        targetSdkVersion apiLevel as int
         consumerProguardFiles 'proguard-rules.pro'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         if (!project.hasProperty('production')) {

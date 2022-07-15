@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.generic_modal
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.mercadopago.android.px.internal.base.BaseViewModel
 import com.mercadopago.android.px.internal.extensions.isNotNullNorEmpty
 import com.mercadopago.android.px.tracking.internal.events.GenericDialogActionEvent

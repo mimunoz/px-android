@@ -3,10 +3,10 @@ package com.mercadopago.android.px.internal.features.payment_result.remedies.vie
 import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import com.mercadolibre.android.ui.widgets.MeliButton
 import com.mercadopago.android.px.R
 import com.mercadopago.android.px.internal.features.payment_result.remedies.RemedyButton

@@ -2,9 +2,9 @@ package com.mercadopago.android.px.core;
 
 import android.content.Context;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Size;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Size;
+import androidx.fragment.app.DialogFragment;
 import com.mercadopago.android.px.model.PaymentData;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import java.util.Collections;

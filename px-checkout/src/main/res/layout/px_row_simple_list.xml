@@ -54,7 +54,7 @@
             android:layout_gravity="center"
             android:scaleType="center"
             app:srcCompat="@drawable/px_arrow_right"
-            android:tint="@color/px_darkest_gray"
+            app:tint="@color/px_darkest_gray"
             android:adjustViewBounds="true"/>
     </LinearLayout>
 </FrameLayout>

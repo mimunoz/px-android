@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.checkout;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;

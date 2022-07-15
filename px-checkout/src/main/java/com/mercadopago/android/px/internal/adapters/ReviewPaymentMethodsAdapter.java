@@ -1,10 +1,11 @@
 package com.mercadopago.android.px.internal.adapters;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil;
 import com.mercadopago.android.px.internal.view.MPTextView;
@@ -22,6 +23,7 @@ public class ReviewPaymentMethodsAdapter extends RecyclerView.Adapter<ReviewPaym
         mPaymentMethods = paymentMethods;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())

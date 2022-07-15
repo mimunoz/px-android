@@ -10,13 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -29,6 +23,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
@@ -315,11 +314,7 @@ public class ExplodingFragment extends Fragment {
 
             final int endColor = explodeDecorator.getPrimaryColor(getContext());
             final Animator anim;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                anim = ViewAnimationUtils.createCircularReveal(reveal, cx, cy, startRadius, finalRadius);
-            } else {
-                anim = ObjectAnimator.ofFloat(reveal, "alpha", 0, 1);
-            }
+            anim = ViewAnimationUtils.createCircularReveal(reveal, cx, cy, startRadius, finalRadius);
             anim.setDuration(getResources().getInteger(R.integer.px_long_animation_time));
             anim.setStartDelay(getResources().getInteger(R.integer.px_long_animation_time));
             anim.setInterpolator(new AccelerateInterpolator());
@@ -363,7 +358,7 @@ public class ExplodingFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(final Context context) {
+    public void onAttach(@NonNull final Context context) {
         super.onAttach(context);
         configureListener(context);
     }

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.controllers;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.util.MercadoPagoUtil;
 import com.mercadopago.android.px.model.CardInformation;
 import com.mercadopago.android.px.model.PaymentMethod;

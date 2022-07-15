@@ -1,13 +1,13 @@
 package com.mercadopago.android.px.internal.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.viewmodel.PaymentMethodViewModel;
@@ -23,6 +23,7 @@ public class PaymentMethodSearchItemAdapter extends RecyclerView.Adapter<Payment
         items = new ArrayList<>();
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
         return new ViewHolder(

@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.viewmodel
 
 import android.content.Context
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import com.mercadopago.android.px.R
 
 class DiscountBriefColor : IDetailColor {

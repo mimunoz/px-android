@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.review_and_confirm.components.payment_method;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import android.view.View;
 import android.view.ViewGroup;
 import com.mercadopago.android.px.R;

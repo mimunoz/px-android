@@ -18,7 +18,7 @@ import com.squareup.picasso.Callback;
     }
 
     @Override
-    public void onError() {
+    public void onError(final Exception e) {
         getView().hideLogo();
     }
 }

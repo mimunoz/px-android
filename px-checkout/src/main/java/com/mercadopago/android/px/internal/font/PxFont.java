@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.font;
 
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadolibre.android.ui.font.Font;
 
 public enum PxFont {

@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.features.review_and_confirm.components;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.view.Component;
 import com.mercadopago.android.px.internal.view.RendererFactory;
 

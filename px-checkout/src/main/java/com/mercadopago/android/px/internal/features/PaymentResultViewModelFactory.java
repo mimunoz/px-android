@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.features.payment_result.PaymentResultDecorator;
 import com.mercadopago.android.px.internal.features.payment_result.props.BodyErrorProps;

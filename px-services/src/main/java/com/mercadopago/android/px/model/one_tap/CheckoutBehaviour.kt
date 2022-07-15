@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.model.one_tap
 
 import android.os.Parcel
-import android.support.annotation.StringDef
+import androidx.annotation.StringDef
 import com.mercadopago.android.px.internal.util.KParcelable
 import com.mercadopago.android.px.internal.util.parcelableCreator
 

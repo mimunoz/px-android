@@ -1,9 +1,9 @@
 package com.mercadopago.android.px.internal.viewmodel;
 
 import android.content.Context;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.widget.ImageView;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 
 public interface PaymentMethodViewModel {
 

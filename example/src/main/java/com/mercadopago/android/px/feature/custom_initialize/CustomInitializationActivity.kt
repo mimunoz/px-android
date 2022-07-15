@@ -1,12 +1,12 @@
 package com.mercadopago.android.px.feature.custom_initialize
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.mercadopago.android.px.di.Dependencies
 import com.mercadopago.example.R
 
@@ -43,9 +43,9 @@ class CustomInitializationActivity : AppCompatActivity() {
         viewModel.initialize()
     }
 
-    override fun onSaveInstanceState(bundle: Bundle?) {
+    override fun onSaveInstanceState(bundle: Bundle) {
         super.onSaveInstanceState(bundle)
-        bundle?.let { viewModel.storeInBundle(it) }
+        viewModel.storeInBundle(bundle)
     }
 
     private fun bindViewModel(savedInstanceState: Bundle?) {

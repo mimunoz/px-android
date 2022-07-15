@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.features.express.add_new_card;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.util.ResourceUtil;
 import com.mercadopago.android.px.model.OfflinePaymentMethod;
 import com.mercadopago.android.px.model.OfflinePaymentType;

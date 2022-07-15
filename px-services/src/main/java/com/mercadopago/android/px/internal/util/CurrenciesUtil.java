@@ -1,12 +1,12 @@
 package com.mercadopago.android.px.internal.util;
 
-import android.support.annotation.NonNull;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.style.RelativeSizeSpan;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.util.textformatter.SuperscriptSpanAdjuster;
 import com.mercadopago.android.px.model.Currency;
 import java.math.BigDecimal;

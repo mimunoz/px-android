@@ -3,9 +3,6 @@ package com.mercadopago.android.px.internal.features.uicontrollers.card;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +12,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.MPAnimationUtils;
 import com.mercadopago.android.px.internal.util.MPCardMaskUtil;
@@ -65,8 +64,7 @@ public class FrontCardView {
     private MPTextView cardSecurityCodeTextView;
     private FrameLayout baseImageCard;
     private ImageView imageCardContainer;
-    private ImageView cardLowApiImageView;
-    private ImageView cardLollipopImageView;
+    private ImageView cardImageView;
     private Animation animFadeIn;
 
     public FrontCardView(final Context context, final String mode) {
@@ -114,8 +112,7 @@ public class FrontCardView {
         cardSecurityCodeTextView = view.findViewById(R.id.mpsdkCardSecurityCodeViewFront);
         baseImageCard = view.findViewById(R.id.mpsdkBaseImageCard);
         imageCardContainer = view.findViewById(R.id.mpsdkImageCardContainer);
-        cardLowApiImageView = view.findViewById(R.id.mpsdkCardLowApiImageView);
-        cardLollipopImageView = view.findViewById(R.id.mpsdkCardLollipopImageView);
+        cardImageView = view.findViewById(R.id.mpsdkCardImageView);
 
         if (size != null) {
             resize();
@@ -313,15 +310,7 @@ public class FrontCardView {
     }
 
     private void setCardColor(final int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cardLowApiImageView.setVisibility(View.GONE);
-            cardLollipopImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.setImageViewColorLollipop(cardLollipopImageView, color);
-        } else {
-            cardLollipopImageView.setVisibility(View.GONE);
-            cardLowApiImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.setImageViewColor(cardLowApiImageView, color);
-        }
+        MPAnimationUtils.setImageViewColor(cardImageView, color);
     }
 
     private void setCardImage(final int image) {
@@ -416,27 +405,11 @@ public class FrontCardView {
     }
 
     private void fadeInColor(final int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cardLowApiImageView.setVisibility(View.GONE);
-            cardLollipopImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.fadeInLollipop(color, cardLollipopImageView);
-        } else {
-            cardLollipopImageView.setVisibility(View.GONE);
-            cardLowApiImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.fadeIn(color, cardLowApiImageView);
-        }
+        MPAnimationUtils.fadeIn(color, cardImageView);
     }
 
     private void fadeOutColor(final int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cardLowApiImageView.setVisibility(View.GONE);
-            cardLollipopImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.fadeOutLollipop(color, cardLollipopImageView);
-        } else {
-            cardLollipopImageView.setVisibility(View.GONE);
-            cardLowApiImageView.setVisibility(View.VISIBLE);
-            MPAnimationUtils.fadeOut(color, cardLowApiImageView);
-        }
+        MPAnimationUtils.fadeOut(color, cardImageView);
     }
 
     private void clearCardImage() {

@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.internal.datasource;
 
-import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
+import android.util.LongSparseArray;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
@@ -36,8 +36,9 @@ public class InstructionsService implements InstructionsRepository {
             .getPaymentTypeId();
 
         final Long paymentId = paymentResult.getPaymentId();
-        if (instructionsCache.containsKey(paymentId)) {
-            return callback -> callback.success(instructionsCache.get(paymentId));
+        final List<Instruction> instructions = instructionsCache.get(paymentId);
+        if (instructions != null) {
+            return callback -> callback.success(instructions);
         }
         return callback -> getInstructionsCall(paymentTypeId, paymentId)
             .enqueue(getCallback(callback, paymentId));

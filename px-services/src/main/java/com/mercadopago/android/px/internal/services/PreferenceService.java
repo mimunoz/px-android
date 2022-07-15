@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.services;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
 import com.mercadopago.android.px.preferences.CheckoutPreference;
 import retrofit2.http.Body;

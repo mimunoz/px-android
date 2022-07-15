@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.configuration;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;

@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.core;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.di.Session;
 
 @SuppressWarnings("unused")

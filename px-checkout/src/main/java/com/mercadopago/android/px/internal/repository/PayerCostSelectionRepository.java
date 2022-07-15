@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.repository;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public interface PayerCostSelectionRepository {
 

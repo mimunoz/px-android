@@ -1,8 +1,8 @@
 package com.mercadopago.android.px.internal.datasource;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.model.SecurityType;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;

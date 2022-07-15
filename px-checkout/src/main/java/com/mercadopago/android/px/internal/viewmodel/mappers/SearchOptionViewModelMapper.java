@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.internal.features.payment_vault.SearchItemOnClickListenerHandler;
 
 public abstract class SearchOptionViewModelMapper<T, V> extends Mapper<T, V> {

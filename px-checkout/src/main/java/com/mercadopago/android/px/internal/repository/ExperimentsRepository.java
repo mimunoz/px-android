@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.repository;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.mercadopago.android.px.addons.model.internal.Experiment;
 import java.util.List;
 

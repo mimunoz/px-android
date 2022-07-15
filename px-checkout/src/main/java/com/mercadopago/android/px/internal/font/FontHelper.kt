@@ -4,11 +4,11 @@ import android.content.Context
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.HandlerThread
-import android.support.design.widget.CollapsingToolbarLayout
-import android.support.v4.provider.FontRequest
-import android.support.v4.provider.FontsContractCompat
 import android.util.SparseArray
 import android.widget.TextView
+import androidx.core.provider.FontRequest
+import androidx.core.provider.FontsContractCompat
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.mercadopago.android.px.R
 
 object FontHelper {

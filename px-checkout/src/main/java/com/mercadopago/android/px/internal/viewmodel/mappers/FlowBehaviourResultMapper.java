@@ -1,6 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.FlowBehaviour;
 import com.mercadopago.android.px.internal.util.StatusHelper;
 import com.mercadopago.android.px.model.IPaymentDescriptor;

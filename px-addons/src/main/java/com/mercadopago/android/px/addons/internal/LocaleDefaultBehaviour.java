@@ -1,7 +1,7 @@
 package com.mercadopago.android.px.addons.internal;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.mercadopago.android.px.addons.LocaleBehaviour;
 
 public final class LocaleDefaultBehaviour implements LocaleBehaviour {
